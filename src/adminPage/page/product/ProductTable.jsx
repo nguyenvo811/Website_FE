@@ -4,8 +4,12 @@ import * as React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import AddProduct from "./AddProduct";
+import { getProducts } from "../../../api/apiServices";
 // import MaterialReactTable from 'material-react-table';
 // import { Box, IconButton, Tooltip } from '@mui/material';
 // import Button from '@mui/joy/Button';
@@ -16,7 +20,7 @@ import AddProduct from "./AddProduct";
 // import UpdateProductModal from "./UpdateProductModal";
 // import { FormatDateTimeDislay } from "../../../assets/FormatDateTimeDisplay";
 
-export default function ProductTable (){
+export default function ProductTable() {
 	return (
 		<>
 			<div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
@@ -63,23 +67,71 @@ const Table = function() {
     setOpen(false);
   };
 
-	// Call data
-	const VISIBLE_FIELDS = ['name', 'rating', 'country', 'dateCreated', 'isAdmin'];
-	const { data } = useDemoData({
-    dataSet: 'Employee',
-    visibleFields: VISIBLE_FIELDS,
-    rowLength: 100,
-  });
+	const [data, setData] = React.useState([]);
 
-  const [filterModel, setFilterModel] = React.useState({
-    items: [
-      {
-        field: 'rating',
-        operator: '>',
-        value: '2.5',
+	React.useEffect(() => {
+	
+    getProducts()
+      .then(res => {
+        setData(res.data.data)
+        console.log(res.data.data)
+      })
+      .catch(err => {
+        console.log(err); 
+      }) 
+  }, [])
+
+	// Call data
+	const columns = [
+		{
+      field: 'actions',
+      headerName: 'Actions',
+			width: 200,
+      renderCell: (params) => {
+        return (
+          <div>
+						<IconButton 
+							aria-label="delete"
+							onClick={() => updateRow(params.row)}
+						>
+							<EditIcon />
+						</IconButton>
+						<IconButton 
+							aria-label="delete"
+						>
+							<DeleteIcon />
+						</IconButton>
+          </div>
+        );
       },
-    ],
-  });
+    },
+    { field: 'image', headerName: 'Sản phẩm', width: 100 },
+    { field: 'productName', headerName: 'Tên sản phẩm', width: 200, },
+    { field: 'description', headerName: 'Mô tả' },
+		{ field: 'category', headerName: 'Loại sản phẩm', width: 200, valueGetter: (params) => params.row?.category?.categoryName },
+    { field: 'color', headerName: 'Màu sắc' },
+		{ field: 'origin', headerName: 'Xuất xứ' }
+  ];
+
+	 // Update the row.
+	 const updateRow = (row) => {
+    // ...
+  };
+
+  // Delete the row.
+  const deleteRow = (row) => {
+    // ...
+  };
+
+  // const [filterModel, setFilterModel] = React.useState({
+  //   items: [
+  //     {
+  //       field: 'rating',
+  //       operator: '>',
+  //       value: '2.5',
+  //     },
+  //   ],
+  // });
 	return (
 		<>
 			<div className="flex pb-4 justify-end">
@@ -91,12 +143,15 @@ const Table = function() {
 			<div className="flex justify-center">
 				<div style={{ height: 600, width: '100%' }}>
 				<DataGrid
-					{...data}
+					rows={data}
+					columns={columns}
+					getRowId={(row) => row._id}
 					slots={{
 						toolbar: GridToolbar,
 					}}
-					filterModel={filterModel}
-					onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
+					
+					// filterModel={filterModel}
+					// onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 					/>
 				</div>
 			</div>
@@ -104,3 +159,49 @@ const Table = function() {
 		</>
 	)
 }
+
+// import React, { useState, useEffect } from 'react';
+// import { DataGrid } from '@mui/x-data-grid';
+
+// const App = () => {
+//   const [users, setUsers] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     const getUsers = async () => {
+//       setLoading(true);
+
+//       try {
+//         const response = await axios.get('https://api.example.com/users');
+//         setUsers(response.data);
+//       } catch (error) {
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     getUsers();
+//   }, []);
+
+//   const columns = [
+//     { field: 'id', headerName: 'ID' },
+//     { field: 'name', headerName: 'Name' },
+//     { field: 'email', headerName: 'Email' },
+//   ];
+
+//   return (
+//     <DataGrid
+//       rows={users}
+//       columns={columns}
+//       loading={loading}
+//       error={error}
+//       fetchRows={async () => {
+//         // Call the API and return the data.
+//         const response = await axios.get('https://api.example.com/users');
+//         return response.data;
+//       }}
+//     />
+//   );
+// };

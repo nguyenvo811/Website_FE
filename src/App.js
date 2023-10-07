@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LayoutAdmin from './adminPage/layout/LayoutAdmin';
 import ProductTable from './adminPage/page/product/ProductTable';
 
-
 function App() {
   return (
     <div className="App">
