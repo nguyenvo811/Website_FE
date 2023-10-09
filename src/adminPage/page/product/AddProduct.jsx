@@ -19,19 +19,45 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 // import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
-import { Checkbox, Label, TextInput, Select, Textarea } from 'flowbite-react';
+import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
 import { createTimer, getCategories } from '../../../api/apiServices';
+import UploadFile from '../../../asset/library/UploadFile';
 
 export default function AddProduct(props) {
 
   // Declare global variables to create product
   const { open, close } = props;
-  const [select, setSelect] = React.useState([]);
-  // const [] = React.useState("");
-  // const [] = React.useState("");
-  // const [] = React.useState("");
-  // const [] = React.useState("");
-  // const [] = React.useState("");
+  const [select, setSelect] = React.useState([]); 
+
+  const [newProduct, setNewProduct] = React.useState({
+    productName: "",
+    description: "", 
+    color: "",
+    origin: ""
+  });
+
+  const handleChangeInput = (e) => {
+    let {name, value} = e.target;
+    setNewProduct({...newProduct, [name]: value})
+  }
+
+  const selectColor = [
+    {id: "red", value: "Đỏ"},
+    {id: "black", value: "Đen"},
+    {id: "white", value: "Trắng"},
+    {id: "blue", value: "Xanh dương"},
+    {id: "yellow", value: "Vàng"},
+    {id: "purple", value: "Tím"},
+    {id: "pink", value: "Hồng"}
+  ]
+
+  // Declare variables to create Timer
+  const [supplyTimer, setSupplyTimer] = React.useState("");
+  const [switchContacts, setSwitchContacts] = React.useState("");
+  const [maximumLoadContact, setMaximumLoadContact] = React.useState("");
+  const [programCapacity, setProgramCapacity] = React.useState("");
+  const [saveProgram, setSaveProgram] = React.useState("");
+  const [batteryMemory, setBatteryMemory] = React.useState("");
 
   // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
@@ -53,7 +79,7 @@ export default function AddProduct(props) {
   }, []);
 
   // Select category options to change attributes
-  const [selectedValue, setSelectedValue] = React.useState('');
+  const [selectedValue, setSelectedValue] = React.useState("");
   const handleSelect = (e) => {
     // Set the state variable to the selected value.
     setSelectedValue(e.target.value);
@@ -75,6 +101,7 @@ export default function AddProduct(props) {
               placeholder="DC 12V"
               required
               type="text"
+              onChange={e => setSupplyTimer(e.target.value)}
             />
           </div>
           <div>
@@ -89,6 +116,7 @@ export default function AddProduct(props) {
               required
               placeholder="2 Rơ-le"
               type="text"
+              onChange={e => setSwitchContacts(e.target.value)}
             />
           </div>
         </div>
@@ -106,6 +134,7 @@ export default function AddProduct(props) {
               placeholder="10 A /220VAC/Rơle/Kênh"
               required
               type="text"
+              onChange={e => setMaximumLoadContact(e.target.value)}
             />
           </div>
           <div>
@@ -120,6 +149,7 @@ export default function AddProduct(props) {
               required
               placeholder="2 chương trình hẹn giờ (2 TẮT & 2 BẬT)/ Kênh"
               type="text"
+              onChange={e => setProgramCapacity(e.target.value)}
             />
           </div>
         </div>
@@ -137,6 +167,7 @@ export default function AddProduct(props) {
               placeholder="Chương trình vẫn được lưu khi không có nguồn cung cấp"
               required
               type="text"
+              onChange={e => setSaveProgram(e.target.value)}
             />
           </div>
           <div>
@@ -151,6 +182,7 @@ export default function AddProduct(props) {
               required
               placeholder="CR 2032"
               type="text"
+              onChange={e => setBatteryMemory(e.target.value)}
             />
           </div>
         </div>
@@ -428,6 +460,7 @@ export default function AddProduct(props) {
 
   // Select, preview and remove image
   const [selectedImages, setSelectedImages] = React.useState([]);
+  const [image, setImage] = React.useState(null);
 
   const handleFileUpload = (e) => {
     const files = e.target.files;
@@ -435,7 +468,7 @@ export default function AddProduct(props) {
     if (files.length === 0) {
       return;
     }
-
+    setImage(files)
     setSelectedImages([...selectedImages, ...files]);
   };
 
@@ -469,8 +502,39 @@ export default function AddProduct(props) {
     }
   };
 
-  // Declare variables to create Timer
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const data = {
+      productName: newProduct.productName,
+      description: newProduct.description,
+      color: newProduct.color,
+      category: selectedValue,
+      origin: newProduct.origin,
+      image: [],
+      supplyTimer: supplyTimer,
+      switchContacts: switchContacts,
+			maximumLoadContact: maximumLoadContact,
+			programCapacity: programCapacity,
+			saveProgram: saveProgram,
+			batteryMemory: batteryMemory
+    }
+
+    console.log(data)
+      for (let index = 0; index < image.length; index++) {
+        const element = image[index];
+        const upfile = await UploadFile(element);
+        data.image.push(upfile.data);
+        // setListUrl(val=>[...val, upfile.data])  
+      }
+      await createTimer(data)
+        .then(res => {
+          console.log(res.data.data)
+        })
+        .catch((err)=>{
+          console.log(err)
+        }) 
+  }
 
   return (
     <div>
@@ -509,15 +573,18 @@ export default function AddProduct(props) {
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="name"
+                      htmlFor="productName"
                       value="Tên sản phẩm"
                     />
                   </div>
                   <TextInput
-                    id="name"
+                    id="productName"
+                    name="productName"
                     placeholder="Tên sản phẩm"
                     required
                     type="text"
+                    value={newProduct.productName}
+                    onChange={handleChangeInput}
                   />
                 </div>
                 <div>
@@ -529,9 +596,12 @@ export default function AddProduct(props) {
                   </div>
                   <TextInput
                     id="origin"
+                    name="origin"
                     required
                     placeholder="Viet Nam"
                     type="text"
+                    value={newProduct.origin}
+                    onChange={handleChangeInput}
                   />
                 </div>
               </div>
@@ -546,6 +616,7 @@ export default function AddProduct(props) {
                   </div>
                   <Select
                     id="category"
+                    name="category"
                     required
                     defaultValue={"Chọn loại sản phẩm"}
                     onChange={handleSelect}
@@ -570,14 +641,20 @@ export default function AddProduct(props) {
                   </div>
                   <Select
                     id="color"
-                    required
+                    name="color"
+                    required 
+                    defaultValue={"Chọn màu"}
+                    value={newProduct.color}
+                    onChange={handleChangeInput}
                   >
-                    {select?.map((option) => (
-                      <option key={option._id} value={option.categoryName}>
-                        {option.categoryName}
+                    <option value={"Chọn màu"}>
+                      Chọn màu
+                    </option>
+                    {selectColor?.map((option) => (
+                      <option key={option._id} value={option.value}>
+                        {option.value}
                       </option>
                     ))}
-
                   </Select>
                 </div>
               </div>
@@ -591,9 +668,12 @@ export default function AddProduct(props) {
                 </div>
                 <Textarea
                   id="description"
+                  name="description"
                   placeholder="Mô tả sản phẩm"
                   required
                   rows={4}
+                  value={newProduct.description}
+                  onChange={handleChangeInput}
                 />
               </div>
 
@@ -613,7 +693,9 @@ export default function AddProduct(props) {
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
                       </svg>
                     </div>
-                    <input id="dropzone-file" type="file" class="hidden" multiple onChange={handleFileUpload} />
+                    <input id="dropzone-file"
+                      name="image"
+                     type="file" class="hidden" multiple onChange={(e) => handleFileUpload(e)} />
                     
                   </label>
                   {displayPreview()}
@@ -626,7 +708,7 @@ export default function AddProduct(props) {
             <Button variant="outlined" color="inherit" onClick={close}>
               Hủy
             </Button>
-            <Button variant="contained" >
+            <Button variant="contained" onClick={handleSubmit}>
               Xác nhận
             </Button>
           </DialogActions>
