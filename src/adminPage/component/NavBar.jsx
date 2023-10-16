@@ -11,7 +11,7 @@ export default function NavBar() {
 
   const handleLogOut = () => {
     localStorage.clear();
-    navigate("/")
+    navigate("/dang-nhap")
   }
 
   // useEffect(() => {

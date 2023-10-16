@@ -59,6 +59,18 @@ export default function AddProduct(props) {
   const [saveProgram, setSaveProgram] = React.useState("");
   const [batteryMemory, setBatteryMemory] = React.useState("");
 
+  // Declare variables to create Timer
+  const [channelInput, setChannelInput] = React.useState("");
+  const [channelOutput, setChannelOutput] = React.useState("");
+  const [amplifierClass, setAmplifierClass] = React.useState("");
+  const [autoSwitching, setAutoSwitching] = React.useState("");
+  const [autoAdjustVoltage, setAutoAdjustVoltage] = React.useState("");
+  const [overallDimensions, setOverallDimensions] = React.useState("");
+  const [weight, setWeight] = React.useState("");
+
+  // 
+  
+
   // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('md');
@@ -84,6 +96,9 @@ export default function AddProduct(props) {
     // Set the state variable to the selected value.
     setSelectedValue(e.target.value);
   }
+
+  // List category to rendert
+  const listCategory = select.map(val => {return val._id});
 
   const renderTimerAttribute = () => {
     return (
@@ -521,8 +536,8 @@ export default function AddProduct(props) {
     }
 
     console.log(data)
-      for (let index = 0; index < image.length; index++) {
-        const element = image[index];
+      for (let index = 0; index < selectedImages.length; index++) {
+        const element = selectedImages[index];
         const upfile = await UploadFile(element);
         data.image.push(upfile.data);
         // setListUrl(val=>[...val, upfile.data])  
@@ -625,7 +640,7 @@ export default function AddProduct(props) {
                       Chọn loại sản phẩm
                     </option>
                     {select?.map((option) => (
-                      <option key={option._id} value={option.categoryName}>
+                      <option key={option._id} value={option._id}>
                         {option.categoryName}
                       </option>
                     ))}
@@ -679,9 +694,9 @@ export default function AddProduct(props) {
 
               {
                 selectedValue === "" ? "" 
-                : selectedValue === "Timer" ? renderTimerAttribute() 
-                : selectedValue === "Speaker" ? renderSpeakerAttribute()
-                : selectedValue === "Amplifier" ? renderAmplifierAttribute()
+                : selectedValue === listCategory[0] ? renderTimerAttribute() 
+                : selectedValue === listCategory[1] ? renderSpeakerAttribute()
+                : selectedValue === listCategory[2] ? renderAmplifierAttribute()
                 : ""
               }
 

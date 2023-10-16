@@ -9,7 +9,8 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddProduct from "./AddProduct";
-import { getProducts } from "../../../api/apiServices";
+import { getProducts, removeProduct } from "../../../api/apiServices";
+import AlertProduct from "./AlertProduct";
 // import MaterialReactTable from 'material-react-table';
 // import { Box, IconButton, Tooltip } from '@mui/material';
 // import Button from '@mui/joy/Button';
@@ -58,6 +59,8 @@ const Table = function() {
 
 	// Add product dialog
 	const [open, setOpen] = React.useState(false);
+	const [openAlert, setOpenAlert] = React.useState(false);
+	const [row, setRow] = React.useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -81,23 +84,44 @@ const Table = function() {
       }) 
   }, [])
 
+	// Update the row.
+	const updateRow = (row) => {
+    // ...
+  };
+
+	console.log(data)
+
+  // Delete the row.
+  const removeRow = () => {
+    removeProduct(row?.row._id)
+		.then((response) => { 
+      data.splice(row.tabIndex, 1);
+      setData([...data]);
+    })
+    .catch((err)=>{
+      console.log(err)
+    })  
+    setOpenAlert(false)
+  };
+
 	// Call data
 	const columns = [
 		{
       field: 'actions',
       headerName: 'Actions',
-			width: 200,
+			width: 100,
       renderCell: (params) => {
         return (
           <div>
 						<IconButton 
-							aria-label="delete"
-							onClick={() => updateRow(params.row)}
+							aria-label="update"
+							onClick={() => updateRow(params?.row)}
 						>
 							<EditIcon />
 						</IconButton>
 						<IconButton 
 							aria-label="delete"
+							onClick={() => {return setOpenAlert(true), setRow(params)}}
 						>
 							<DeleteIcon />
 						</IconButton>
@@ -112,16 +136,6 @@ const Table = function() {
     { field: 'color', headerName: 'Màu sắc' },
 		{ field: 'origin', headerName: 'Xuất xứ' }
   ];
-
-	 // Update the row.
-	 const updateRow = (row) => {
-    // ...
-  };
-
-  // Delete the row.
-  const deleteRow = (row) => {
-    // ...
-  };
 
   // const [filterModel, setFilterModel] = React.useState({
   //   items: [
@@ -156,6 +170,7 @@ const Table = function() {
 				</div>
 			</div>
 			<AddProduct open={open} close={() => setOpen(false)} />
+			<AlertProduct open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
 		</>
 	)
 }

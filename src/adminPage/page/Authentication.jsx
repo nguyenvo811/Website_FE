@@ -2,7 +2,6 @@ import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
@@ -12,9 +11,17 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { Label, TextInput, Select, Textarea } from 'flowbite-react';
+import { signIn } from '../../api/apiServices';
+import { useNavigate } from 'react-router-dom';
+import isEmail from 'validator/lib/isEmail';
 
-function Authentication(props) {
+function Copyright(props) {
 	return (
 		<Typography variant="body2" color="text.secondary" align="center" {...props}>
 			{'Copyright © '}
@@ -27,18 +34,129 @@ function Authentication(props) {
 	);
 }
 
+function AlertModal(props) {
+	const { open, close, error } = props;
+	
+	return (
+    <div>
+      <Dialog
+        open={open}
+        onClose={close}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Thông tin xác thực"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {error}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={close}>Đóng</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
 
-export default function SignInSide() {
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		const data = new FormData(event.currentTarget);
-		console.log({
-			email: data.get('email'),
-			password: data.get('password'),
-		});
+export default function Authentication() {
+	// Use navigate when user sign in successfully
+	const navigate = useNavigate();
+
+	// Declare globl variables
+	const [open, setOpen] = React.useState(false);
+	const [alertError, setAlertError] = React.useState("");
+
+	const handleOpen = (val) => {
+		setOpen(true)
+		setAlertError(val)
+	}
+
+	const handleClose = () => {
+		setOpen(false)
+		setAlertError("")
+	}
+
+	const [account, setAccount] = React.useState({
+		email: "",
+		password: ""
+	})
+
+	const [error, setError] = React.useState({
+		email: "",
+		password: ""
+	});
+
+	// Get value
+	const handleChangeInput = (e) => {
+		let { name, value } = e.target;
+		setAccount({ ...account, [name]: value })
+		setError({...error, [name]: ""})
+	}
+
+	// Validation
+	const validate = () => {
+		let msg = {}
+		if (account.email === "") {
+			msg.email = "Vui lòng nhập email!"
+		} else if (!isEmail(account.email)) {
+			msg.email = "Email không đúng định dạng!"
+		} if (account.password === "") {
+			msg.password = "Vui lòng nhập mật khẩu!"
+		}
+
+		setError(msg)
+		console.log("validating")
+		if (Object.keys(msg).length > 0) {
+			return false
+		} else {
+			return true
+		}
+	};
+
+	// Set state to null
+	const clearState = () => {
+    setError({
+      email: "",
+      password: "",
+    })
+    setAccount({
+      email: "",
+      password: "", 
+    })
+  }
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+
+		const data = {
+			email: account.email,
+			password: account.password
+		}
+
+		const isValid = validate()
+		if (isValid) {
+			return await signIn(data)
+			.then(res => {
+				if (res.status === 200) {
+					clearState()
+					navigate("/products")
+					window.location.reload()
+				}
+			})
+			.catch((err) => {
+				if (err.response.status === 500) {
+					console.log(err.response.data.result);
+					handleOpen(err.response.data.message);
+				}
+			})
+		}
 	};
 
 	return (
@@ -80,30 +198,42 @@ export default function SignInSide() {
 								<div>
 									<div className="mb-2 flex">
 										<Label
-											htmlFor="account"
-											value="Tai khoan"
+											htmlFor="email"
+											value="Email"
 										/>
 									</div>
 									<TextInput
-										id="account"
-										placeholder="Tai khoan cua ban"
+										id="email"
+										name="email"
+										placeholder="email@gmail.com"
 										required
-										type="text"
+										type="email"
+										value={account.email}
+										onChange={handleChangeInput}
 									/>
+									<p class="flex mt-1 text-sm text-red-500"> 
+										{error.email}
+									</p>
 								</div>
 								<div>
 									<div className="mb-2 flex">
 										<Label
 											htmlFor="password"
-											value="Mat khau"
+											value="Mật khẩu"
 										/>
 									</div>
 									<TextInput
 										id="password"
-										placeholder="Your password"
+										name='password'
+										placeholder="Nhập mật khẩu"
 										required
 										type="password"
+										value={account.password}
+										onChange={handleChangeInput}
 									/>
+									<p class="flex mt-1 text-sm text-red-500"> 
+										{error.password}
+									</p>
 								</div>
 							</div>
 							<FormControlLabel
@@ -115,22 +245,12 @@ export default function SignInSide() {
 								fullWidth
 								variant="contained"
 								sx={{ mt: 3, mb: 2 }}
+								onChange={handleSubmit}
 							>
-								Sign In
+								Đăng nhập
 							</Button>
-							<Grid container>
-								<Grid item xs>
-									<Link href="#" variant="body2">
-										Forgot password?
-									</Link>
-								</Grid>
-								<Grid item>
-									<Link href="#" variant="body2">
-										{"Don't have an account? Sign Up"}
-									</Link>
-								</Grid>
-							</Grid>
-							<Authentication sx={{ mt: 5 }} />
+							<Copyright sx={{ mt: 5 }} />
+							<AlertModal open={open} close={handleClose} error={alertError} />
 						</Box>
 					</Box>
 				</Grid>

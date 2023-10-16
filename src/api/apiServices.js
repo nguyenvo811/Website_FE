@@ -1,36 +1,51 @@
 import axios from "axios";
 
 const config = {
-    headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsIl9pZCI6IjY1MWJkYjI3OThiYjFlYzM5ZmVmMmY2YyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTY5NjU4MTkzNCwiZXhwIjoxNjk2NjY4MzM0fQ.kH79pFiJ-wSrKNTmX2CD4-eL0A0bB68969EGugp7XUw"}`
-    },
-  }
+	headers: {
+		"Content-Type": "application/json",
+		Authorization: `Bearer ${JSON.parse(localStorage.getItem("Authentication"))}`
+	},
+}
 
-	const getProducts = async () => {
-		return await axios.get("http://localhost:8081/products")
-	}
-	
-	const createTimer = async () => {
-		return await axios.post("http://localhost:8081/products/timers/add-timer")
-	}
+const signIn = async (data) => {
+	return axios.post("http://localhost:8081/sign-in", data)
+		.then((response) => {
+			localStorage.setItem('Authentication', JSON.stringify(response.data.data));
+			axios.defaults.headers.common['Authorization'] = response.data.data;
+			return response
+		})
+}
 
-	const createSpeaker = async () => {
-		return await axios.post("http://localhost:8081/products/timers/add-timer")
-	}
+const getProducts = async () => {
+	return await axios.get("http://localhost:8081/products", config)
+}
 
-	const createAmplifier = async () => {
-		return await axios.post("http://localhost:8081/products/timers/add-timer")
-	}
+const createTimer = async (data) => {
+	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
+}
 
-	const getCategories = async () => {
-		return await axios.get("http://localhost:8081/categories", config)
-	}
+const createSpeaker = async () => {
+	return await axios.post("http://localhost:8081/products/timers/add-timer", config)
+}
 
-	export {
-		getProducts,
-		getCategories,
-		createTimer,
-		createSpeaker,
-		createAmplifier
-	}
+const createAmplifier = async () => {
+	return await axios.post("http://localhost:8081/products/timers/add-timer", config)
+}
+
+const removeProduct = async (id) => {
+	return await axios.delete(`http://localhost:8081/products/${id}`, config)
+}
+
+const getCategories = async () => {
+	return await axios.get("http://localhost:8081/categories", config)
+}
+
+export {
+	signIn,
+	getProducts,
+	getCategories,
+	createTimer,
+	createSpeaker,
+	createAmplifier,
+	removeProduct,
+}
