@@ -20,13 +20,13 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createTimer, getCategories } from '../../../api/apiServices';
+import { createAmplifier, createSpeaker, createTimer, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
 
 export default function AddProduct(props) {
 
   // Declare global variables to create product
-  const { open, close } = props;
+  const { open, close, row, product } = props;
   const [select, setSelect] = React.useState([]); 
 
   const [newProduct, setNewProduct] = React.useState({
@@ -52,25 +52,54 @@ export default function AddProduct(props) {
   ]
 
   // Declare variables to create Timer
-  const [supplyTimer, setSupplyTimer] = React.useState("");
-  const [switchContacts, setSwitchContacts] = React.useState("");
-  const [maximumLoadContact, setMaximumLoadContact] = React.useState("");
-  const [programCapacity, setProgramCapacity] = React.useState("");
-  const [saveProgram, setSaveProgram] = React.useState("");
-  const [batteryMemory, setBatteryMemory] = React.useState("");
+  const [timer, setTimer] = React.useState({
+    supplyTimer: "",
+    switchContacts: "", 
+    maximumLoadContact: "",
+    programCapacity: "", 
+    saveProgram: "",
+    batteryMemory: ""
+  });
 
-  // Declare variables to create Timer
-  const [channelInput, setChannelInput] = React.useState("");
-  const [channelOutput, setChannelOutput] = React.useState("");
-  const [amplifierClass, setAmplifierClass] = React.useState("");
-  const [autoSwitching, setAutoSwitching] = React.useState("");
-  const [autoAdjustVoltage, setAutoAdjustVoltage] = React.useState("");
-  const [overallDimensions, setOverallDimensions] = React.useState("");
-  const [weight, setWeight] = React.useState("");
+  const handleChangeInputTimer = (e) => {
+    let {name, value} = e.target;
+    setTimer({...timer, [name]: value})
+  }
 
-  // 
+  // Declare variables to create Amplifier
+  const [amplifier, setAmplifier] = React.useState({
+    channelInput: "",
+    channelOutput: "", 
+    amplifierClass: "",
+    autoSwitching: "", 
+    autoAdjustVoltage: "",
+    overallDimensions: "",
+    weight: ""
+  });
+
+  const handleChangeInputAmplifier = (e) => {
+    let {name, value} = e.target;
+    setAmplifier({...amplifier, [name]: value})
+  }
+
+  // Declare variables to create Amplifier
+  const [speaker, setSpeaker] = React.useState({
+    frequencyResponse: "",
+    averageSensitivity: "", 
+    maximumPowerHandlingCapacity: "",
+    maximumVoltage: "", 
+    overallDimensions: "",
+    impedance: "",
+    maxHandlingCapacity: "",
+    totalDriver: "",
+    material: ""
+  });
+
+  const handleChangeInputSpeaker = (e) => {
+    let {name, value} = e.target;
+    setSpeaker({...speaker, [name]: value})
+  } 
   
-
   // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('md');
@@ -113,10 +142,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="supplyTimer"
+              name="supplyTimer"
               placeholder="DC 12V"
               required
               type="text"
-              onChange={e => setSupplyTimer(e.target.value)}
+              value={timer.supplyTimer}
+              onChange={handleChangeInputTimer}
             />
           </div>
           <div>
@@ -128,10 +159,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="switchContacts"
+              name="switchContacts"
               required
               placeholder="2 Rơ-le"
               type="text"
-              onChange={e => setSwitchContacts(e.target.value)}
+              value={timer.switchContacts}
+              onChange={handleChangeInputTimer}
             />
           </div>
         </div>
@@ -146,10 +179,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="maximumLoadContact"
+              name="maximumLoadContact"
               placeholder="10 A /220VAC/Rơle/Kênh"
               required
               type="text"
-              onChange={e => setMaximumLoadContact(e.target.value)}
+              value={timer.maximumLoadContact}
+              onChange={handleChangeInputTimer}
             />
           </div>
           <div>
@@ -161,10 +196,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="programCapacity"
+              name="programCapacity"
               required
               placeholder="2 chương trình hẹn giờ (2 TẮT & 2 BẬT)/ Kênh"
               type="text"
-              onChange={e => setProgramCapacity(e.target.value)}
+              value={timer.programCapacity}
+              onChange={handleChangeInputTimer}
             />
           </div>
         </div>
@@ -179,10 +216,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="saveProgram"
+              name="saveProgram"
               placeholder="Chương trình vẫn được lưu khi không có nguồn cung cấp"
               required
               type="text"
-              onChange={e => setSaveProgram(e.target.value)}
+              value={timer.saveProgram}
+              onChange={handleChangeInputTimer}
             />
           </div>
           <div>
@@ -194,10 +233,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="batteryMemory"
+              name="batteryMemory"
               required
               placeholder="CR 2032"
               type="text"
-              onChange={e => setBatteryMemory(e.target.value)}
+              value={timer.batteryMemory}
+              onChange={handleChangeInputTimer}
             />
           </div>
         </div>
@@ -218,9 +259,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="frequencyResponse"
+              name="frequencyResponse"
               required
               placeholder="1,5-13 KHz"
               type="text"
+              value={speaker.frequencyResponse}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
           <div>
@@ -232,9 +276,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="maxHandlingCapacity"
+              name="maxHandlingCapacity"
               required
               placeholder="80W"
               type="text"
+              value={speaker.maxHandlingCapacity}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
         </div>
@@ -249,9 +296,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="averageSensitivity"
+              name="averageSensitivity"
               placeholder="103dB"
               required
               type="text"
+              value={speaker.averageSensitivity}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
           <div>
@@ -263,9 +313,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="maximumPowerHandlingCapacity"
+              name="maximumPowerHandlingCapacity"
               required
               placeholder="75 W (EIA RS426) "
               type="text"
+              value={speaker.maximumPowerHandlingCapacity}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
         </div>
@@ -280,9 +333,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="maximumVoltage"
+              name="maximumVoltage"
               placeholder="15 V rms liên tục / 35 V rms gián đoạn"
               required
               type="text"
+              value={speaker.maximumVoltage}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
           <div>
@@ -294,9 +350,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="overallDimensions"
+              name="overallDimensions"
               required
               placeholder="39,0 x 39,0 x 21,0 cm"
               type="text"
+              value={speaker.overallDimensions}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
         </div>
@@ -311,9 +370,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="totalDriver"
+              name="totalDriver"
               placeholder="6 x 2 = 12"
               required
               type="text"
+              value={speaker.totalDriver}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
           <div>
@@ -325,13 +387,14 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="material"
+              name="material"
               required
               placeholder="Tấm Besi Tebal 1.5mm"
               type="text"
+              value={speaker.material}
+              onChange={handleChangeInputSpeaker}
             />
           </div>
-
-          
         </div>
 
         <div className='gap-2'>
@@ -344,12 +407,15 @@ export default function AddProduct(props) {
               </div>
               <TextInput
                 id="impedance"
+                name="impedance"
                 placeholder="
-              8 Ohms
-              / 6.420 Ohms @1 KHz
-              / 7.232 Ohms @10 KHz"
+                8 Ohms
+                / 6.420 Ohms @1 KHz
+                / 7.232 Ohms @10 KHz"
                 required
                 type="text"
+                value={speaker.impedance}
+                onChange={handleChangeInputSpeaker}
               />
             </div>
           </div>
@@ -370,9 +436,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="channelInput"
+              name="channelInput"
               placeholder="2"
               required
               type="text"
+              value={amplifier.channelInput}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
           <div>
@@ -384,9 +453,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="channelOutput"
+              name="channelOutput"
               required
               placeholder="4"
               type="text"
+              value={amplifier.channelOutput}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
         </div>
@@ -401,9 +473,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="amplifierClass"
+              name="amplifierClass"
               placeholder="D"
               required
               type="text"
+              value={amplifier.amplifierClass}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
           <div>
@@ -415,9 +490,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="autoSwitching"
+              name="autoSwitching"
               required
               placeholder="AC <=> DC"
               type="text"
+              value={amplifier.autoSwitching}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
         </div>
@@ -432,9 +510,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="autoAdjustVoltage"
+              name="autoAdjustVoltage"
               placeholder="110 - 230 V"
               required
               type="text"
+              value={amplifier.autoAdjustVoltage}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
           <div>
@@ -446,9 +527,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="weight"
+              name="weight"
               required
               placeholder="2 kg"
               type="text"
+              value={amplifier.weight}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
         </div>
@@ -463,9 +547,12 @@ export default function AddProduct(props) {
             </div>
             <TextInput
               id="overallDimensions"
+              name="overallDimensions"
               placeholder="55 x 210 x 188mm"
               required
               type="text"
+              value={amplifier.overallDimensions}
+              onChange={handleChangeInputAmplifier}
             />
           </div>
         </div>
@@ -475,7 +562,6 @@ export default function AddProduct(props) {
 
   // Select, preview and remove image
   const [selectedImages, setSelectedImages] = React.useState([]);
-  const [image, setImage] = React.useState(null);
 
   const handleFileUpload = (e) => {
     const files = e.target.files;
@@ -483,7 +569,6 @@ export default function AddProduct(props) {
     if (files.length === 0) {
       return;
     }
-    setImage(files)
     setSelectedImages([...selectedImages, ...files]);
   };
 
@@ -517,6 +602,67 @@ export default function AddProduct(props) {
     }
   };
 
+  const clearState = () => {
+    setTimer({
+      supplyTimer: "",
+      switchContacts: "", 
+      maximumLoadContact: "",
+      programCapacity: "", 
+      saveProgram: "",
+      batteryMemory: ""
+    });
+
+    setNewProduct({
+      productName: "",
+      description: "", 
+      color: "",
+      origin: ""
+    });
+
+    setSelectedValue("");
+    setSelectedImages([]);
+
+    close();
+  }
+
+  const choseValue = (value) => {
+    switch (value) {
+      case listCategory[0]:
+        return {
+          supplyTimer: timer.supplyTimer,
+          switchContacts: timer.switchContacts,
+          maximumLoadContact: timer.maximumLoadContact,
+          programCapacity: timer.programCapacity,
+          saveProgram: timer.saveProgram,
+          batteryMemory: timer.batteryMemory
+        };
+      case listCategory[1]:
+        return {
+          frequencyResponse: speaker.frequencyResponse,
+          averageSensitivity: speaker.averageSensitivity,
+          maximumPowerHandlingCapacity: speaker.maximumPowerHandlingCapacity,
+          maximumVoltage: speaker.maximumVoltage,
+          overallDimensions: speaker.overallDimensions,
+          impedance: speaker.impedance,
+          maxHandlingCapacity: speaker.maxHandlingCapacity,
+          totalDriver: speaker.totalDriver,
+          material: speaker.material
+        };
+      case listCategory[2]:
+        return {
+          channelInput: amplifier.channelInput,
+          channelOutput: amplifier.channelOutput,
+          amplifierClass: amplifier.amplifierClass,
+          autoSwitching: amplifier.autoSwitching,
+          autoAdjustVoltage: amplifier.autoAdjustVoltage,
+          overallDimensions: amplifier.overallDimensions,
+          weight: amplifier.weight
+        };
+      default:
+        throw new Error('Invalid product type');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -527,28 +673,38 @@ export default function AddProduct(props) {
       category: selectedValue,
       origin: newProduct.origin,
       image: [],
-      supplyTimer: supplyTimer,
-      switchContacts: switchContacts,
-			maximumLoadContact: maximumLoadContact,
-			programCapacity: programCapacity,
-			saveProgram: saveProgram,
-			batteryMemory: batteryMemory
+      ...choseValue(selectedValue)
+    }
+    for (let index = 0; index < selectedImages.length; index++) {
+      const element = selectedImages[index];
+      const upfile = await UploadFile(element);
+      data.image.push(upfile.data);
     }
 
-    console.log(data)
-      for (let index = 0; index < selectedImages.length; index++) {
-        const element = selectedImages[index];
-        const upfile = await UploadFile(element);
-        data.image.push(upfile.data);
-        // setListUrl(val=>[...val, upfile.data])  
+    // Create the appropriate product type based on the selected category
+    const createProductType = async (productType) => {
+      switch (productType) {
+        case listCategory[0]:
+          return await createTimer(data);
+        case listCategory[1]:
+          return await createSpeaker(data);
+        case listCategory[2]:
+          return await createAmplifier(data);
+        default:
+          throw new Error('Invalid product type');
       }
-      await createTimer(data)
-        .then(res => {
-          console.log(res.data.data)
-        })
-        .catch((err)=>{
-          console.log(err)
-        }) 
+    };
+
+    // Create the product
+    return await createProductType(selectedValue)
+      .then((response) => {
+        row([...product, response.data.data]);
+        clearState();
+      }) 
+      .catch((error) => {
+        console.log(error)
+      })
+   
   }
 
   return (

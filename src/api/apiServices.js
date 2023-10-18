@@ -24,12 +24,12 @@ const createTimer = async (data) => {
 	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
 }
 
-const createSpeaker = async () => {
-	return await axios.post("http://localhost:8081/products/timers/add-timer", config)
+const createSpeaker = async (data) => {
+	return await axios.post("http://localhost:8081/products/timers/add-speaker", data, config)
 }
 
-const createAmplifier = async () => {
-	return await axios.post("http://localhost:8081/products/timers/add-timer", config)
+const createAmplifier = async (data) => {
+	return await axios.post("http://localhost:8081/products/timers/add-amplifier", data, config)
 }
 
 const removeProduct = async (id) => {

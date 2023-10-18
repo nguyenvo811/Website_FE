@@ -60,7 +60,7 @@ const Table = function() {
 	// Add product dialog
 	const [open, setOpen] = React.useState(false);
 	const [openAlert, setOpenAlert] = React.useState(false);
-	const [row, setRow] = React.useState("");
+	const [rows, setRows] = React.useState("");
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -71,9 +71,9 @@ const Table = function() {
   };
 
 	const [data, setData] = React.useState([]);
+	const apiRef = React.useRef(null);
 
 	React.useEffect(() => {
-	
     getProducts()
       .then(res => {
         setData(res.data.data)
@@ -85,18 +85,24 @@ const Table = function() {
   }, [])
 
 	// Update the row.
-	const updateRow = (row) => {
-    // ...
+	const updateRow = (product) => {
+		const updatedRows = data.map((row) => {
+			if (row._id === product._id) {
+				return product;
+			} else {
+				return row;
+			}
+		});
+		setData(updatedRows);
   };
-
-	console.log(data)
 
   // Delete the row.
   const removeRow = () => {
-    removeProduct(row?.row._id)
+		const updatedRows = data.filter(row => row._id !== rows.row._id);
+    removeProduct(rows?.row._id)
 		.then((response) => { 
-      data.splice(row.tabIndex, 1);
-      setData([...data]);
+      setData(updatedRows);
+    	apiRef.current.updateRows(updatedRows);
     })
     .catch((err)=>{
       console.log(err)
@@ -105,7 +111,7 @@ const Table = function() {
   };
 
 	// Call data
-	const columns = [
+	const columns = React.useMemo(() => [
 		{
       field: 'actions',
       headerName: 'Actions',
@@ -121,7 +127,7 @@ const Table = function() {
 						</IconButton>
 						<IconButton 
 							aria-label="delete"
-							onClick={() => {return setOpenAlert(true), setRow(params)}}
+							onClick={() => {return setOpenAlert(true), setRows(params)}}
 						>
 							<DeleteIcon />
 						</IconButton>
@@ -129,23 +135,21 @@ const Table = function() {
         );
       },
     },
-    { field: 'image', headerName: 'Sản phẩm', width: 100 },
+    { 
+			field: 'image', 
+			headerName: 'Sản phẩm', 
+			width: 100,
+			renderCell: (params) => {
+      	return <img src={params.value[0]} alt={params.value} className="w-20 h-20 object-cover object-center" />;
+    }, 
+		},
     { field: 'productName', headerName: 'Tên sản phẩm', width: 200, },
     { field: 'description', headerName: 'Mô tả' },
 		{ field: 'category', headerName: 'Loại sản phẩm', width: 200, valueGetter: (params) => params.row?.category?.categoryName },
     { field: 'color', headerName: 'Màu sắc' },
 		{ field: 'origin', headerName: 'Xuất xứ' }
-  ];
+  ], []);
 
-  // const [filterModel, setFilterModel] = React.useState({
-  //   items: [
-  //     {
-  //       field: 'rating',
-  //       operator: '>',
-  //       value: '2.5',
-  //     },
-  //   ],
-  // });
 	return (
 		<>
 			<div className="flex pb-4 justify-end">
@@ -164,12 +168,10 @@ const Table = function() {
 						toolbar: GridToolbar,
 					}}
 					
-					// filterModel={filterModel}
-					// onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 					/>
 				</div>
 			</div>
-			<AddProduct open={open} close={() => setOpen(false)} />
+			<AddProduct open={open} close={() => setOpen(false)} row={updateRow} product={data}/>
 			<AlertProduct open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
 		</>
 	)
