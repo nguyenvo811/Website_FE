@@ -26,68 +26,58 @@ import UploadFile from '../../../asset/library/UploadFile';
 export default function AddProduct(props) {
 
   // Declare global variables to create product
-  const { open, close, row, product } = props;
-  const [select, setSelect] = React.useState([]); 
+  const { open, close, row } = props;
+  const [select, setSelect] = React.useState([]);
 
   const [newProduct, setNewProduct] = React.useState({
     productName: "",
-    description: "", 
+    description: "",
     color: "",
     origin: ""
   });
 
   const handleChangeInput = (e) => {
-    let {name, value} = e.target;
-    setNewProduct({...newProduct, [name]: value})
+    let { name, value } = e.target;
+    setNewProduct({ ...newProduct, [name]: value })
   }
-
-  const selectColor = [
-    {id: "red", value: "Đỏ"},
-    {id: "black", value: "Đen"},
-    {id: "white", value: "Trắng"},
-    {id: "blue", value: "Xanh dương"},
-    {id: "yellow", value: "Vàng"},
-    {id: "purple", value: "Tím"},
-    {id: "pink", value: "Hồng"}
-  ]
 
   // Declare variables to create Timer
   const [timer, setTimer] = React.useState({
     supplyTimer: "",
-    switchContacts: "", 
+    switchContacts: "",
     maximumLoadContact: "",
-    programCapacity: "", 
+    programCapacity: "",
     saveProgram: "",
     batteryMemory: ""
   });
 
   const handleChangeInputTimer = (e) => {
-    let {name, value} = e.target;
-    setTimer({...timer, [name]: value})
+    let { name, value } = e.target;
+    setTimer({ ...timer, [name]: value })
   }
 
   // Declare variables to create Amplifier
   const [amplifier, setAmplifier] = React.useState({
     channelInput: "",
-    channelOutput: "", 
+    channelOutput: "",
     amplifierClass: "",
-    autoSwitching: "", 
+    autoSwitching: "",
     autoAdjustVoltage: "",
     overallDimensions: "",
     weight: ""
   });
 
   const handleChangeInputAmplifier = (e) => {
-    let {name, value} = e.target;
-    setAmplifier({...amplifier, [name]: value})
+    let { name, value } = e.target;
+    setAmplifier({ ...amplifier, [name]: value })
   }
 
   // Declare variables to create Amplifier
   const [speaker, setSpeaker] = React.useState({
     frequencyResponse: "",
-    averageSensitivity: "", 
+    averageSensitivity: "",
     maximumPowerHandlingCapacity: "",
-    maximumVoltage: "", 
+    maximumVoltage: "",
     overallDimensions: "",
     impedance: "",
     maxHandlingCapacity: "",
@@ -96,10 +86,10 @@ export default function AddProduct(props) {
   });
 
   const handleChangeInputSpeaker = (e) => {
-    let {name, value} = e.target;
-    setSpeaker({...speaker, [name]: value})
-  } 
-  
+    let { name, value } = e.target;
+    setSpeaker({ ...speaker, [name]: value })
+  }
+
   // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('md');
@@ -127,7 +117,7 @@ export default function AddProduct(props) {
   }
 
   // List category to rendert
-  const listCategory = select.map(val => {return val._id});
+  const listCategory = select.map(val => { return val._id });
 
   const renderTimerAttribute = () => {
     return (
@@ -398,27 +388,27 @@ export default function AddProduct(props) {
         </div>
 
         <div className='gap-2'>
-            <div>
-              <div className="mb-2 block">
-                <Label
-                  htmlFor="impedance"
-                  value="Trở kháng"
-                />
-              </div>
-              <TextInput
-                id="impedance"
-                name="impedance"
-                placeholder="
+          <div>
+            <div className="mb-2 block">
+              <Label
+                htmlFor="impedance"
+                value="Trở kháng"
+              />
+            </div>
+            <TextInput
+              id="impedance"
+              name="impedance"
+              placeholder="
                 8 Ohms
                 / 6.420 Ohms @1 KHz
                 / 7.232 Ohms @10 KHz"
-                required
-                type="text"
-                value={speaker.impedance}
-                onChange={handleChangeInputSpeaker}
-              />
-            </div>
+              required
+              type="text"
+              value={speaker.impedance}
+              onChange={handleChangeInputSpeaker}
+            />
           </div>
+        </div>
       </>
     )
   }
@@ -561,66 +551,145 @@ export default function AddProduct(props) {
   }
 
   // Select, preview and remove image
-  const [selectedImages, setSelectedImages] = React.useState([]);
+  const [variants, setVariants] = React.useState([]);
+  const [currentVariantIndex, setCurrentVariantIndex] = React.useState(0);
 
-  const handleFileUpload = (e) => {
-    const files = e.target.files;
+  const handleAddVariant = () => {
+    const newVariant = {
+      color: "",
+      images: [],
+    };
 
-    if (files.length === 0) {
-      return;
-    }
-    setSelectedImages([...selectedImages, ...files]);
+    setVariants((prevVariants) => [...prevVariants, newVariant]);
+    setCurrentVariantIndex(variants.length)
   };
+
+  const handleColorChange = (event) => {
+    const variantsCopy = [...variants];
+    variantsCopy[currentVariantIndex].color = event.target.value;
+
+    setVariants(variantsCopy);
+  };
+
+  const handleFileUpload = (event) => {
+    const variantsCopy = [...variants];
+    const files = event.target.files;
+    for (const file of files) {
+      variantsCopy[currentVariantIndex].images.push(file);
+    }
+
+    setVariants(variantsCopy);
+  };
+
+  const handleImageDeletion = (index, imageIndex) => {
+    const variantsCopy = [...variants];
+    variantsCopy[index].images.splice(imageIndex, 1);
+
+    setVariants(variantsCopy);
+  };
+
+  const handleVariantDeletion = (index) => {
+    const variantsCopy = [...variants];
+    variantsCopy.splice(index, 1);
+
+    setVariants(variantsCopy);
+  };
+
+  console.log(variants)
 
   const displayPreview = () => {
-    return selectedImages.map((image) => {
-      const url = URL.createObjectURL(image);
-      return (
-        <div key={image} className='relative'>
-          <div className='h-36 w-36 m-auto relative group border-2 rounded-xl'>
-            <img src={url} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
+    return (
+      <>
+        {variants.map((variant, index) => (
+          <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
+            <div className="border-b border-gray-300 my-2">
+              <div className='absolute top-0 right-0'>
+                <IconButton>
+                  <HighlightOffIcon onClick={(e) => handleVariantDeletion(index)} />
+                </IconButton>
+              </div>
+              <div className='p-2 font-sans font-bold'>
+                <h4>Sản phẩm {index + 1}</h4>
+              </div>
+            </div>
+            <div className='grid grid-cols-2 gap-2 m-2'>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="color"
+                    value="Màu sắc"
+                  />
+                </div>
+                <TextInput
+                  id="color"
+                  name="color"
+                  required
+                  placeholder="Màu của sản phẩm"
+                  onClick={() => setCurrentVariantIndex(index)}
+                  value={variant.color}
+                  onChange={(event) => handleColorChange(event)}
+                />
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="image"
+                    value="Hình sản phẩm"
+                  />
+                </div>
+                <TextInput
+                  id="dropzone-file"
+                  name="image"
+                  type="file"
+                  class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
+                  multiple
+                  onClick={() => setCurrentVariantIndex(index)}
+                  onChange={(event) => handleFileUpload(event)}
+                />
+              </div>
+            </div>
+           
+            <div className="w-full mx-auto">
+              <div className='relative flex m-2 justify-center space-x-6'>
+                {variant.images.map((image, imageIndex) => (
+                  <div key={imageIndex} className='relative'>
+                    <div className='h-36 w-36 m-auto relative group border-dashed border-2 border-gray-300 rounded-xl'>
+                      <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
+                      <div className='absolute top-0 right-0'>
+                        <IconButton>
+                          <HighlightOffIcon onClick={(e) => handleImageDeletion(index, imageIndex)} />
+                        </IconButton>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className='absolute top-0 right-0'>
-            <IconButton>
-              <HighlightOffIcon onClick={(e) => handleImageDeletion(image, e)}/>
-            </IconButton>
-          </div>
-        </div>
-      );
-    });
-  };
-
-  const handleImageDeletion = (image, e) => {
-    // Prevent the default behavior of the onClick event.
-    e.preventDefault();
-
-    setSelectedImages(selectedImages.filter((item) => item !== image));
-
-    // Only revoke the URL of the image if it is not in the selectedImages state variable.
-    if (!selectedImages.includes(image)) {
-      URL.revokeObjectURL(image);
-    }
+        ))}
+      </>
+    );
   };
 
   const clearState = () => {
     setTimer({
       supplyTimer: "",
-      switchContacts: "", 
+      switchContacts: "",
       maximumLoadContact: "",
-      programCapacity: "", 
+      programCapacity: "",
       saveProgram: "",
       batteryMemory: ""
     });
 
     setNewProduct({
       productName: "",
-      description: "", 
+      description: "",
       color: "",
       origin: ""
     });
 
     setSelectedValue("");
-    setSelectedImages([]);
+    setVariants([]);
 
     close();
   }
@@ -669,18 +738,27 @@ export default function AddProduct(props) {
     const data = {
       productName: newProduct.productName,
       description: newProduct.description,
-      color: newProduct.color,
       category: selectedValue,
       origin: newProduct.origin,
-      image: [],
+      variants: variants,
       ...choseValue(selectedValue)
     }
-    for (let index = 0; index < selectedImages.length; index++) {
-      const element = selectedImages[index];
-      const upfile = await UploadFile(element);
-      data.image.push(upfile.data);
+
+    const updatedVariants = [];
+    for (let index = 0; index < variants.length; index++) {
+
+      const element = variants[index];
+      const upfiles = await Promise.all(element.images.map(UploadFile));
+      const updatedElement = {
+        ...element,
+        images: upfiles.map((upfile) => upfile.data),
+      };
+      updatedVariants.push(updatedElement);
     }
 
+    data.variants = updatedVariants;
+
+    console.log(data)
     // Create the appropriate product type based on the selected category
     const createProductType = async (productType) => {
       switch (productType) {
@@ -698,14 +776,15 @@ export default function AddProduct(props) {
     // Create the product
     return await createProductType(selectedValue)
       .then((response) => {
-        row([...product, response.data.data]);
+        console.log(response.data.data)
+        row(response.data.data);
         clearState();
-      }) 
+      })
       .catch((error) => {
         console.log(error)
       })
-   
   }
+
 
   return (
     <div>
@@ -740,7 +819,7 @@ export default function AddProduct(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid grid-cols-2 gap-2'>
+              <div className='grid gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
@@ -755,23 +834,6 @@ export default function AddProduct(props) {
                     required
                     type="text"
                     value={newProduct.productName}
-                    onChange={handleChangeInput}
-                  />
-                </div>
-                <div>
-                  <div className="mb-2 block">
-                    <Label
-                      htmlFor="origin"
-                      value="Xuất xứ"
-                    />
-                  </div>
-                  <TextInput
-                    id="origin"
-                    name="origin"
-                    required
-                    placeholder="Viet Nam"
-                    type="text"
-                    value={newProduct.origin}
                     onChange={handleChangeInput}
                   />
                 </div>
@@ -806,27 +868,19 @@ export default function AddProduct(props) {
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="color"
-                      value="Màu sắc"
+                      htmlFor="origin"
+                      value="Xuất xứ"
                     />
                   </div>
-                  <Select
-                    id="color"
-                    name="color"
-                    required 
-                    defaultValue={"Chọn màu"}
-                    value={newProduct.color}
+                  <TextInput
+                    id="origin"
+                    name="origin"
+                    required
+                    placeholder="Viet Nam"
+                    type="text"
+                    value={newProduct.origin}
                     onChange={handleChangeInput}
-                  >
-                    <option value={"Chọn màu"}>
-                      Chọn màu
-                    </option>
-                    {selectColor?.map((option) => (
-                      <option key={option._id} value={option.value}>
-                        {option.value}
-                      </option>
-                    ))}
-                  </Select>
+                  />
                 </div>
               </div>
 
@@ -849,28 +903,21 @@ export default function AddProduct(props) {
               </div>
 
               {
-                selectedValue === "" ? "" 
-                : selectedValue === listCategory[0] ? renderTimerAttribute() 
-                : selectedValue === listCategory[1] ? renderSpeakerAttribute()
-                : selectedValue === listCategory[2] ? renderAmplifierAttribute()
-                : ""
+                selectedValue === "" ? ""
+                  : selectedValue === listCategory[0] ? renderTimerAttribute()
+                    : selectedValue === listCategory[1] ? renderSpeakerAttribute()
+                      : selectedValue === listCategory[2] ? renderAmplifierAttribute()
+                        : ""
               }
 
-              <div className="mt-2">
-                <div class={`flex w-full gap-8 ${selectedImages.length === 4 ? "justify-between" : ""}`}>
-                  <label for="dropzone-file" class="flex flex-col items-center justify-center w-36 h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                      <svg class="w-8 h-8  text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                      </svg>
-                    </div>
-                    <input id="dropzone-file"
-                      name="image"
-                     type="file" class="hidden" multiple onChange={(e) => handleFileUpload(e)} />
-                    
-                  </label>
-                  {displayPreview()}
-                </div>   
+              {displayPreview()}
+
+              <div className='mt-4'>
+                <Button 
+                  variant="contained" 
+                  color="inherit"
+                  onClick={handleAddVariant}
+                >Thêm màu sản phẩm</Button>
               </div>
 
             </Box>

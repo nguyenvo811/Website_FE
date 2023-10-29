@@ -15,7 +15,7 @@ class Res {
 
 const UploadFile = async (file) => {
 	const c1 = checkFile(file);
-	if (c1.result == "success") {
+	if (c1.result === "success") {
 		try {
 			// Create a reference to the location where you want to store the image in Firestore.
 			const fileName = generateFileName();

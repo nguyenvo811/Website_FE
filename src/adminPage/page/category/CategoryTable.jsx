@@ -8,9 +8,12 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import AddProduct from "./AddProduct";
-import { getProducts, removeProduct } from "../../../api/apiServices";
-import AlertProduct from "./AlertProduct";
+// import AddProduct from "./AddProduct";
+import { getCategories, removeCategory } from "../../../api/apiServices";
+import AddCategory from "./AddCategory";
+import AlertCategory from "./AlertCategory";
+import UpdateCategory from "./UpdateCategory";
+// import AlertProduct from "./AlertProduct";
 // import MaterialReactTable from 'material-react-table';
 // import { Box, IconButton, Tooltip } from '@mui/material';
 // import Button from '@mui/joy/Button';
@@ -21,14 +24,14 @@ import AlertProduct from "./AlertProduct";
 // import UpdateProductModal from "./UpdateProductModal";
 // import { FormatDateTimeDislay } from "../../../assets/FormatDateTimeDisplay";
 
-export default function ProductTable() {
+export default function CategoryTable() {
 	return (
 		<>
 			<div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
 				<div className="mb-1 w-full">
 					<div className="mb-4 pt-16">
 						<h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-							DANH SÁCH SẢN PHẨM
+							DANH SÁCH THỂ LOẠI SẢN PHẨM
 						</h1>
 						<Breadcrumb className="mb-4">
 							<Breadcrumb.Item href="#">
@@ -37,7 +40,7 @@ export default function ProductTable() {
 									<span className="dark:text-white">Home</span>
 								</div>
 							</Breadcrumb.Item>
-							<Breadcrumb.Item>Products</Breadcrumb.Item>
+							<Breadcrumb.Item>Thể loại sản phẩm</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 				</div>
@@ -59,6 +62,7 @@ const Table = function() {
 
 	// Add product dialog
 	const [open, setOpen] = React.useState(false);
+	const [openUpdate, setOpenUpdate] = React.useState(false);
 	const [openAlert, setOpenAlert] = React.useState(false);
 	const [rows, setRows] = React.useState("");
 
@@ -74,7 +78,7 @@ const Table = function() {
 	const apiRef = React.useRef(null);
 
 	React.useEffect(() => {
-    getProducts()
+    getCategories()
       .then(res => {
         setData(res.data.data)
         console.log(res.data.data)
@@ -99,7 +103,7 @@ const Table = function() {
   // Delete the row.
   const removeRow = () => {
 		const updatedRows = data.filter(row => row._id !== rows.row._id);
-    removeProduct(rows?.row._id)
+    removeCategory(rows?.row._id)
 		.then((response) => { 
       setData(updatedRows);
     	apiRef.current.updateRows(updatedRows);
@@ -121,7 +125,7 @@ const Table = function() {
           <div>
 						<IconButton 
 							aria-label="update"
-							onClick={() => updateRow(params?.row)}
+							onClick={() => {return setOpenUpdate(true), setRows(params.row)}}
 						>
 							<EditIcon />
 						</IconButton>
@@ -135,24 +139,8 @@ const Table = function() {
         );
       },
     },
-    { 
-			field: 'variants', 
-			headerName: 'Sản phẩm', 
-			width: 100,
-			valueGetter: (params) => params.row?.variants[0]?.images[0],
-			renderCell: (params) => {
-      	return <img src={params?.row?.variants[0]?.images[0]} alt={params.value} className="w-20 h-20 object-cover object-center" />;
-   	 }, 
-		},
-    { field: 'productName', headerName: 'Tên sản phẩm', width: 200, },
+    { field: 'categoryName', headerName: 'Loại sản phẩm', width: 200, },
     { field: 'description', headerName: 'Mô tả' },
-		{ 
-			field: 'category', 
-			headerName: 'Loại sản phẩm', 
-			width: 200, 
-			valueGetter: (params) => params?.value?.categoryName 
-		},
-		{ field: 'origin', headerName: 'Xuất xứ' }
   ], []);
 
 	return (
@@ -160,7 +148,7 @@ const Table = function() {
 			<div className="flex pb-4 justify-end">
 				<Button variant="outlined" onClick={handleClickOpen}>
 				<AddIcon />
-					THÊM SẢN PHẨM
+					THÊM LOẠI SẢN PHẨM
 				</Button>
 			</div>
 			<div className="flex justify-center">
@@ -176,8 +164,9 @@ const Table = function() {
 					/>
 				</div>
 			</div>
-			<AddProduct open={open} close={() => setOpen(false)} row={updateRow}/>
-			<AlertProduct open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
+			<AddCategory open={open} close={() => setOpen(false)} row={updateRow} />
+			<UpdateCategory open={openUpdate} close={() => setOpenUpdate(false)} row={updateRow} data={rows} setData={setRows} />
+			<AlertCategory open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
 		</>
 	)
 }

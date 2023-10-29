@@ -8,9 +8,12 @@ import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import AddProduct from "./AddProduct";
-import { getProducts, removeProduct } from "../../../api/apiServices";
-import AlertProduct from "./AlertProduct";
+// import AddProduct from "./AddProduct";
+import { getCategories, getUsers, removeCategory, removeUser } from "../../../api/apiServices";
+import AddUser from "./AddUser";
+import AlertUser from "./AlertUser";
+import UpdateUser from "./UpdateUser";
+// import AlertProduct from "./AlertProduct";
 // import MaterialReactTable from 'material-react-table';
 // import { Box, IconButton, Tooltip } from '@mui/material';
 // import Button from '@mui/joy/Button';
@@ -21,14 +24,14 @@ import AlertProduct from "./AlertProduct";
 // import UpdateProductModal from "./UpdateProductModal";
 // import { FormatDateTimeDislay } from "../../../assets/FormatDateTimeDisplay";
 
-export default function ProductTable() {
+export default function UserTable() {
 	return (
 		<>
 			<div className="block items-center justify-between border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800 sm:flex">
 				<div className="mb-1 w-full">
 					<div className="mb-4 pt-16">
 						<h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-							DANH SÁCH SẢN PHẨM
+							DANH SÁCH NGƯỜI DÙNG
 						</h1>
 						<Breadcrumb className="mb-4">
 							<Breadcrumb.Item href="#">
@@ -37,7 +40,7 @@ export default function ProductTable() {
 									<span className="dark:text-white">Home</span>
 								</div>
 							</Breadcrumb.Item>
-							<Breadcrumb.Item>Products</Breadcrumb.Item>
+							<Breadcrumb.Item>Người dùng</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 				</div>
@@ -59,6 +62,7 @@ const Table = function() {
 
 	// Add product dialog
 	const [open, setOpen] = React.useState(false);
+	const [openUpdate, setOpenUpdate] = React.useState(false);
 	const [openAlert, setOpenAlert] = React.useState(false);
 	const [rows, setRows] = React.useState("");
 
@@ -74,7 +78,7 @@ const Table = function() {
 	const apiRef = React.useRef(null);
 
 	React.useEffect(() => {
-    getProducts()
+    getUsers()
       .then(res => {
         setData(res.data.data)
         console.log(res.data.data)
@@ -99,7 +103,7 @@ const Table = function() {
   // Delete the row.
   const removeRow = () => {
 		const updatedRows = data.filter(row => row._id !== rows.row._id);
-    removeProduct(rows?.row._id)
+    removeUser(rows?.row._id)
 		.then((response) => { 
       setData(updatedRows);
     	apiRef.current.updateRows(updatedRows);
@@ -121,7 +125,7 @@ const Table = function() {
           <div>
 						<IconButton 
 							aria-label="update"
-							onClick={() => updateRow(params?.row)}
+							onClick={() => {return setOpenUpdate(true), setRows(params.row)}}
 						>
 							<EditIcon />
 						</IconButton>
@@ -135,24 +139,11 @@ const Table = function() {
         );
       },
     },
-    { 
-			field: 'variants', 
-			headerName: 'Sản phẩm', 
-			width: 100,
-			valueGetter: (params) => params.row?.variants[0]?.images[0],
-			renderCell: (params) => {
-      	return <img src={params?.row?.variants[0]?.images[0]} alt={params.value} className="w-20 h-20 object-cover object-center" />;
-   	 }, 
-		},
-    { field: 'productName', headerName: 'Tên sản phẩm', width: 200, },
-    { field: 'description', headerName: 'Mô tả' },
-		{ 
-			field: 'category', 
-			headerName: 'Loại sản phẩm', 
-			width: 200, 
-			valueGetter: (params) => params?.value?.categoryName 
-		},
-		{ field: 'origin', headerName: 'Xuất xứ' }
+    { field: 'email', headerName: 'Email', width: 200, },
+    { field: 'fullName', headerName: 'Họ và tên' },
+		{ field: 'phoneNumber', headerName: 'Số điện thoại', width: 200, },
+    { field: 'gender', headerName: 'Giới tính' },
+		{ field: 'role', headerName: 'Vai trò', width: 200, },
   ], []);
 
 	return (
@@ -160,7 +151,7 @@ const Table = function() {
 			<div className="flex pb-4 justify-end">
 				<Button variant="outlined" onClick={handleClickOpen}>
 				<AddIcon />
-					THÊM SẢN PHẨM
+					THÊM NGƯỜI DÙNG
 				</Button>
 			</div>
 			<div className="flex justify-center">
@@ -176,54 +167,9 @@ const Table = function() {
 					/>
 				</div>
 			</div>
-			<AddProduct open={open} close={() => setOpen(false)} row={updateRow}/>
-			<AlertProduct open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
+			<AddUser open={open} close={() => setOpen(false)} row={updateRow} />
+			<UpdateUser open={openUpdate} close={() => setOpenUpdate(false)} row={updateRow} data={rows} setData={setRows} />
+			<AlertUser open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()}/>
 		</>
 	)
 }
-
-// import React, { useState, useEffect } from 'react';
-// import { DataGrid } from '@mui/x-data-grid';
-
-// const App = () => {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const getUsers = async () => {
-//       setLoading(true);
-
-//       try {
-//         const response = await axios.get('https://api.example.com/users');
-//         setUsers(response.data);
-//       } catch (error) {
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     getUsers();
-//   }, []);
-
-//   const columns = [
-//     { field: 'id', headerName: 'ID' },
-//     { field: 'name', headerName: 'Name' },
-//     { field: 'email', headerName: 'Email' },
-//   ];
-
-//   return (
-//     <DataGrid
-//       rows={users}
-//       columns={columns}
-//       loading={loading}
-//       error={error}
-//       fetchRows={async () => {
-//         // Call the API and return the data.
-//         const response = await axios.get('https://api.example.com/users');
-//         return response.data;
-//       }}
-//     />
-//   );
-// };
