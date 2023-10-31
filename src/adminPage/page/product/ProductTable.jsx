@@ -145,10 +145,9 @@ const Table = function() {
    	 }, 
 		},
     { field: 'productName', headerName: 'Tên sản phẩm', width: 200, },
-    { field: 'description', headerName: 'Mô tả' },
 		{ 
 			field: 'category', 
-			headerName: 'Loại sản phẩm', 
+			headerName: 'Danh mục sản phẩm', 
 			width: 200, 
 			valueGetter: (params) => params?.value?.categoryName 
 		},

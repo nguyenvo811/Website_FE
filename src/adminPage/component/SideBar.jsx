@@ -21,7 +21,7 @@ export default function Sidebar() {
 		},
 		{
 			icon: <HiUsers size='1.2rem' />,
-			label: "Thể loại sản phẩm",
+			label: "Danh mục sản phẩm",
 			path: "/categories"
 		}
 	]

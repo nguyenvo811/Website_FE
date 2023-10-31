@@ -32,13 +32,38 @@ export default function AddProduct(props) {
   const [newProduct, setNewProduct] = React.useState({
     productName: "",
     description: "",
-    color: "",
     origin: ""
   });
+
+  const [error, setError] = React.useState({
+    productName: "",
+    description: "",
+    origin: ""
+  });
+
+  const validation = () => {
+    let msg = {}
+    if (newProduct.productName === "") {
+      msg.productName = "Vui lòng nhập tên sản phẩm!"
+    } if (newProduct.description === "") {
+      msg.description = "Vui lòng nhập mô tả sản phẩm!"
+    } if (newProduct.origin === "") {
+      msg.origin = "Vui lòng nhập xuất xứ sản phẩm!"
+    } 
+    
+    setError(msg)
+    console.log("validating")
+    if (Object.keys(msg).length > 0) {
+      return false
+    } else {
+      return true
+    }
+  };
 
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value })
+    setError({...error, [name]: ""})
   }
 
   // Declare variables to create Timer
@@ -557,7 +582,8 @@ export default function AddProduct(props) {
   const handleAddVariant = () => {
     const newVariant = {
       color: "",
-      images: [],
+      price: "",
+      images: []
     };
 
     setVariants((prevVariants) => [...prevVariants, newVariant]);
@@ -567,6 +593,13 @@ export default function AddProduct(props) {
   const handleColorChange = (event) => {
     const variantsCopy = [...variants];
     variantsCopy[currentVariantIndex].color = event.target.value;
+
+    setVariants(variantsCopy);
+  };
+
+  const handlePriceChange = (event) => {
+    const variantsCopy = [...variants];
+    variantsCopy[currentVariantIndex].price = event.target.value;
 
     setVariants(variantsCopy);
   };
@@ -612,7 +645,7 @@ export default function AddProduct(props) {
                 <h4>Sản phẩm {index + 1}</h4>
               </div>
             </div>
-            <div className='grid grid-cols-2 gap-2 m-2'>
+            <div className='grid grid-cols-3 gap-2 m-2'>
               <div>
                 <div className="mb-2 block">
                   <Label
@@ -628,6 +661,23 @@ export default function AddProduct(props) {
                   onClick={() => setCurrentVariantIndex(index)}
                   value={variant.color}
                   onChange={(event) => handleColorChange(event)}
+                />
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="price"
+                    value="Giá sản phẩm"
+                  />
+                </div>
+                <TextInput
+                  id="price"
+                  name="price"
+                  required
+                  placeholder="Giá của sản phẩm"
+                  onClick={() => setCurrentVariantIndex(index)}
+                  value={variant.color}
+                  onChange={(event) => handlePriceChange(event)}
                 />
               </div>
               <div>
@@ -844,18 +894,18 @@ export default function AddProduct(props) {
                   <div className="mb-2 block">
                     <Label
                       htmlFor="category"
-                      value="Loại sản phẩm"
+                      value="Danh mục sản phẩm"
                     />
                   </div>
                   <Select
                     id="category"
                     name="category"
                     required
-                    defaultValue={"Chọn loại sản phẩm"}
+                    defaultValue={"Chọn danh mục sản phẩm"}
                     onChange={handleSelect}
                   >
-                    <option value={"Chọn loại sản phẩm"}>
-                      Chọn loại sản phẩm
+                    <option value={"Chọn danh mục sản phẩm"}>
+                      Chọn danh mục sản phẩm
                     </option>
                     {select?.map((option) => (
                       <option key={option._id} value={option._id}>
