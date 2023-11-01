@@ -31,6 +31,8 @@ export default function UpdateUser(props) {
 
   // Declare global variables to create product
   const { open, close, row, data, setData } = props;
+  
+  const [msgErr, setMsgErr] = React.useState("");
 
 	const [error, setError] = React.useState({
     email: "",
@@ -54,6 +56,8 @@ export default function UpdateUser(props) {
     let msg = {}
     if (data.email === "") {
       msg.email = "Vui lòng điền email!"
+    } else if (msgErr !== "") {
+      msg.categoryName = msgErr
     } else if (!isEmail(data.email)) {
       msg.email = "Email không đúng định dạng!"
 		} if (data.fullName === "") {
@@ -97,6 +101,7 @@ export default function UpdateUser(props) {
 			gender: "",
 			role: ""
     })
+    setMsgErr("");
     close()
   }
 
@@ -126,7 +131,11 @@ export default function UpdateUser(props) {
         clearState();
       })
       .catch((error) => {
-        console.log(error)
+				if (error.response.status === 500) {
+					console.log(error.response.data.result);
+					console.log(error);
+					setMsgErr(error.response.data.message);
+				}
       })
 		}
   }
@@ -146,7 +155,7 @@ export default function UpdateUser(props) {
           </DialogTitle>
           <IconButton
             aria-label="close"
-            onClick={close}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,

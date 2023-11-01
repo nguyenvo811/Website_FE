@@ -31,6 +31,8 @@ export default function AddCategory(props) {
   // Declare global variables to create product
   const { open, close, row } = props;
 
+  const [msgErr, setMsgErr] = React.useState("");
+
   const [newCategory, setNewCategory] = React.useState({
     categoryName: "",
     description: "",
@@ -44,9 +46,11 @@ export default function AddCategory(props) {
   const validation = () => {
     let msg = {}
     if (newCategory.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
+      msg.categoryName = "Vui lòng nhập tên danh mục sản phẩm!"
+    } else if (msgErr !== "") {
+      msg.categoryName = msgErr
     } if (newCategory.description === "") {
-      msg.description = "Không được bỏ trống ô!"
+      msg.description = "Vui lòng nhập mô tả danh mục!"
     } 
     
     setError(msg)
@@ -68,12 +72,13 @@ export default function AddCategory(props) {
 		setError({
       categoryName: "",
       description: "", 
-    })
+    });
     setNewCategory({
       categoryName: "",
       description: "", 
-    })
-    close()
+    });
+    setMsgErr("");
+    close();
   }
 
 	const handleClose = () => {
@@ -99,7 +104,11 @@ export default function AddCategory(props) {
         clearState();
       })
       .catch((error) => {
-        console.log(error)
+				if (error.response.status === 500) {
+					console.log(error.response.data.result);
+					console.log(error);
+					setMsgErr(error.response.data.message);
+				}
       })
 		}
   }
@@ -115,11 +124,11 @@ export default function AddCategory(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm sản phẩm
+            Thêm danh mục sản phẩm
           </DialogTitle>
           <IconButton
             aria-label="close"
-            onClick={close}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,
@@ -143,13 +152,13 @@ export default function AddCategory(props) {
                   <div className="mb-2 block">
                     <Label
                       htmlFor="categoryName"
-                      value="Loại sản phẩm"
+                      value="Danh mục sản phẩm"
                     />
                   </div>
                   <TextInput
                     id="categoryName"
                     name="categoryName"
-                    placeholder="Loại sản phẩm"
+                    placeholder="Tên danh mục sản phẩm"
                     required
                     type="text"
                     value={newCategory.categoryName}
@@ -165,13 +174,13 @@ export default function AddCategory(props) {
                 <div className="mb-2 block">
                   <Label
                     htmlFor="description"
-                    value="Mô tả loại sản phẩm"
+                    value="Mô tả danh mục sản phẩm"
                   />
                 </div>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Mô tả loại sản phẩm"
+                  placeholder="Mô tả danh mục sản phẩm"
                   required
                   rows={4}
                   value={newCategory.description}

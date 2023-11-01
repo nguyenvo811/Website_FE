@@ -27,18 +27,18 @@ export default function AlertProduct(props) {
 						component="h2"
 						startDecorator={<WarningRoundedIcon />}
 					>
-						Confirmation
+						Xác nhận
 					</Typography>
 					<Divider />
 					<Typography id="alert-dialog-modal-description" className="flex justify-center" textColor="text.tertiary">
-						Are you sure you want to discard this product?
+						Bạn có chắc là sẽ xóa sản phẩm này?
 					</Typography>
 					<Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 2 }}>
 						<Button variant="plain" color="neutral" onClick={close}>
-							Cancel
+							Hủy
 						</Button>
 						<Button variant="solid" color="danger" onClick={handleRemove}>
-							Discard
+							Xác nhận
 						</Button>
 					</Box>
 				</ModalDialog>

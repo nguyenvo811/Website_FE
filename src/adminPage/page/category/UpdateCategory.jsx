@@ -31,6 +31,8 @@ export default function UpdateCategory(props) {
   // Declare global variables to create product
   const { open, close, row, data, setData} = props;
 
+  const [msgErr, setMsgErr] = React.useState("");
+
 	const [error, setError] = React.useState({
     categoryName: "",
     description: "", 
@@ -40,6 +42,8 @@ export default function UpdateCategory(props) {
     let msg = {}
     if (data.categoryName === "") {
       msg.categoryName = "Không được bỏ trống ô!"
+    } else if (msgErr !== "") {
+      msg.categoryName = msgErr
     } if (data.description === "") {
       msg.description = "Không được bỏ trống ô!"
     } 
@@ -67,6 +71,7 @@ export default function UpdateCategory(props) {
       categoryName: "",
       description: "", 
     })
+    setMsgErr("");
     close()
   }
 
@@ -93,7 +98,11 @@ export default function UpdateCategory(props) {
         clearState();
       })
       .catch((error) => {
-        console.log(error)
+				if (error.response.status === 500) {
+					console.log(error.response.data.result);
+					console.log(error);
+					setMsgErr(error.response.data.message);
+				}
       })
 		}
   }
@@ -109,11 +118,11 @@ export default function UpdateCategory(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm sản phẩm
+            Thêm danh mục sản phẩm
           </DialogTitle>
           <IconButton
             aria-label="close"
-            onClick={close}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,
@@ -137,13 +146,13 @@ export default function UpdateCategory(props) {
                   <div className="mb-2 block">
                     <Label
                       htmlFor="categoryName"
-                      value="Loại sản phẩm"
+                      value="Danh mục sản phẩm"
                     />
                   </div>
                   <TextInput
                     id="categoryName"
                     name="categoryName"
-                    placeholder="Loại sản phẩm"
+                    placeholder="Tên danh mục sản phẩm"
                     required
                     type="text"
                     value={data.categoryName}
@@ -159,13 +168,13 @@ export default function UpdateCategory(props) {
                 <div className="mb-2 block">
                   <Label
                     htmlFor="description"
-                    value="Mô tả loại sản phẩm"
+                    value="Mô tả danh mục sản phẩm"
                   />
                 </div>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Mô tả loại sản phẩm"
+                  placeholder="Mô tả danh mục sản phẩm"
                   required
                   rows={4}
                   value={data.description}

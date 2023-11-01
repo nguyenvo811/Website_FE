@@ -31,6 +31,7 @@ export default function AddUser(props) {
 
   // Declare global variables to create product
   const { open, close, row } = props;
+  const [msgErr, setMsgErr] = React.useState("");
 
   const [newUser, setNewUser] = React.useState({
     email: "",
@@ -66,7 +67,9 @@ export default function AddUser(props) {
       msg.email = "Vui lòng điền email!"
     } else if (!isEmail(newUser.email)) {
       msg.email = "Email không đúng định dạng!"
-		} if (newUser.password === "") {
+		} else if (msgErr !== "") {
+      msg.email = msgErr
+    }if (newUser.password === "") {
       msg.password = "Vui lòng điền mật khẩu!"
     } else if (newUser.password.length < 6) {
       msg.password = "Mật khẩu phải trên 6 ký tự!"
@@ -113,6 +116,7 @@ export default function AddUser(props) {
 			gender: "",
 			role: ""
     })
+    setMsgErr("");
     close()
   }
 
@@ -143,7 +147,11 @@ export default function AddUser(props) {
         clearState();
       })
       .catch((error) => {
-        console.log(error)
+				if (error.response.status === 500) {
+					console.log(error.response.data.result);
+					console.log(error);
+					setMsgErr(error.response.data.message);
+				}
       })
 		}
   }
@@ -159,11 +167,11 @@ export default function AddUser(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm sản phẩm
+            Thêm người dùng
           </DialogTitle>
           <IconButton
             aria-label="close"
-            onClick={close}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,

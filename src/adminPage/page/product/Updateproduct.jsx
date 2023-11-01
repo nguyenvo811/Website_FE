@@ -23,68 +23,28 @@ import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
 import { createAmplifier, createSpeaker, createTimer, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
 
-export default function AddProduct(props) {
+export default function UpdateProduct(props) {
 
   // Declare global variables to create product
-  const { open, close, row } = props;
+  const { open, close, row, data, setData } = props;
   const [select, setSelect] = React.useState([]);
   const [msgErr, setMsgErr] = React.useState("");
-
-
-  const [newProduct, setNewProduct] = React.useState({
-    productName: "",
-    description: "",
-    origin: ""
-  });
-
-
-  // Declare variables to create Timer
-  const [timer, setTimer] = React.useState({
-    supplyTimer: "",
-    switchContacts: "",
-    maximumLoadContact: "",
-    programCapacity: "",
-    saveProgram: "",
-    batteryMemory: ""
-  });
+  
+	console.log(data)
 
   const handleChangeInputTimer = (e) => {
     let { name, value } = e.target;
-    setTimer({ ...timer, [name]: value })
+    setData({ ...data, [name]: value })
   }
-
-  // Declare variables to create Amplifier
-  const [amplifier, setAmplifier] = React.useState({
-    channelInput: "",
-    channelOutput: "",
-    amplifierClass: "",
-    autoSwitching: "",
-    autoAdjustVoltage: "",
-    overallDimensions: "",
-    weight: ""
-  });
 
   const handleChangeInputAmplifier = (e) => {
     let { name, value } = e.target;
-    setAmplifier({ ...amplifier, [name]: value })
+    setData({ ...data, [name]: value })
   }
-
-  // Declare variables to create Amplifier
-  const [speaker, setSpeaker] = React.useState({
-    frequencyResponse: "",
-    averageSensitivity: "",
-    maximumPowerHandlingCapacity: "",
-    maximumVoltage: "",
-    overallDimensions: "",
-    impedance: "",
-    maxHandlingCapacity: "",
-    totalDriver: "",
-    material: ""
-  });
 
   const handleChangeInputSpeaker = (e) => {
     let { name, value } = e.target;
-    setSpeaker({ ...speaker, [name]: value })
+    setData({ ...data, [name]: value })
   }
 
   // Set dialog size
@@ -108,6 +68,7 @@ export default function AddProduct(props) {
 
   // Select category options to change attributes
   const [selectedValue, setSelectedValue] = React.useState("");
+
   const handleSelect = (e) => {
     // Set the state variable to the selected value.
     setSelectedValue(e.target.value);
@@ -116,6 +77,13 @@ export default function AddProduct(props) {
 
   // List category to rendert
   const listCategory = select.map(val => { return val._id });
+	const defaultCategoryName = listCategory.find((e)=> {return e === data?.category?._id});
+
+	React.useEffect(() => {
+		setSelectedValue(defaultCategoryName);
+	}, [defaultCategoryName]);
+
+	console.log(defaultCategoryName)
 
   const renderTimerAttribute = () => {
     return (
@@ -134,7 +102,7 @@ export default function AddProduct(props) {
               placeholder="DC 12V"
               required
               type="text"
-              value={timer.supplyTimer}
+              value={data?.moreAttribute?.supplyTimer}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -151,7 +119,7 @@ export default function AddProduct(props) {
               required
               placeholder="2 Rơ-le"
               type="text"
-              value={timer.switchContacts}
+              value={data?.moreAttribute?.switchContacts}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -171,7 +139,7 @@ export default function AddProduct(props) {
               placeholder="10 A /220VAC/Rơle/Kênh"
               required
               type="text"
-              value={timer.maximumLoadContact}
+              value={data?.moreAttribute?.maximumLoadContact}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -188,7 +156,7 @@ export default function AddProduct(props) {
               required
               placeholder="2 chương trình hẹn giờ (2 TẮT & 2 BẬT)/ Kênh"
               type="text"
-              value={timer.programCapacity}
+              value={data?.moreAttribute?.programCapacity}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -208,7 +176,7 @@ export default function AddProduct(props) {
               placeholder="Chương trình vẫn được lưu khi không có nguồn cung cấp"
               required
               type="text"
-              value={timer.saveProgram}
+              value={data?.moreAttribute?.saveProgram}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -225,7 +193,7 @@ export default function AddProduct(props) {
               required
               placeholder="CR 2032"
               type="text"
-              value={timer.batteryMemory}
+              value={data?.moreAttribute?.batteryMemory}
               onChange={handleChangeInputTimer}
             />
           </div>
@@ -251,7 +219,7 @@ export default function AddProduct(props) {
               required
               placeholder="1,5-13 KHz"
               type="text"
-              value={speaker.frequencyResponse}
+              value={data?.moreAttribute?.frequencyResponse}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -268,7 +236,7 @@ export default function AddProduct(props) {
               required
               placeholder="80W"
               type="text"
-              value={speaker.maxHandlingCapacity}
+              value={data?.moreAttribute?.maxHandlingCapacity}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -288,7 +256,7 @@ export default function AddProduct(props) {
               placeholder="103dB"
               required
               type="text"
-              value={speaker.averageSensitivity}
+              value={data?.moreAttribute?.averageSensitivity}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -305,7 +273,7 @@ export default function AddProduct(props) {
               required
               placeholder="75 W (EIA RS426) "
               type="text"
-              value={speaker.maximumPowerHandlingCapacity}
+              value={data?.moreAttribute?.maximumPowerHandlingCapacity}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -325,7 +293,7 @@ export default function AddProduct(props) {
               placeholder="15 V rms liên tục / 35 V rms gián đoạn"
               required
               type="text"
-              value={speaker.maximumVoltage}
+              value={data?.moreAttribute?.maximumVoltage}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -342,7 +310,7 @@ export default function AddProduct(props) {
               required
               placeholder="39,0 x 39,0 x 21,0 cm"
               type="text"
-              value={speaker.overallDimensions}
+              value={data?.moreAttribute?.overallDimensions}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -362,7 +330,7 @@ export default function AddProduct(props) {
               placeholder="6 x 2 = 12"
               required
               type="text"
-              value={speaker.totalDriver}
+              value={data?.moreAttribute?.totalDriver}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -379,7 +347,7 @@ export default function AddProduct(props) {
               required
               placeholder="Tấm Besi Tebal 1.5mm"
               type="text"
-              value={speaker.material}
+              value={data?.moreAttribute?.material}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -402,7 +370,7 @@ export default function AddProduct(props) {
                 / 7.232 Ohms @10 KHz"
               required
               type="text"
-              value={speaker.impedance}
+              value={data?.moreAttribute?.impedance}
               onChange={handleChangeInputSpeaker}
             />
           </div>
@@ -428,7 +396,7 @@ export default function AddProduct(props) {
               placeholder="2"
               required
               type="text"
-              value={amplifier.channelInput}
+              value={data?.moreAttribute?.channelInput}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -445,7 +413,7 @@ export default function AddProduct(props) {
               required
               placeholder="4"
               type="text"
-              value={amplifier.channelOutput}
+              value={data?.moreAttribute?.channelOutput}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -465,7 +433,7 @@ export default function AddProduct(props) {
               placeholder="D"
               required
               type="text"
-              value={amplifier.amplifierClass}
+              value={data?.moreAttribute?.amplifierClass}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -482,7 +450,7 @@ export default function AddProduct(props) {
               required
               placeholder="AC <=> DC"
               type="text"
-              value={amplifier.autoSwitching}
+              value={data?.moreAttribute?.autoSwitching}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -502,7 +470,7 @@ export default function AddProduct(props) {
               placeholder="110 - 230 V"
               required
               type="text"
-              value={amplifier.autoAdjustVoltage}
+              value={data?.moreAttribute?.autoAdjustVoltage}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -519,7 +487,7 @@ export default function AddProduct(props) {
               required
               placeholder="2 kg"
               type="text"
-              value={amplifier.weight}
+              value={data?.moreAttribute?.weight}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -539,7 +507,7 @@ export default function AddProduct(props) {
               placeholder="55 x 210 x 188mm"
               required
               type="text"
-              value={amplifier.overallDimensions}
+              value={data?.moreAttribute?.overallDimensions}
               onChange={handleChangeInputAmplifier}
             />
           </div>
@@ -576,13 +544,13 @@ export default function AddProduct(props) {
 
   const validation = () => {
     let msg = {}
-    if (newProduct.productName === "") {
+    if (data.productName === "") {
       msg.productName = "Vui lòng nhập tên sản phẩm!"
     } else if (msgErr !== "") {
       msg.productName = msgErr
-    } if (newProduct.description === "") {
+    } if (data.description === "") {
       msg.description = "Vui lòng nhập mô tả sản phẩm!"
-    } if (newProduct.origin === "") {
+    } if (data.origin === "") {
       msg.origin = "Vui lòng nhập xuất xứ sản phẩm!"
     } if (variants.price === "") {
       msg.price = "Vui lòng nhập giá sản phẩm!"
@@ -606,13 +574,9 @@ export default function AddProduct(props) {
     }
   };
 
-  console.log(error)
-
-  console.log(variants)
-
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
-    setNewProduct({ ...newProduct, [name]: value })
+    setData({ ...data, [name]: value })
     setError({...error, [name]: ""})
   }
 
@@ -758,20 +722,38 @@ export default function AddProduct(props) {
   };
 
   const clearState = () => {
-    setTimer({
+
+
+    setData({
+      productName: "",
+      description: "",
+      color: "",
+      origin: "",
+
       supplyTimer: "",
       switchContacts: "",
       maximumLoadContact: "",
       programCapacity: "",
       saveProgram: "",
-      batteryMemory: ""
-    });
+      batteryMemory: "",
 
-    setNewProduct({
-      productName: "",
-      description: "",
-      color: "",
-      origin: ""
+      frequencyResponse: "",
+			averageSensitivity: "",
+			maximumPowerHandlingCapacity: "",
+			maximumVoltage: "",
+			overallDimensions: "",
+			impedance: "",
+			maxHandlingCapacity: "",
+			totalDriver: "",
+			material: "",
+
+			channelInput: "",
+			channelOutput: "",
+			amplifierClass: "",
+			autoSwitching: "",
+			autoAdjustVoltage: "",
+			overallDimensions: "",
+			weight: ""
     });
 
     setSelectedValue("");
@@ -784,34 +766,34 @@ export default function AddProduct(props) {
     switch (value) {
       case listCategory[0]:
         return {
-          supplyTimer: timer.supplyTimer,
-          switchContacts: timer.switchContacts,
-          maximumLoadContact: timer.maximumLoadContact,
-          programCapacity: timer.programCapacity,
-          saveProgram: timer.saveProgram,
-          batteryMemory: timer.batteryMemory
+          supplyTimer: data.supplyTimer,
+          switchContacts: data.switchContacts,
+          maximumLoadContact: data.maximumLoadContact,
+          programCapacity: data.programCapacity,
+          saveProgram: data.saveProgram,
+          batteryMemory: data.batteryMemory
         };
       case listCategory[1]:
         return {
-          frequencyResponse: speaker.frequencyResponse,
-          averageSensitivity: speaker.averageSensitivity,
-          maximumPowerHandlingCapacity: speaker.maximumPowerHandlingCapacity,
-          maximumVoltage: speaker.maximumVoltage,
-          overallDimensions: speaker.overallDimensions,
-          impedance: speaker.impedance,
-          maxHandlingCapacity: speaker.maxHandlingCapacity,
-          totalDriver: speaker.totalDriver,
-          material: speaker.material
+          frequencyResponse: data.frequencyResponse,
+          averageSensitivity: data.averageSensitivity,
+          maximumPowerHandlingCapacity: data.maximumPowerHandlingCapacity,
+          maximumVoltage: data.maximumVoltage,
+          overallDimensions: data.overallDimensions,
+          impedance: data.impedance,
+          maxHandlingCapacity: data.maxHandlingCapacity,
+          totalDriver: data.totalDriver,
+          material: data.material
         };
       case listCategory[2]:
         return {
-          channelInput: amplifier.channelInput,
-          channelOutput: amplifier.channelOutput,
-          amplifierClass: amplifier.amplifierClass,
-          autoSwitching: amplifier.autoSwitching,
-          autoAdjustVoltage: amplifier.autoAdjustVoltage,
-          overallDimensions: amplifier.overallDimensions,
-          weight: amplifier.weight
+          channelInput: data.channelInput,
+          channelOutput: data.channelOutput,
+          amplifierClass: data.amplifierClass,
+          autoSwitching: data.autoSwitching,
+          autoAdjustVoltage: data.autoAdjustVoltage,
+          overallDimensions: data.overallDimensions,
+          weight: data.weight
         };
       default:
         setError({category: ""})
@@ -821,11 +803,11 @@ export default function AddProduct(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = {
-      productName: newProduct.productName,
-      description: newProduct.description,
+    const updatedData = {
+      productName: data.productName,
+      description: data.description,
       category: selectedValue,
-      origin: newProduct.origin,
+      origin: data.origin,
       variants: variants,
       ...choseValue(selectedValue)
     }
@@ -842,20 +824,20 @@ export default function AddProduct(props) {
       updatedVariants.push(updatedElement);
     }
 
-    data.variants = updatedVariants;
+    updatedData.variants = updatedVariants;
 
-    console.log(data)
+    console.log(updatedData)
     const isValid = validation()
     if (isValid){
     // Create the appropriate product type based on the selected category
     const createProductType = async (productType) => {
       switch (productType) {
         case listCategory[0]:
-          return await createTimer(data);
+          return await createTimer(updatedData);
         case listCategory[1]:
-          return await createSpeaker(data);
+          return await createSpeaker(updatedData);
         case listCategory[2]:
-          return await createAmplifier(data);
+          return await createAmplifier(updatedData);
         default:
           setError({category: ""})
       }
@@ -867,7 +849,7 @@ export default function AddProduct(props) {
     return await createProductType(selectedValue)
       .then((response) => {
         console.log(response.data.data)
-        row(response.data.data);
+        row(response.data.data.value);
         clearState();
       })
       .catch((error) => {
@@ -928,7 +910,7 @@ export default function AddProduct(props) {
                     placeholder="Tên sản phẩm"
                     required
                     type="text"
-                    value={newProduct.productName}
+                    value={data.productName}
                     onChange={handleChangeInput}
                   />
                   <p class="mt-1 text-sm text-red-500"> 
@@ -949,6 +931,7 @@ export default function AddProduct(props) {
                     id="category"
                     name="category"
                     required
+										// defaultValue={defaultCategoryName}
                     value={selectedValue}
                     onChange={handleSelect}
                   >
@@ -979,7 +962,7 @@ export default function AddProduct(props) {
                     required
                     placeholder="Viet Nam"
                     type="text"
-                    value={newProduct.origin}
+                    value={data.origin}
                     onChange={handleChangeInput}
                   />
                   <p class="mt-1 text-sm text-red-500"> 
@@ -1001,7 +984,7 @@ export default function AddProduct(props) {
                   placeholder="Mô tả sản phẩm"
                   required
                   rows={4}
-                  value={newProduct.description}
+                  value={data.description}
                   onChange={handleChangeInput}
                 />
                 <p class="mt-1 text-sm text-red-500"> 

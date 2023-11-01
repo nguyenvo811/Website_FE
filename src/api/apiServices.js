@@ -17,32 +17,38 @@ const signIn = async (data) => {
 }
 
 const getUsers = async () => {
-  return await axios.get("http://localhost:8081/user-list", config)
+	return await axios.get("http://localhost:8081/user-list", config)
 }
 
 const createUser = async (data) => {
-  return await axios.post("http://localhost:8081/register", data, config)
+	return await axios.post("http://localhost:8081/register", data, config)
+		.then(response => {
+			return response
+		})
 }
 
 const updateUser = async (id, data) => {
-  return await axios.patch(`http://localhost:8081/user-list/${id}`, data, config)
+	return await axios.patch(`http://localhost:8081/user-list/${id}`, data, config)
+	.then(response => {
+		return response
+	})
 }
 
 const changePass = async (data) => {
 	return await axios.post("http://localhost:8081/user-list/change-password", data, config)
-	.then(response => {
-		return response
-	})
-  }
+		.then(response => {
+			return response
+		})
+}
 
 const removeUser = async (id) => {
-  return await axios.delete(`http://localhost:8081/user-list/${id}`, config)
+	return await axios.delete(`http://localhost:8081/user-list/${id}`, config)
 }
 
 const viewProfile = async () => {
 	return await axios.get("http://localhost:8081/view-profile", config)
 }
-  
+
 
 const getProducts = async () => {
 	return await axios.get("http://localhost:8081/products", config)
@@ -50,14 +56,23 @@ const getProducts = async () => {
 
 const createTimer = async (data) => {
 	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
+	.then(response => {
+		return response
+	})
 }
 
 const createSpeaker = async (data) => {
 	return await axios.post("http://localhost:8081/products/speakers/add-speaker", data, config)
+	.then(response => {
+		return response
+	})
 }
 
 const createAmplifier = async (data) => {
 	return await axios.post("http://localhost:8081/products/amplifiers/add-amplifier", data, config)
+	.then(response => {
+		return response
+	})
 }
 
 const removeProduct = async (id) => {
@@ -70,6 +85,9 @@ const getCategories = async () => {
 
 const createCategory = async (data) => {
 	return await axios.post("http://localhost:8081/categories/addcategory", data, config)
+		.then(response => {
+			return response
+		})
 }
 
 const removeCategory = async (id) => {
@@ -78,6 +96,9 @@ const removeCategory = async (id) => {
 
 const updateCategory = async (id, data) => {
 	return await axios.patch(`http://localhost:8081/categories/${id}`, data, config)
+		.then(response => {
+			return response
+		})
 }
 
 

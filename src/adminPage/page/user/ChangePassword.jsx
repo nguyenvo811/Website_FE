@@ -81,12 +81,13 @@ export default function ChangePassword(props) {
       oldPass: "",
 			newPass: "",
 			confirmPass: "",
-    })
+    });
     setData({
       oldPass: "",
 			newPass: "",
 			confirmPass: "",
-    })
+    });
+    setAlertError("");
     close()
   }
 
@@ -141,7 +142,7 @@ export default function ChangePassword(props) {
           </DialogTitle>
           <IconButton
             aria-label="close"
-            onClick={close}
+            onClick={handleClose}
             sx={{
               position: 'absolute',
               right: 8,
