@@ -75,6 +75,13 @@ const createAmplifier = async (data) => {
 	})
 }
 
+const updateTimer = async (id, data) => {
+	return await axios.patch(`http://localhost:8081/products/timers/${id}`, data, config)
+		.then(response => {
+			return response
+		})
+}
+
 const removeProduct = async (id) => {
 	return await axios.delete(`http://localhost:8081/products/${id}`, config)
 }
@@ -118,5 +125,6 @@ export {
 	createTimer,
 	createSpeaker,
 	createAmplifier,
+	updateTimer,
 	removeProduct,
 }

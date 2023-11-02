@@ -20,7 +20,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createAmplifier, createSpeaker, createTimer, getCategories } from '../../../api/apiServices';
+import { createAmplifier, createSpeaker, updateTimer, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
 
 export default function UpdateProduct(props) {
@@ -517,8 +517,14 @@ export default function UpdateProduct(props) {
   }
 
   // Select, preview and remove image
-  const [variants, setVariants] = React.useState([]);
+  const [variants, setVariants] = React.useState(null);
   const [currentVariantIndex, setCurrentVariantIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    if (data) {
+      setVariants(data.variants);
+    }
+  }, [data]);
 
   const handleAddVariant = () => {
     const newVariant = {
@@ -528,7 +534,7 @@ export default function UpdateProduct(props) {
     };
 
     setVariants((prevVariants) => [...prevVariants, newVariant]);
-    setCurrentVariantIndex(variants.length)
+    setCurrentVariantIndex(variants?.length)
   };
 
   // Validation
@@ -599,6 +605,7 @@ export default function UpdateProduct(props) {
   const handleFileUpload = (event) => {
     const variantsCopy = [...variants];
     const files = event.target.files;
+    
     for (const file of files) {
       variantsCopy[currentVariantIndex].images.push(file);
     }
@@ -621,10 +628,12 @@ export default function UpdateProduct(props) {
     setVariants(variantsCopy);
   };
 
+  console.log(variants)
+
   const displayPreview = () => {
     return (
       <>
-        {variants.map((variant, index) => (
+        {variants?.map((variant, index) => (
           <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
             <div className="border-b border-gray-300 my-2">
               <div className='absolute top-0 right-0'>
@@ -650,6 +659,7 @@ export default function UpdateProduct(props) {
                   required
                   placeholder="Màu của sản phẩm"
                   onClick={() => setCurrentVariantIndex(index)}
+                  defaultValue={variant.color}
                   value={variants.color}
                   onChange={(event) => handleColorChange(event)}
                 />
@@ -670,6 +680,7 @@ export default function UpdateProduct(props) {
                   required
                   placeholder="Giá của sản phẩm"
                   onClick={() => setCurrentVariantIndex(index)}
+                  defaultValue={variant.price}
                   value={variants.price}
                   onChange={(event) => handlePriceChange(event)}
                 />
@@ -701,10 +712,11 @@ export default function UpdateProduct(props) {
            
             <div className="w-full mx-auto">
               <div className='relative flex m-2 justify-center space-x-6'>
-                {variant.images.map((image, imageIndex) => (
+                {variant?.images?.map((image, imageIndex) => (
                   <div key={imageIndex} className='relative'>
                     <div className='h-36 w-36 m-auto relative group border-dashed border-2 border-gray-300 rounded-xl'>
-                      <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
+                      {/* <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' /> */}
+                      <img src={image} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
                       <div className='absolute top-0 right-0'>
                         <IconButton>
                           <HighlightOffIcon onClick={(e) => handleImageDeletion(index, imageIndex)} />
@@ -830,10 +842,10 @@ export default function UpdateProduct(props) {
     const isValid = validation()
     if (isValid){
     // Create the appropriate product type based on the selected category
-    const createProductType = async (productType) => {
+    const updateProductType = async (productType) => {
       switch (productType) {
         case listCategory[0]:
-          return await createTimer(updatedData);
+          return await updateTimer(data._id, updatedData);
         case listCategory[1]:
           return await createSpeaker(updatedData);
         case listCategory[2]:
@@ -845,8 +857,8 @@ export default function UpdateProduct(props) {
 
     
 
-    // Create the product
-    return await createProductType(selectedValue)
+    // Update the product
+    return await updateProductType(selectedValue)
       .then((response) => {
         console.log(response.data.data)
         row(response.data.data.value);
@@ -1000,7 +1012,7 @@ export default function UpdateProduct(props) {
                         : ""
               }
 
-              {displayPreview()}
+              {displayPreview() || []}
 
               <div className='mt-4'>
                 <Button 
