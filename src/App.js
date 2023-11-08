@@ -5,6 +5,7 @@ import ProductTable from './adminPage/page/product/ProductTable';
 import Authentication from './adminPage/page/Authentication';
 import CategoryTable from './adminPage/page/category/CategoryTable';
 import UserTable from './adminPage/page/user/UserTable';
+import BrandTable from './adminPage/page/brand/BrandTable';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route index path='/products' element={<ProductTable />} />
             <Route path='/categories' element={<CategoryTable />} />
             <Route path='/user-list' element={<UserTable />} />
+            <Route path='/nhan-hieu' element={<BrandTable />} />
           </Route>
         </Routes>
       </BrowserRouter>

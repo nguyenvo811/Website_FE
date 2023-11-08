@@ -23,6 +23,11 @@ export default function Sidebar() {
 			icon: <HiUsers size='1.2rem' />,
 			label: "Danh mục sản phẩm",
 			path: "/categories"
+		},
+		{
+			icon: <HiUsers size='1.2rem' />,
+			label: "Nhãn hiệu",
+			path: "/nhan-hieu"
 		}
 	]
 

@@ -108,6 +108,28 @@ const updateCategory = async (id, data) => {
 		})
 }
 
+const getBrands = async () => {
+	return await axios.get("http://localhost:8081/brands", config)
+}
+
+const createBrand = async (data) => {
+	return await axios.post("http://localhost:8081/brands/add-brand", data, config)
+		.then(response => {
+			return response
+		})
+}
+
+const removeBrand = async (id) => {
+	return await axios.delete(`http://localhost:8081/brands/${id}`, config)
+}
+
+const updateBrand = async (id, data) => {
+	return await axios.patch(`http://localhost:8081/brands/${id}`, data, config)
+		.then(response => {
+			return response
+		})
+}
+
 
 export {
 	signIn,
@@ -122,6 +144,10 @@ export {
 	createCategory,
 	updateCategory,
 	removeCategory,
+	getBrands,
+	createBrand,
+	removeBrand,
+	updateBrand,
 	createTimer,
 	createSpeaker,
 	createAmplifier,
