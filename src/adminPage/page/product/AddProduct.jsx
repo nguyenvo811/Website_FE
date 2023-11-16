@@ -549,8 +549,11 @@ export default function AddProduct(props) {
   }
 
   // Select, preview and remove image
-  const [variants, setVariants] = React.useState([]);
-  const [currentVariantIndex, setCurrentVariantIndex] = React.useState(0);
+  const [variants, setVariants] = React.useState([{
+    color: "",
+    price: "",
+    images: []
+  }]);
 
   const handleAddVariant = () => {
     const newVariant = {
@@ -559,8 +562,7 @@ export default function AddProduct(props) {
       images: []
     };
 
-    setVariants((prevVariants) => [...prevVariants, newVariant]);
-    setCurrentVariantIndex(variants.length)
+    setVariants([...variants, newVariant]);
   };
 
   // Validation
@@ -616,27 +618,27 @@ export default function AddProduct(props) {
     setError({...error, [name]: ""})
   }
 
-  const handleColorChange = (event) => {
+  const handleColorChange = (index, event) => {
     const variantsCopy = [...variants];
-    variantsCopy[currentVariantIndex].color = event.target.value;
+    variantsCopy[index].color = event.target.value;
 
     setVariants(variantsCopy);
     setError({color: ""})
   };
 
-  const handlePriceChange = (event) => {
+  const handlePriceChange = (index, event) => {
     const variantsCopy = [...variants];
-    variantsCopy[currentVariantIndex].price = event.target.value;
+    variantsCopy[index].price = event.target.value;
 
     setVariants(variantsCopy);
     setError({price: ""})
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = (index, event) => {
     const variantsCopy = [...variants];
     const files = event.target.files;
     for (const file of files) {
-      variantsCopy[currentVariantIndex].images.push(file);
+      variantsCopy[index].images.push(file);
     }
 
     setVariants(variantsCopy);
@@ -685,9 +687,8 @@ export default function AddProduct(props) {
                   name="color"
                   required
                   placeholder="Màu của sản phẩm"
-                  onClick={() => setCurrentVariantIndex(index)}
-                  value={variants.color}
-                  onChange={(event) => handleColorChange(event)}
+                  defaultValue={variant.color}
+                  onChange={(event) => handleColorChange(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.color}
@@ -705,9 +706,8 @@ export default function AddProduct(props) {
                   name="price"
                   required
                   placeholder="Giá của sản phẩm"
-                  onClick={() => setCurrentVariantIndex(index)}
-                  value={variants.price}
-                  onChange={(event) => handlePriceChange(event)}
+                  defaultValue={variant.price}
+                  onChange={(event) => handlePriceChange(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.price}
@@ -726,8 +726,7 @@ export default function AddProduct(props) {
                   type="file"
                   class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                   multiple
-                  onClick={() => setCurrentVariantIndex(index)}
-                  onChange={(event) => handleFileUpload(event)}
+                  onChange={(event) => handleFileUpload(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.images}

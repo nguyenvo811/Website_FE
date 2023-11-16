@@ -77,13 +77,10 @@ export default function UpdateProduct(props) {
 
   // List category to rendert
   const listCategory = select.map(val => { return val._id });
-	const defaultCategoryName = listCategory.find((e)=> {return e === data?.category?._id});
 
 	React.useEffect(() => {
-		setSelectedValue(defaultCategoryName);
-	}, [defaultCategoryName]);
-
-	console.log(defaultCategoryName)
+		setSelectedValue(data?.category?._id);
+	}, [data?.category?._id]);
 
   const renderTimerAttribute = () => {
     return (
@@ -517,14 +514,25 @@ export default function UpdateProduct(props) {
   }
 
   // Select, preview and remove image
-  const [variants, setVariants] = React.useState(null);
-  const [currentVariantIndex, setCurrentVariantIndex] = React.useState(0);
+  const [variants, setVariants] = React.useState([{
+    color: "",
+    price: "",
+    images: []
+  }]);
+
+  const [tmpVariants, setTmpVariants] = React.useState([]);
 
   React.useEffect(() => {
     if (data) {
-      setVariants(data.variants);
+      setVariants(data?.variants);
+      setTmpVariants(variants?.map((variant) => ({
+        ...variant,
+        images: []
+      })))
     }
-  }, [data]);
+  }, [data?.variants, ...variants]);
+
+
 
   const handleAddVariant = () => {
     const newVariant = {
@@ -533,9 +541,12 @@ export default function UpdateProduct(props) {
       images: []
     };
 
-    setVariants((prevVariants) => [...prevVariants, newVariant]);
-    setCurrentVariantIndex(variants?.length)
+    setVariants([...variants, newVariant]);
+    setTmpVariants([...tmpVariants, newVariant])
   };
+
+  console.log("old", variants)
+  console.log("new",tmpVariants)
 
   // Validation
   const [error, setError] = React.useState({
@@ -586,36 +597,44 @@ export default function UpdateProduct(props) {
     setError({...error, [name]: ""})
   }
 
-  const handleColorChange = (event) => {
+  const handleColorChange = (index, event) => {
     const variantsCopy = [...variants];
-    variantsCopy[currentVariantIndex].color = event.target.value;
+    variantsCopy[index].color = event.target.value;
 
     setVariants(variantsCopy);
     setError({color: ""})
   };
 
-  const handlePriceChange = (event) => {
+  const handlePriceChange = (index, event) => {
     const variantsCopy = [...variants];
-    variantsCopy[currentVariantIndex].price = event.target.value;
+    variantsCopy[index].price = event.target.value;
 
     setVariants(variantsCopy);
     setError({price: ""})
   };
 
-  const handleFileUpload = (event) => {
-    const variantsCopy = [...variants];
+  const handleFileUpload = (index, event) => {
+    const tmpVariantsCopy = [...tmpVariants];
     const files = event.target.files;
-    
-    for (const file of files) {
-      variantsCopy[currentVariantIndex].images.push(file);
+    console.log(files)
+    console.log(tmpVariantsCopy)
+
+    for (const file of files) { 
+      tmpVariantsCopy[index]?.images?.push(file);
     }
 
-    setVariants(variantsCopy);
-    setError({images: ""})
+    setTmpVariants(tmpVariantsCopy);
   };
 
   const handleImageDeletion = (index, imageIndex) => {
     const variantsCopy = [...variants];
+    variantsCopy[index].images.splice(imageIndex, 1);
+
+    setVariants(variantsCopy);
+  };
+
+  const handleTmpImageDeletion = (index, imageIndex) => {
+    const variantsCopy = [...tmpVariants];
     variantsCopy[index].images.splice(imageIndex, 1);
 
     setVariants(variantsCopy);
@@ -658,10 +677,8 @@ export default function UpdateProduct(props) {
                   name="color"
                   required
                   placeholder="Màu của sản phẩm"
-                  onClick={() => setCurrentVariantIndex(index)}
                   defaultValue={variant.color}
-                  value={variants.color}
-                  onChange={(event) => handleColorChange(event)}
+                  onChange={(event) => handleColorChange(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.color}
@@ -679,10 +696,8 @@ export default function UpdateProduct(props) {
                   name="price"
                   required
                   placeholder="Giá của sản phẩm"
-                  onClick={() => setCurrentVariantIndex(index)}
                   defaultValue={variant.price}
-                  value={variants.price}
-                  onChange={(event) => handlePriceChange(event)}
+                  onChange={(event) => handlePriceChange(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.price}
@@ -701,8 +716,7 @@ export default function UpdateProduct(props) {
                   type="file"
                   class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
                   multiple
-                  onClick={() => setCurrentVariantIndex(index)}
-                  onChange={(event) => handleFileUpload(event)}
+                  onChange={(event) => handleFileUpload(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
                   {error.images}
@@ -715,11 +729,22 @@ export default function UpdateProduct(props) {
                 {variant?.images?.map((image, imageIndex) => (
                   <div key={imageIndex} className='relative'>
                     <div className='h-36 w-36 m-auto relative group border-dashed border-2 border-gray-300 rounded-xl'>
-                      {/* <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' /> */}
                       <img src={image} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
                       <div className='absolute top-0 right-0'>
                         <IconButton>
                           <HighlightOffIcon onClick={(e) => handleImageDeletion(index, imageIndex)} />
+                        </IconButton>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {tmpVariants[index]?.images?.map((image, imageIndex) => (
+                  <div key={imageIndex} className='relative'>
+                    <div className='h-36 w-36 m-auto relative group border-dashed border-2 border-gray-300 rounded-xl'>
+                      <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
+                      <div className='absolute top-0 right-0'>
+                        <IconButton>
+                          <HighlightOffIcon onClick={(e) => handleTmpImageDeletion(index, imageIndex)} />
                         </IconButton>
                       </div>
                     </div>
@@ -825,15 +850,25 @@ export default function UpdateProduct(props) {
     }
 
     const updatedVariants = [];
-    for (let index = 0; index < variants.length; index++) {
+    for (let index = 0; index < tmpVariants.length; index++) {
 
-      const element = variants[index];
-      const upfiles = await Promise.all(element.images.map(UploadFile));
+      const element = tmpVariants[index];
+      const upfiles = await Promise.all(element?.images?.map(UploadFile));
       const updatedElement = {
         ...element,
         images: upfiles.map((upfile) => upfile.data),
       };
-      updatedVariants.push(updatedElement);
+
+      for (let tmpIndex = 0; tmpIndex < variants.length; tmpIndex++) {
+        const element = variants[tmpIndex];
+        if (tmpIndex === index) {
+          const updatedImages = {
+          ...element,
+          images: [...element.images?.map((image) => image), ...updatedElement.images?.map((image) => image)],
+        };
+        updatedVariants.push(updatedImages);
+        }
+      }
     }
 
     updatedData.variants = updatedVariants;
