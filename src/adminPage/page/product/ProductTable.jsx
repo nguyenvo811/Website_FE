@@ -47,7 +47,7 @@ export default function ProductTable() {
 			<div className="flex flex-col">
 				<div className="overflow-x-auto">
 					<div className="min-w-full align-middle">
-						<div className="relative overflow-hidden mx-4 mt-4">
+						<div className="overflow-hidden mx-4 mt-4">
 							<Table />
 						</div>
 					</div>
