@@ -525,14 +525,12 @@ export default function UpdateProduct(props) {
   React.useEffect(() => {
     if (data) {
       setVariants(data?.variants);
-      setTmpVariants(variants?.map((variant) => ({
+      setTmpVariants(data?.variants?.map((variant) => ({
         ...variant,
         images: []
       })))
     }
-  }, [data?.variants, ...variants]);
-
-
+  }, [data?.variants]);
 
   const handleAddVariant = () => {
     const newVariant = {
@@ -541,12 +539,18 @@ export default function UpdateProduct(props) {
       images: []
     };
 
+    const newTmpVariant = {
+      color: "",
+      price: "",
+      images: []
+    };
+
     setVariants([...variants, newVariant]);
-    setTmpVariants([...tmpVariants, newVariant])
+    setTmpVariants([...tmpVariants, newTmpVariant])
   };
 
-  console.log("old", variants)
-  console.log("new",tmpVariants)
+  console.log("old", variants);
+  console.log("new", tmpVariants);
 
   // Validation
   const [error, setError] = React.useState({
@@ -616,8 +620,6 @@ export default function UpdateProduct(props) {
   const handleFileUpload = (index, event) => {
     const tmpVariantsCopy = [...tmpVariants];
     const files = event.target.files;
-    console.log(files)
-    console.log(tmpVariantsCopy)
 
     for (const file of files) { 
       tmpVariantsCopy[index]?.images?.push(file);
@@ -633,11 +635,11 @@ export default function UpdateProduct(props) {
     setVariants(variantsCopy);
   };
 
-  const handleTmpImageDeletion = (index, imageIndex) => {
-    const variantsCopy = [...tmpVariants];
-    variantsCopy[index].images.splice(imageIndex, 1);
+  const handleTmpImageDeletion = (index, imageTmpIndex) => {
+    const tmpVariantsCopy = [...tmpVariants];
+    tmpVariantsCopy[index].images.splice(imageTmpIndex, 1);
 
-    setVariants(variantsCopy);
+    setTmpVariants(tmpVariantsCopy);
   };
 
   const handleVariantDeletion = (index) => {
@@ -646,8 +648,6 @@ export default function UpdateProduct(props) {
 
     setVariants(variantsCopy);
   };
-
-  console.log(variants)
 
   const displayPreview = () => {
     return (
@@ -738,13 +738,13 @@ export default function UpdateProduct(props) {
                     </div>
                   </div>
                 ))}
-                {tmpVariants[index]?.images?.map((image, imageIndex) => (
-                  <div key={imageIndex} className='relative'>
+                {tmpVariants[index]?.images?.map((tmpImage, imageTmpIndex) => (
+                  <div key={imageTmpIndex} className='relative'>
                     <div className='h-36 w-36 m-auto relative group border-dashed border-2 border-gray-300 rounded-xl'>
-                      <img src={URL.createObjectURL(image)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
+                      <img src={URL.createObjectURL(tmpImage)} alt="Preview" className='w-full h-full rounded-xl bg-center bg-cover ' />
                       <div className='absolute top-0 right-0'>
                         <IconButton>
-                          <HighlightOffIcon onClick={(e) => handleTmpImageDeletion(index, imageIndex)} />
+                          <HighlightOffIcon onClick={(e) => handleTmpImageDeletion(index, imageTmpIndex)} />
                         </IconButton>
                       </div>
                     </div>
