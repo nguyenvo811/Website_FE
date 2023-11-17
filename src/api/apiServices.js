@@ -54,6 +54,10 @@ const getProducts = async () => {
 	return await axios.get("http://localhost:8081/products", config)
 }
 
+const getProduct = async (id) => {
+	return await axios.get(`http://localhost:8081/products/${id}`, config)
+}
+
 const createTimer = async (data) => {
 	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
 	.then(response => {
@@ -140,6 +144,7 @@ export {
 	removeUser,
 	viewProfile,
 	getProducts,
+	getProduct,
 	getCategories,
 	createCategory,
 	updateCategory,

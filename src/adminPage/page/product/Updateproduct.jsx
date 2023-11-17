@@ -549,9 +549,6 @@ export default function UpdateProduct(props) {
     setTmpVariants([...tmpVariants, newTmpVariant])
   };
 
-  console.log("old", variants);
-  console.log("new", tmpVariants);
-
   // Validation
   const [error, setError] = React.useState({
     productName: "",

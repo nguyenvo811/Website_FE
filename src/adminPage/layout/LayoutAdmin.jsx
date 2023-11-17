@@ -22,9 +22,9 @@ const MainContent = function() {
   return (
     <div className="sm:ml-64 mt-12">
       <Outlet />
-      <div className="mx-4 mt-4">
+      {/* <div className="mx-4 mt-4">
           <MainContentFooter />
-      </div>
+      </div> */}
     </div>
   )
 }

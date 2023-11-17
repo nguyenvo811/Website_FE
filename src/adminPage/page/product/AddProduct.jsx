@@ -608,10 +608,6 @@ export default function AddProduct(props) {
     }
   };
 
-  console.log(error)
-
-  console.log(variants)
-
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value })
