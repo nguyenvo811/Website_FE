@@ -6,12 +6,19 @@ import Authentication from './adminPage/page/Authentication';
 import CategoryTable from './adminPage/page/category/CategoryTable';
 import UserTable from './adminPage/page/user/UserTable';
 import BrandTable from './adminPage/page/brand/BrandTable';
+import Layout from './clientPage/layout/Layout';
+import Home from './clientPage/page/Home';
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
+          <Route element={<Layout />}>
+            <Route index path='/' element={<Home />} />
+            
+            {/* <Route index path={slug.DETAIL} element={<ProductDetail />} /> */}
+          </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
           <Route element={<LayoutAdmin />}>
             <Route index path='/products' element={<ProductTable />} />
