@@ -17,6 +17,10 @@ module.exports = {
     require('flowbite/plugin'),
     "tw-elements/dist/plugin"
   ],
+  corePlugins: {
+    transitionProperty: ['responsive', 'hover', 'focus', 'active'],
+    // ... other core plugins
+  },
   important: true,
 }
 

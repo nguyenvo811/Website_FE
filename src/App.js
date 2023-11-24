@@ -8,6 +8,7 @@ import UserTable from './adminPage/page/user/UserTable';
 import BrandTable from './adminPage/page/brand/BrandTable';
 import Layout from './clientPage/layout/Layout';
 import Home from './clientPage/page/Home';
+import ProductDetail from './clientPage/page/ProductDetail';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index path='/' element={<Home />} />
+            <Route index path='/chi-tiet-san-pham' element={<ProductDetail />} />
             
             {/* <Route index path={slug.DETAIL} element={<ProductDetail />} /> */}
           </Route>

@@ -15,3 +15,42 @@ code {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.scroll-to-top-btn {
+  @apply fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded focus:outline-none transition-opacity duration-300 opacity-0;
+}
+
+.scroll-to-top-btn.visible {
+  @apply opacity-100;
+}
+
+.scroll-to-top-btn.hidden {
+  @apply opacity-0 pointer-events-none;
+}
+
+.scroll-to-top-btn:hover {
+  @apply bg-blue-600;
+}
+
+.centerMode {
+  display: block;
+}
+
+.btm {
+  bottom: 1.65rem !important;
+}
+
+.slick-slide .centerMode{
+transform: scale(0.8);
+transition: all 0.4s ease-in-out;
+padding: 10px 0;
+}
+
+.slick-slide .centerMode {
+max-width: 100%;
+transition: all 0.4s ease-in-out;
+}
+
+.slick-center .centerMode{
+transform: scale(1.1);
+}

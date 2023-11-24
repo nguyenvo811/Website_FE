@@ -47,6 +47,7 @@ export default function Carousel() {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    fade: true,
     prevArrow: <PrevArrow />,
     nextArrow: <NextArrow />,
   };
@@ -55,7 +56,7 @@ export default function Carousel() {
     <div className="w-full relative">
       <Slider {...settings} ref={sliderRef}>
         {images.map((image, index) => (
-          <div key={index} className="h-[450px] max-sm:h-[350px] lg:h-[750px] w-full m-auto relative group">
+          <div key={index} className="h-[450px] lg:h-[750px] w-full m-auto relative group">
             <img src={image} className="w-full h-full object-center object-cover duration-700" alt={`Slide ${index + 1}`} />
           </div>
         ))}

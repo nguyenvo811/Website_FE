@@ -1,13 +1,14 @@
 import { Outlet } from "react-router-dom";
 import * as React from 'react';
-import { Footer } from "flowbite-react"
 import { MdFacebook } from "react-icons/md"
 import { FaDribbble, FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
 import StateContext from "../component/StateContext";
 // import Bottom from "../component/Bottom";
 import Header from "../component/Header";
+import Footer from "../component/Footer";
 // import ASide from "../component/ASide";
 import { getCategories } from "../../api/apiServices";
+import ScrollToTopButton from "../component/ScrollToTopButton";
 
 export default function Layout(){
   // State variable here
@@ -40,6 +41,8 @@ export default function Layout(){
         {/* <div className="mt-4">
           <Bottom />
         </div> */}
+        <ScrollToTopButton />
+        <Footer />
       </StateContext.Provider>
     </>
   )
