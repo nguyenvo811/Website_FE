@@ -17,7 +17,7 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index path='/' element={<Home />} />
-            <Route index path='/chi-tiet-san-pham' element={<ProductDetail />} />
+            <Route index path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
             
             {/* <Route index path={slug.DETAIL} element={<ProductDetail />} /> */}
           </Route>
