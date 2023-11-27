@@ -20,7 +20,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createCategory } from '../../../api/apiServices';
+import { createBrand, createCategory } from '../../../api/apiServices';
 
 export default function AddBrand(props) {
 
@@ -33,7 +33,7 @@ export default function AddBrand(props) {
 
   const [msgErr, setMsgErr] = React.useState("");
 
-  const [newCategory, setNewCategory] = React.useState({
+  const [newBrand, setNewBrand] = React.useState({
     brandName: "",
     description: "",
   });
@@ -45,11 +45,11 @@ export default function AddBrand(props) {
 
   const validation = () => {
     let msg = {}
-    if (newCategory.brandName === "") {
+    if (newBrand.brandName === "") {
       msg.brandName = "Vui lòng nhập tên danh mục sản phẩm!"
     } else if (msgErr !== "") {
       msg.brandName = msgErr
-    } if (newCategory.description === "") {
+    } if (newBrand.description === "") {
       msg.description = "Vui lòng nhập mô tả danh mục!"
     } 
     
@@ -64,7 +64,7 @@ export default function AddBrand(props) {
 
 	const handleChangeInput = (e) => {
     let {name, value} = e.target;
-    setNewCategory({...newCategory, [name]: value})
+    setNewBrand({...newBrand, [name]: value})
     setError({...error, [name]: ""})
   }
 
@@ -73,7 +73,7 @@ export default function AddBrand(props) {
       brandName: "",
       description: "", 
     });
-    setNewCategory({
+    setNewBrand({
       brandName: "",
       description: "", 
     });
@@ -90,15 +90,16 @@ export default function AddBrand(props) {
     e.preventDefault();
 
     const data = {
-      brandName: newCategory.brandName,
-      description: newCategory.description,
+      brandName: newBrand.brandName,
+      description: newBrand.description,
     }
+    console.log(data)
 
 		const isValid = validation()
     if (isValid){
 
     // Create the category
-    await createCategory(data)
+    await createBrand(data)
       .then((response) => {
         row(response.data.data);
         clearState();
@@ -161,7 +162,7 @@ export default function AddBrand(props) {
                     placeholder="Tên danh mục sản phẩm"
                     required
                     type="text"
-                    value={newCategory.brandName}
+                    value={newBrand.brandName}
                     onChange={handleChangeInput}
                   />
 									<p class="mt-1 text-sm text-red-500"> 
@@ -183,7 +184,7 @@ export default function AddBrand(props) {
                   placeholder="Mô tả danh mục sản phẩm"
                   required
                   rows={4}
-                  value={newCategory.description}
+                  value={newBrand.description}
                   onChange={handleChangeInput}
                 />
 								<p class="mt-1 text-sm text-red-500"> 

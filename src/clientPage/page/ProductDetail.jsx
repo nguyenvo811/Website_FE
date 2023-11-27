@@ -6,20 +6,39 @@ import { Link, useNavigate } from "react-router-dom";
 import "react-toggle/style.css";
 import queryString from "query-string";
 import Slider from "react-slick";
+import Box from '@mui/material/Box';
+import Tab from '@mui/material/Tab';
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 
 export default function ProductDetail() {
-
-  const sliderRef = useRef(null);
   const location = useLocation();
-  const [product, setProduct] = useState("");
+  const [product, setProduct] = useState([]);
+  const [listColor, setListColor] = useState([]);
   const [color, setColor] = useState("");
   const [colorChange, setColorChange] = useState("");
 
+  const [value, setValue] = useState('1');
+
+	const handleChange = (event, newValue) => {
+		setValue(newValue);
+	};
+
+  const scrollToElement = () => {
+    // Find the element you want to scroll to
+    const targetElement = document.getElementById('targetElementId');
+    // Scroll to the target element with an offset
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest'});
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     const productData = data.find(val => val?._id === location?.state)
     setProduct(productData)
+    setListColor(productData.variants)
   }, [])
 
   const data = [
@@ -215,25 +234,28 @@ export default function ProductDetail() {
     }
   ]
 
+  const selectValue = product?.variants?.find(val => val._id === product?.variants[0]?._id)
+
+  console.log(product?.variants)
+  console.log(selectValue)
+
+  
   const handleSelectColor = (event) => {
-    // Get the selected color value
     const selectedColor = event.target.value;
-    
-  const test = product?.variants?.find(val => val._id );
-  console.log(test._id)
-    console.log(selectedColor)
-    // Update the color state variable
-    setColor(selectedColor)
+    console.log(selectedColor);
+    setColor(selectedColor);
+  
+    // Find the selected variant based on the color
+    const variant = listColor?.find((variant) => variant._id === selectedColor);
+    console.log(variant);
   };
 
-
   const listProductDetail = product?.variants?.map(val => { return val._id });
-  const defaultColor = listProductDetail?.find((id) => { return id === product?.variants[0]?._id });
+  const defaultColor = listProductDetail?.find((id) => { return id === selectValue?._id });
 
   useEffect(() => {
     setColor(defaultColor);
-  }, [defaultColor]);
-
+  }, [defaultColor]); 
 
   const PrevArrow = ({ onClick }) => (
     <button
@@ -303,7 +325,7 @@ export default function ProductDetail() {
     <>
       <section class="pt-28 font-poppins dark:bg-gray-800">
         <div class="max-w-6xl px-4 mx-auto text-left">
-          <div class="flex flex-wrap mb-24 -mx-4">
+          <div class="flex flex-wrap -mx-4">
             <div class="w-full px-4 mb-8 md:w-1/2 md:mb-0">
               <Slider {...settings} asNavFor={nav2} ref={slider => (setSlider1(slider))}>
                 {product?.variants?.map((val, index) =>
@@ -344,136 +366,29 @@ export default function ProductDetail() {
                   <h2 class="max-w-xl mt-6 mb-6 text-xl font-semibold leading-loose tracking-wide text-gray-700 md:text-2xl dark:text-gray-300">
                     {product?.productName}
                   </h2>
-                  <div class="flex flex-wrap items-center mb-6">
-                    <ul class="flex mb-4 mr-2 lg:mb-0">
-                      <li>
-                        <a href="#">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 mr-1 text-red-500 dark:text-gray-400 bi bi-star " viewBox="0 0 16 16">
-                            <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z">
-                            </path>
-                          </svg>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 mr-1 text-red-500 dark:text-gray-400 bi bi-star " viewBox="0 0 16 16">
-                            <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z">
-                            </path>
-                          </svg>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 mr-1 text-red-500 dark:text-gray-400 bi bi-star " viewBox="0 0 16 16">
-                            <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z">
-                            </path>
-                          </svg>
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 mr-1 text-red-500 dark:text-gray-400 bi bi-star " viewBox="0 0 16 16">
-                            <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z">
-                            </path>
-                          </svg>
-                        </a>
-                      </li>
-                    </ul>
-                    <a class="mb-4 text-xs underline hover:text-blue-600 dark:text-gray-400 dark:hover:text-gray-300 lg:mb-0" href="#">
-                      View the acer store
-                    </a>
-                  </div>
+                 
                   <p class="inline-block text-2xl font-semibold text-gray-700 dark:text-gray-400 ">
-                    <span>Rs.7,000.00</span>
-                    <span class="ml-3 text-base font-normal text-gray-500 line-through dark:text-gray-400">Rs.10,000.00</span>
+                    <span>Giá: Rs.7,000.00</span>
                   </p>
                 </div>
-                <div class="mb-6">
-                  <h2 class="mb-2 text-lg font-bold text-gray-700 dark:text-gray-400">System Specs :</h2>
-                  <div class="bg-gray-100 dark:bg-gray-700 rounded-xl">
-                    <div class="p-3 lg:p-5 ">
-                      <div class="p-2 rounded-xl lg:p-6 dark:bg-gray-800 bg-gray-50">
-                        <div class="flex flex-wrap justify-center gap-x-10 gap-y-4">
-                          <div class="w-full mb-4 md:w-2/5">
-                            <div class="flex ">
-                              <span class="mr-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-diagram-3 w-7 h-7" viewBox="0 0 16 16">
-                                  <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5v-1zM8.5 5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1zM0 11.5A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm4.5.5a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"></path>
-                                </svg>
-                              </span>
-                              <div>
-                                <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                  No. of cores
-                                </p>
-                                <h2 class="text-base font-semibold text-gray-700 dark:text-gray-400">
-                                  12 Cores
-                                </h2>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="w-full mb-4 md:w-2/5">
-                            <div class="flex ">
-                              <span class="mr-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gpu-card w-7 h-7" viewBox="0 0 16 16">
-                                  <path d="M4 8a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm7.5-1.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"></path>
-                                  <path d="M0 1.5A.5.5 0 0 1 .5 1h1a.5.5 0 0 1 .5.5V4h13.5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5H2v2.5a.5.5 0 0 1-1 0V2H.5a.5.5 0 0 1-.5-.5Zm5.5 4a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5ZM9 8a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0Z"></path>
-                                  <path d="M3 12.5h3.5v1a.5.5 0 0 1-.5.5H3.5a.5.5 0 0 1-.5-.5v-1Zm4 1v-1h4v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5Z"></path>
-                                </svg>
-                              </span>
-                              <div>
-                                <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                  Graphic
-                                </p>
-                                <h2 class="text-base font-semibold text-gray-700 dark:text-gray-400">
-                                  Intel UHD
-                                </h2>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="w-full mb-4 lg:mb-0 md:w-2/5">
-                            <div class="flex ">
-                              <span class="mr-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-7 h-7 bi bi-cpu" viewBox="0 0 16 16">
-                                  <path d="M5 0a.5.5 0 0 1 .5.5V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2h1V.5a.5.5 0 0 1 1 0V2A2.5 2.5 0 0 1 14 4.5h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14v1h1.5a.5.5 0 0 1 0 1H14a2.5 2.5 0 0 1-2.5 2.5v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14h-1v1.5a.5.5 0 0 1-1 0V14A2.5 2.5 0 0 1 2 11.5H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2v-1H.5a.5.5 0 0 1 0-1H2A2.5 2.5 0 0 1 4.5 2V.5A.5.5 0 0 1 5 0zm-.5 3A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13h7a1.5 1.5 0 0 0 1.5-1.5v-7A1.5 1.5 0 0 0 11.5 3h-7zM5 6.5A1.5 1.5 0 0 1 6.5 5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3zM6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"></path>
-                                </svg>
-                              </span>
-                              <div>
-                                <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                  Processor
-                                </p>
-                                <h2 class="text-base font-semibold text-gray-700 dark:text-gray-400">
-                                  INTEL 80486
-                                </h2>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="w-full mb-4 lg:mb-0 md:w-2/5">
-                            <div class="flex ">
-                              <span class="mr-3 text-gray-500 dark:text-gray-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock-history w-7 h-7" viewBox="0 0 16 16">
-                                  <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"></path>
-                                  <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"></path>
-                                  <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"></path>
-                                </svg>
-                              </span>
-                              <div>
-                                <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                  Frequency
-                                </p>
-                                <h2 class="text-base font-semibold text-gray-700 dark:text-gray-400">
-                                  3.5 GHz
-                                </h2>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div 
+                  class="cursor-pointer mb-6 flex items-center"
+                  onClick={scrollToElement}
+                >
+                  <h2 class="text-lg font-bold text-gray-700">Chi tiết sản phẩm</h2>
+                  <svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-4 w-4 ml-1 transform rotate-90"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+									</svg>
                 </div>
                 <div class="py-6 mb-6 border-t border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
-                    <span class="mr-3">Color</span>
+                    <span class="mr-3">Phiên bản:</span>
                     <div class="relative">
                       <select
                         class="rounded border appearance-none border-gray-400 py-2 focus:outline-none focus:border-red-500 text-base pl-3 pr-10"
@@ -501,11 +416,253 @@ export default function ProductDetail() {
                 <div class="flex gap-4 mb-6">
                   <button class="w-full px-4 py-3 text-center text-gray-100 bg-yellow-400 hover:bg-yellow-500 border rounded-xl">
                     <span className="cursor-pointer" >
-                      Buy now</span>
+                      Mua ngay
+                    </span>
                   </button>
                 </div>
               </div>
             </div>
+          </div>
+          <div id="targetElementId" className="-mx-4 mb-6 sm:mt-16 border-t border-b border-gray-200">
+            <Box sx={{ width: '100%', typography: 'body1' }}>
+              <TabContext value={value}>
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                }}>
+                  <TabList 
+                    value={value}
+                    onChange={handleChange}
+                    sx={{
+                      "& .MuiTabs-indicator": {
+                        backgroundColor: "#eab308", // Set the tab indicator color
+                      }
+                    }}
+                  >
+                    <Tab label="MÔ TẢ SẢN PHẨM" value="1" 
+                      sx={{
+                        "&.Mui-selected": {
+                          color: "#eab308", // Add '#' and fix the color value
+                        },
+                      }}
+                    />
+                    <Tab label="THÔNG SỐ CHI TIẾT" value="2" 
+                      sx={{
+                        "&.Mui-selected": {
+                          color: "#eab308", // Add '#' and fix the color value
+                        },
+                      }}
+                    />
+                  </TabList>
+                </Box>
+                <TabPanel value="1">
+                  <div className="text-left">
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        LỊCH SỬ THÀNH LẬP
+                      </strong>
+                    </div>
+                    <p className="text-justify">
+                      Được thành lập vào năm 2013 - trải qua một chặng đường dài trong việc nghiên cứu và phát triển về lĩnh vực thiết bị nhà nuôi yến,
+                      cùng với mong muốn mang đến cho khách hàng những sản phẩm và dịch vụ tốt nhất, ngày nay, CÔNG TY TNHH TM CUNG CẤP THIẾT BỊ NHÀ YẾN THÂN THI
+                      được nhắc đến như là một trong những nhà cung cấp hàng đầu các giải pháp dịch vụ trọn gói cho hệ thống Nhà Nuôi yến và hệ thống thiết bị lắp
+                      đặt nhà yến chuyên nghiệp, cũng như hỗ trợ, tư vấn tận tâm cho Quý khách hàng.
+                    </p>
+                    <br />
+                    <p className="text-justify">
+                      Hiểu được tâm tư và nguyện vọng của khách hàng, NHÀ YẾN THÂN THI luôn không ngừng phấn đấu để đem đến một quy trình phục vụ tốt nhất từ việc lên kế hoạch
+                      tìm hiểu, Tư vấn cho khách hàng, Thiết kế mô hình nhà nuôi yến, Cung cấp trọn gói hệ thống thiết bị lắp đặt nhà yến hoàn chỉnh và quan tâm
+                      sát sao đến việc bảo hành, bảo trì sản phẩm cho Quý khách hàng.
+                      May mắn nhận được sự hỗ trợ từ phía đối tác cũng như sự tin tưởng và tín nhiệm của khách hàng, NHÀ YẾN THÂN THI THÂN THI đã có cơ hội mở rộng quy mô thị
+                      trường hoạt động từ Trung Bộ trải dài tới Tây Nam Bộ nhằm đáp ứng nhu cầu ngày một cao hơn của khách hàng là các chủ nhà yến, kỹ thuật lắp đặt, đại
+                      lý phân phối sản phẩm thiết bị… trên Toàn Quốc.
+                    </p>
+                    <br />
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        TÌNH HÌNH HIỆN NAY
+                      </strong>
+                    </div>
+                    <p className="text-justify">
+                      Được thành lập vào năm 2013 - trải qua một chặng đường dài trong việc nghiên cứu và phát triển về lĩnh vực thiết bị nhà nuôi yến,
+                      cùng với mong muốn mang đến cho khách hàng những sản phẩm và dịch vụ tốt nhất, ngày nay, CÔNG TY TNHH TM CUNG CẤP THIẾT BỊ NHÀ YẾN THÂN THI
+                      được nhắc đến như là một trong những nhà cung cấp hàng đầu các giải pháp dịch vụ trọn gói cho hệ thống Nhà Nuôi yến và hệ thống thiết bị lắp
+                      đặt nhà yến chuyên nghiệp, cũng như hỗ trợ, tư vấn tận tâm cho Quý khách hàng.
+                    </p>
+                    <br />
+                    <p className="text-justify">
+                      Hiểu được tâm tư và nguyện vọng của khách hàng, NHÀ YẾN THÂN THI luôn không ngừng phấn đấu để đem đến một quy trình phục vụ tốt nhất từ việc lên kế hoạch
+                      tìm hiểu, Tư vấn cho khách hàng, Thiết kế mô hình nhà nuôi yến, Cung cấp trọn gói hệ thống thiết bị lắp đặt nhà yến hoàn chỉnh và quan tâm
+                      sát sao đến việc bảo hành, bảo trì sản phẩm cho Quý khách hàng.
+                      May mắn nhận được sự hỗ trợ từ phía đối tác cũng như sự tin tưởng và tín nhiệm của khách hàng, NHÀ YẾN THÂN THI THÂN THI đã có cơ hội mở rộng quy mô thị
+                      trường hoạt động từ Trung Bộ trải dài tới Tây Nam Bộ nhằm đáp ứng nhu cầu ngày một cao hơn của khách hàng là các chủ nhà yến, kỹ thuật lắp đặt, đại
+                      lý phân phối sản phẩm thiết bị… trên Toàn Quốc.
+                    </p>
+                    <br />
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        NHÓM HÀNG - SẢN PHẨM CHỦ LỰC
+                      </strong>
+                    </div>
+                    <p className="text-justify">
+                      Nhóm hệ thống gỗ
+                      Nhóm hệ thống Loa và Amply
+                      Nhóm hệ thống phun sương, tạo ẩm
+                      Nhóm dung dịch
+                      Nhóm thiết bị điện
+                      Nhóm thiết bị khác
+                    </p>
+                    <br />
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        THẾ MẠNH CỦA NHÀ YẾN THÂN THI
+                      </strong>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-justify">
+                        Có kinh nghiệm hơn 10 năm tìm hiểu và hoạt động trong lĩnh vực cung cấp thiết bị lắp đặt nhà nuôi yến.
+                      </p>
+                      <p className="text-justify">
+                        Sản phẩm mang thương hiệu  được nhập khẩu chính ngạch từ Malaysia, Indonesia, Taiwan,…Quý khách hàng khi
+                        mua thiết bị tại NHÀ YẾN THÂN THI sẽ được tư vấn và hướng dẫn cách sử dụng tận tâm cùng với chế độ bảo hành sản phẩm đặc biệt dành riêng cho quý khách hàng.
+                      </p>
+                      <p className="text-justify">
+                        Các nhóm sản phẩm đa dạng, chất lượng cao, với mức chi phí cạnh tranh và phù hợp nhất cho từng điều kiện kinh tế của chủ đầu tư.
+                      </p>
+                      <p className="text-justify">
+                        Hệ thống Đại lý phân phối của lớn mạnh trải dài từ Bắc Trung Bộ đến Tây Nam Bộ , đáp ứng mọi nhu cầu xây dựng, lắp đặt nhà yến của chủ nhà yến mọi miền Tổ quốc.
+                      </p>
+                      <p className="text-justify">
+                        Dịch vụ chăm sóc khách hàng, bảo trì, thay thế linh kiện linh hoạt, tận tâm và nhanh chóng.
+                      </p>
+                      <p className="text-justify">
+                        Đội ngũ nhân viên THÂN THI giàu kinh nghiệm, thân thiện, nhịêt tình và đầy trách nhiệm luôn thấu hiểu nhu cầu và phục vụ tối đa quyền lợi cho Quý khách hàng.
+                      </p>
+                    </div>
+                  </div>
+                </TabPanel>
+                <TabPanel value="2">
+                  <div className="text-left">
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        TẦM NHÌN CHIẾN LƯỢC
+                      </strong>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-justify">
+                        “NHÀ YẾN THÂN THI- niềm tin hàng đầu của Quý khách hàng về sản phẩm thiết bị và dịch vụ”
+                      </p>
+                      <p className="text-justify">
+                        Với tầm nhìn dài hạn tập trung cho sự phát triển bền vững trở thành công ty tiên phong có tên tuổi và vị thế trên thị trường trong lĩnh vực Nhà nuôi yến.
+                      </p>
+                      <p className="text-justify">
+                        NHÀ YẾN THÂN THI tập trung cơ cấu ở 4 mảng chính gồm:
+                        <div className="space-y-1 ml-4">
+                          <p className="text-justify">
+                            Nghiên cứu cải tiến và phát triển công nghệ sản phẩm theo tiêu chuẩn chất lượng Quốc tế.
+                          </p>
+                          <p className="text-justify">
+                            Nhập khẩu và thương mại Thiết Bị Nhà Yến.
+                          </p>
+                          <p className="text-justify">
+                            Tư vấn và hỗ trợ kỹ thuật lắp đặt thiết bị nhà yến cho khách hàng.
+                          </p>
+                          <p className="text-justify">
+                            Xây dựng kênh thu mua, chế biến và phân phối.
+                          </p>
+                        </div>
+                      </p>
+                    </div>
+                    <br />
+                    <div className="flex items-center pb-2">
+                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
+                      <strong
+                        class="block text-xl font-bold text-black sm:text-2xl"
+                      >
+                        SỨ MỆNH
+                      </strong>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-justify">
+                        “Giúp hàng ngàn người Việt thành công trong lĩnh vực Nhà Nuôi Yến”
+                      </p>
+                      <div>
+                        <span>
+                          <strong
+                            class="block text-sm font-bold text-black sm:text-lg"
+                          >
+                            Đối với khách hàng
+                          </strong>
+                          <p className="text-justify">
+                            THÂN THI tận tâm phục vụ đưa ra giải pháp thiết kế xây dựng- cung cấp thiết bị Nhà Nuôi Yến phù hợp đạt
+                            tiêu chuẩn chất lượng quốc tế. Giúp khách hàng tiết kiệm tối đa chi phí đầu tư và đem về nguồn lợi đáng kể từ Nhà Nuôi Yến.
+                          </p>
+                        </span>
+                        <span>
+                          <strong
+                            class="block text-sm font-bold text-black sm:text-lg"
+                          >
+                            Đối với đối tác
+                          </strong>
+                          <p className="text-justify">
+                            Trên tinh thần hợp tác cùng phát triển. Tuân thủ các thỏa thuận hợp tác và tuân thủ Pháp luật.
+                          </p>
+                        </span>
+                        <span>
+                          <strong
+                            class="block text-sm font-bold text-black sm:text-lg"
+                          >
+                            Đối với CBCNV
+                          </strong>
+                          <p className="text-justify">
+                            Xây dựng môi trường làm việc chuyên nghiệp, có nguồn thu nhập cao. Mỗi cá nhân đều có cơ hội học tập,
+                            phát triển trong môi trường năng động, sáng tạo, mang tính nhân văn và công bằng.
+                          </p>
+                        </span>
+                        <span>
+                          <strong
+                            class="block text-sm font-bold text-black sm:text-lg"
+                          >
+                            Đối với xã hội
+                          </strong>
+                          <p className="text-justify">
+                            Cân bằng giữa lợi ích doanh nghiệp và lợi ích xã hội. THÂN THI tích cực tham gia đóng góp, xây dựng các
+                            chương trình vì cộng đồng. Thể hiện tinh thần dân tộc và trách nhiệm đối với xã hội.
+                          </p>
+                        </span>
+                        <span>
+                          <strong
+                            class="block text-sm font-bold text-black sm:text-lg"
+                          >
+                            Đối với môi trường
+                          </strong>
+                          <p className="text-justify">
+                            Tuân thủ các quy định của Pháp luật về thiết kế- thi công- xây dựng. Bên cạnh đó là bảo vệ môi trường sinh sống cho loài Chim Yến.
+                          </p>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </TabPanel>
+              </TabContext>
+            </Box>
           </div>
         </div>
       </section>

@@ -9,6 +9,8 @@ import BrandTable from './adminPage/page/brand/BrandTable';
 import Layout from './clientPage/layout/Layout';
 import Home from './clientPage/page/Home';
 import ProductDetail from './clientPage/page/ProductDetail';
+import Introduction from './clientPage/page/Introduction';
+import Policy from './clientPage/page/Policy';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route element={<Layout />}>
             <Route index path='/' element={<Home />} />
             <Route index path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
+            <Route index path='/gioi-thieu' element={<Introduction />} />
+            <Route index path='/chinh-sach' element={<Policy />} />
             
             {/* <Route index path={slug.DETAIL} element={<ProductDetail />} /> */}
           </Route>

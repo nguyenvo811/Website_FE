@@ -20,7 +20,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createAmplifier, createSpeaker, createTimer, getCategories } from '../../../api/apiServices';
+import { createAmplifier, createSpeaker, createTimer, getBrands, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
 
 export default function AddProduct(props) {
@@ -29,7 +29,7 @@ export default function AddProduct(props) {
   const { open, close, row } = props;
   const [select, setSelect] = React.useState([]);
   const [msgErr, setMsgErr] = React.useState("");
-
+  const [selectBrand, setSelectBrand] = React.useState([]);
 
   const [newProduct, setNewProduct] = React.useState({
     productName: "",
@@ -104,15 +104,39 @@ export default function AddProduct(props) {
           console.log(err.response.data.message);
         }
       })
+    getBrands()
+      .then(res => {
+        setSelectBrand(res.data.data)
+      })
+      .catch(err => {
+        if (err.response) {
+          console.log(err.response.data.result);
+          console.log(err.response.status);
+          console.log(err.response.data.message);
+        }
+      })
   }, []);
 
   // Select category options to change attributes
   const [selectedValue, setSelectedValue] = React.useState("");
+  const [selectedBrandValue, setSelectedBrandValue] = React.useState("");
+
   const handleSelect = (e) => {
     // Set the state variable to the selected value.
     setSelectedValue(e.target.value);
-    setError({category: ""})
+    setError({ category: "" })
   }
+
+  const handleBrandSelect = (e) => {
+    // Set the state variable to the selected value.
+    setSelectedBrandValue(e.target.value);
+  }
+
+  const showProductBrand = selectBrand.find(val => {
+    if (val._id === selectedBrandValue) {
+      return val
+    }
+  });
 
   // List category to rendert
   const listCategory = select.map(val => { return val._id });
@@ -594,11 +618,11 @@ export default function AddProduct(props) {
       msg.price = "Vui lòng nhập màu sản phẩm!"
     } if (selectedValue === "") {
       msg.category = "Vui lòng chọn danh mục sản phẩm!"
-    } 
+    }
     // if (!variants.images) {
     //   msg.images = "Vui lòng chọn hình sản phẩm!"
     // }
-    
+
     setError(msg)
     console.log("validating")
     if (Object.keys(msg).length > 0) {
@@ -611,7 +635,7 @@ export default function AddProduct(props) {
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value })
-    setError({...error, [name]: ""})
+    setError({ ...error, [name]: "" })
   }
 
   const handleColorChange = (index, event) => {
@@ -619,7 +643,7 @@ export default function AddProduct(props) {
     variantsCopy[index].color = event.target.value;
 
     setVariants(variantsCopy);
-    setError({color: ""})
+    setError({ color: "" })
   };
 
   const handlePriceChange = (index, event) => {
@@ -627,7 +651,7 @@ export default function AddProduct(props) {
     variantsCopy[index].price = event.target.value;
 
     setVariants(variantsCopy);
-    setError({price: ""})
+    setError({ price: "" })
   };
 
   const handleFileUpload = (index, event) => {
@@ -638,7 +662,7 @@ export default function AddProduct(props) {
     }
 
     setVariants(variantsCopy);
-    setError({images: ""})
+    setError({ images: "" })
   };
 
   const handleImageDeletion = (index, imageIndex) => {
@@ -686,7 +710,7 @@ export default function AddProduct(props) {
                   defaultValue={variant.color}
                   onChange={(event) => handleColorChange(index, event)}
                 />
-                <p class="mt-1 text-sm text-red-500"> 
+                <p class="mt-1 text-sm text-red-500">
                   {error.color}
                 </p>
               </div>
@@ -705,7 +729,7 @@ export default function AddProduct(props) {
                   defaultValue={variant.price}
                   onChange={(event) => handlePriceChange(index, event)}
                 />
-                <p class="mt-1 text-sm text-red-500"> 
+                <p class="mt-1 text-sm text-red-500">
                   {error.price}
                 </p>
               </div>
@@ -724,12 +748,12 @@ export default function AddProduct(props) {
                   multiple
                   onChange={(event) => handleFileUpload(index, event)}
                 />
-                <p class="mt-1 text-sm text-red-500"> 
+                <p class="mt-1 text-sm text-red-500">
                   {error.images}
                 </p>
               </div>
             </div>
-           
+
             <div className="w-full mx-auto">
               <div className='relative flex m-2 justify-center space-x-6'>
                 {variant.images.map((image, imageIndex) => (
@@ -809,7 +833,7 @@ export default function AddProduct(props) {
           weight: amplifier.weight
         };
       default:
-        setError({category: ""})
+        setError({ category: "" })
     }
   };
 
@@ -821,6 +845,7 @@ export default function AddProduct(props) {
       description: newProduct.description,
       category: selectedValue,
       origin: newProduct.origin,
+      brand: selectedBrandValue,
       variants: variants,
       ...choseValue(selectedValue)
     }
@@ -841,37 +866,37 @@ export default function AddProduct(props) {
 
     console.log(data)
     const isValid = validation()
-    if (isValid){
-    // Create the appropriate product type based on the selected category
-    const createProductType = async (productType) => {
-      switch (productType) {
-        case listCategory[0]:
-          return await createTimer(data);
-        case listCategory[1]:
-          return await createSpeaker(data);
-        case listCategory[2]:
-          return await createAmplifier(data);
-        default:
-          setError({category: ""})
-      }
-    };
+    if (isValid) {
+      // Create the appropriate product type based on the selected category
+      const createProductType = async (productType) => {
+        switch (productType) {
+          case listCategory[0]:
+            return await createTimer(data);
+          case listCategory[1]:
+            return await createSpeaker(data);
+          case listCategory[2]:
+            return await createAmplifier(data);
+          default:
+            setError({ category: "" })
+        }
+      };
 
-    
 
-    // Create the product
-    return await createProductType(selectedValue)
-      .then((response) => {
-        console.log(response.data.data)
-        row(response.data.data);
-        clearState();
-      })
-      .catch((error) => {
-				if (error.response.status === 500) {
-					console.log(error.response.data.result);
-					console.log(error);
-					setMsgErr(error.response.data.message);
-				}
-      })
+
+      // Create the product
+      return await createProductType(selectedValue)
+        .then((response) => {
+          console.log(response.data.data)
+          row(response.data.data);
+          clearState();
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            console.log(error.response.data.result);
+            console.log(error);
+            setMsgErr(error.response.data.message);
+          }
+        })
     }
   }
 
@@ -909,7 +934,7 @@ export default function AddProduct(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
@@ -926,9 +951,33 @@ export default function AddProduct(props) {
                     value={newProduct.productName}
                     onChange={handleChangeInput}
                   />
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.productName}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.productName}
+                  </p>
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="brand"
+                      value="Thương hiệu"
+                    />
+                  </div>
+                  <Select
+                    id="brand"
+                    name="brand"
+                    required
+                    value={selectedBrandValue}
+                    onChange={handleBrandSelect}
+                  >
+                    <option value={"Chọn thương hiệu"}>
+                      Chọn thương hiệu
+                    </option>
+                    {selectBrand?.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.brandName}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
               </div>
 
@@ -956,9 +1005,9 @@ export default function AddProduct(props) {
                       </option>
                     ))}
                   </Select>
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.category}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.category}
+                  </p>
                 </div>
 
                 <div>
@@ -977,9 +1026,9 @@ export default function AddProduct(props) {
                     value={newProduct.origin}
                     onChange={handleChangeInput}
                   />
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.origin}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.origin}
+                  </p>
                 </div>
               </div>
 
@@ -999,9 +1048,9 @@ export default function AddProduct(props) {
                   value={newProduct.description}
                   onChange={handleChangeInput}
                 />
-                <p class="mt-1 text-sm text-red-500"> 
-										{error.description}
-									</p>
+                <p class="mt-1 text-sm text-red-500">
+                  {error.description}
+                </p>
               </div>
 
               {
@@ -1015,8 +1064,8 @@ export default function AddProduct(props) {
               {displayPreview()}
 
               <div className='mt-4'>
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   color="inherit"
                   onClick={handleAddVariant}
                 >Thêm màu sản phẩm</Button>
