@@ -54,3 +54,30 @@ transition: all 0.4s ease-in-out;
 .slick-center .centerMode{
 transform: scale(1.1);
 }
+
+.ql-editor h1 {
+  font-size: 2em !important;
+  font-weight: 700 !important;
+  color: black !important;
+}
+
+.ql-editor h2 {
+  font-size: 1.6em !important;
+  font-weight: 700 !important;
+  color: black !important;
+}
+
+.ql-editor h3 {
+  font-size: 1.2em !important;
+  font-weight: 700 !important;
+  color: black !important;
+}
+
+.ql-editor p {
+  font-size: 1.2em !important;
+}
+
+.ql-editor img {
+  display: block;
+  margin: auto;
+}

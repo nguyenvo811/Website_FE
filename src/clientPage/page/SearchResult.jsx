@@ -1,0 +1,483 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import StateContext from "../component/StateContext";
+import { getProductInHome } from "../../api/apiServices";
+import { FormatCurrency } from "../../asset/FormatCurrency";
+import slugify from 'slugify';
+import { Label, Select } from "flowbite-react";
+import Pagination from "../component/Pagination";
+
+function useStateContext() {
+  // Get the context value
+  const context = React.useContext(StateContext);
+
+  // Throw an error if the context is undefined
+  if (context === undefined) {
+    throw new Error('useStateContext must be used within a StateContext.Provider');
+  }
+
+  // Return the context value
+  return context;
+}
+
+export default function SearchResult() {
+  const navigate = useNavigate();
+  const { selectCategory, selectBrand } = useStateContext();
+
+  const categories = [];
+  const subCategories = [];
+
+  selectCategory.forEach((category) => {
+    if (!category.subCategories) {
+      categories.push(category);
+    } else if (category.subCategories) {
+      subCategories.push(category);
+    }
+  });
+
+  const [filters, setFilters] = useState({
+    category: '',
+    brand: '',
+    subCategory: '',
+    sort: ''
+  });
+
+  const [data, setData] = useState([]);
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+  const openSideBar = () => { setIsSideBarOpen(!isSideBarOpen) }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    getProductInHome()
+      .then(res => {
+        setData(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }, [])
+
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  let sort = [
+    { _id: 1, value: "Mới nhất" },
+    { _id: 2, value: "Giá từ thấp đến cao" },
+    { _id: 3, value: "Giá từ cao đến thấp" },
+  ]
+
+  const applySorting = (products, sortOption) => {
+    switch (sortOption) {
+      case '1':
+        // Sort by the newest
+        return products.sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt));
+      case '2':
+        // Sort by price low to high
+        return products.sort((a, b) => a?.variants[0]?.price - b?.variants[0]?.price);
+      case '3':
+        // Sort by price high to low
+        return products.sort((a, b) => b?.variants[0]?.price - a?.variants[0]?.price);
+      default:
+        return products;
+    }
+  };
+
+  const handleFilterChange = (filters) => {
+    console.log(filters)
+    // Implement your logic to filter products based on the provided filters
+    const updatedFilteredProducts = data.filter((product) => {
+      // Access the nested category object
+      const subCategoryMatches = product?.category?.subCategories?.includes(filters?.subCategory);
+      const categoryMatches = product?.category?._id?.includes(filters?.category);
+      const brandMatches = product?.brand?._id?.includes(filters?.brand);
+
+      // Combine the conditions with logical
+      if (subCategoryMatches && filters?.category && !filters?.brand) {
+        // Match only category
+        return categoryMatches;
+      } else if (subCategoryMatches && !filters?.category && filters?.brand) {
+        // Match only brand
+        return brandMatches;
+      } else {
+        // Match both category and brand
+        return subCategoryMatches && categoryMatches && brandMatches;
+      }
+    });
+
+    const sortedProducts = applySorting(updatedFilteredProducts, filters.sort);
+
+    // Update the state with the filtered products
+    setFilteredProducts(sortedProducts);
+  };
+
+  const handleSelectedCategoryChange = (categoryId) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = {
+        ...prevFilters,
+        subCategory: categoryId,
+      };
+      handleFilterChange(updatedFilters); // Call onFilterChange with the updated filters
+      return updatedFilters; // Return the updated filters to setFilters
+    });
+  };
+
+  // When sorting is changed:
+  const handleSortChange = (e) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = {
+        ...prevFilters,
+        sort: e.target.value,
+      };
+      handleFilterChange(updatedFilters); // Call onFilterChange with the updated filters
+      return updatedFilters; // Return the updated filters to setFilters
+    });
+  };
+
+  const renderCategory = categories.map((val, index) => (
+    <li key={index}>
+      <a
+        className={`cursor-pointer block ${val._id === filters?.subCategory ? 'selected' : ''}`}
+        onClick={() => handleSelectedCategoryChange(val._id)}
+      >
+        {val.categoryName}
+      </a>
+    </li>
+  ));
+
+
+  console.log(filters)
+
+  useEffect(() => {
+    setFilteredProducts(data)
+  }, [data])
+
+  const listProduct = filteredProducts?.map((val, index) => {
+    return (
+      <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
+        <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+          <div className="w-full md:h-[300px] h-[200px] ">
+            <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
+          </div>
+          <div class="mt-2.5 px-5 pb-5">
+            <a href="#">
+              <h5 class="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md font-semibold tracking-tight text-gray-900">{val?.productName}</h5>
+            </a>
+            <div class="flex items-center mt-2.5">
+              <span href="#">
+                <h5 class="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md tracking-tight text-gray-400">{val?.origin}</h5>
+              </span>
+            </div>
+            <div className="mt-2.5">
+              <span class="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
+              <div className="">
+                <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                  Tham khảo
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 ml-1 transform rotate-90"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  })
+
+  return (
+    <div className='pt-28'>
+      <div className='max-w-8xl px-4 mx-auto text-left'>
+        <div class="bg-white">
+          <div>
+            {isSideBarOpen && <div class="relative z-40 lg:hidden" role="dialog" aria-modal="true">
+              <div class="fixed inset-0 bg-black bg-opacity-25"></div>
+              <div class="fixed inset-0 z-50 flex">
+                <div class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
+                  <div class="flex items-center justify-between px-4">
+                    <h2 class="text-lg font-medium text-gray-900">Bộ lọc</h2>
+                    <button type="button" class="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400" onClick={openSideBar}>
+                      <span class="sr-only">Close menu</span>
+                      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <ProductFilter
+                    filters={filters}
+                    setFilters={setFilters}
+                    onFilterChange={handleFilterChange}
+                    renderCategory={renderCategory}
+                    selectBrand={selectBrand}
+                    subCategories={subCategories}
+                  />
+                </div>
+              </div>
+            </div>}
+
+            <main class="">
+              <div class="md:flex items-baseline justify-between border-b border-gray-200 pb-6">
+                <h1 class="pb-4 md:pb-0 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Sản phẩm của chúng tôi</h1>
+
+                <div class="flex items-center">
+                  <div class="relative inline-block text-left w-[200px]">
+                    <div>
+                      <Select
+                        id="category"
+                        name="category"
+                        required
+                        value={filters.sort}
+                        onChange={handleSortChange}
+                      >
+                        <option value={""}>
+                          Lọc
+                        </option>
+                        {sort?.map((option) => (
+                          <option key={option._id} value={option._id}>
+                            {option.value}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+
+                  <button type="button" class="-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7">
+                    <span class="sr-only">View grid</span>
+                    <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4.25 2A2.25 2.25 0 002 4.25v2.5A2.25 2.25 0 004.25 9h2.5A2.25 2.25 0 009 6.75v-2.5A2.25 2.25 0 006.75 2h-2.5zm0 9A2.25 2.25 0 002 13.25v2.5A2.25 2.25 0 004.25 18h2.5A2.25 2.25 0 009 15.75v-2.5A2.25 2.25 0 006.75 11h-2.5zm9-9A2.25 2.25 0 0011 4.25v2.5A2.25 2.25 0 0013.25 9h2.5A2.25 2.25 0 0018 6.75v-2.5A2.25 2.25 0 0015.75 2h-2.5zm0 9A2.25 2.25 0 0011 13.25v2.5A2.25 2.25 0 0013.25 18h2.5A2.25 2.25 0 0018 15.75v-2.5A2.25 2.25 0 0015.75 11h-2.5z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                  <button type="button" class="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden" onClick={openSideBar}>
+                    <span class="sr-only">Filters</span>
+                    <svg class="h-5 w-5" aria-hidden="true" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <section aria-labelledby="products-heading" class="pb-24 pt-6">
+                <h2 id="products-heading" class="sr-only">Products</h2>
+
+                <div class="flex gap-x-8 gap-y-10">
+                  {/* Filters */}
+                  <MainProductFilter
+                    filters={filters}
+                    setFilters={setFilters}
+                    onFilterChange={handleFilterChange}
+                    renderCategory={renderCategory}
+                    selectBrand={selectBrand}
+                    subCategories={subCategories}
+                  />
+                  <div class="w-full mx-auto">
+                    <div className="flex flex-wrap gap-4">
+                      {listProduct}
+                    </div>
+                    <Pagination totalItems={filteredProducts?.length} />
+                  </div>
+                </div>
+              </section>
+            </main>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+// The filter when the screen large
+function MainProductFilter({ filters, setFilters, onFilterChange, renderCategory, selectBrand, subCategories }) {
+  
+  const filteredCaterogy = subCategories
+  .filter(category => category.subCategories?._id === filters?.subCategory)
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters((prevFilters) => {
+      const updatedFilters = {
+        ...prevFilters,
+        [name]: value,
+      };
+      onFilterChange(updatedFilters); // Call onFilterChange with the updated filters
+      return updatedFilters; // Return the updated filters to setFilters
+    });
+  };
+
+  return (
+    <form class="hidden lg:block w-[300px]">
+      <h3 class="sr-only">Categories</h3>
+      <ul role="list" class="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
+        {renderCategory}
+      </ul>
+
+      {filters?.subCategory && (<div class="border-b border-gray-200 py-6">
+        <h3 class="-my-3 flow-root">
+          {/* Expand/collapse section button */}
+          <button type="button" class="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500" aria-controls="filter-section-0" aria-expanded="false">
+            <span class="font-medium text-gray-900">Sản phẩm</span>
+          </button>
+        </h3>
+        {/* Filter section, show/hide based on section state. */}
+        <div class="pt-6" id="filter-section-0">
+          <div class="space-y-4">
+            <div>
+              <Select
+                id="category"
+                name="category"
+                required
+                value={filters?.category}
+                onChange={handleFilterChange}
+              >
+                <option value={""}>
+                  Chọn sản phẩm
+                </option>
+                {filteredCaterogy?.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {option.categoryName}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </div>
+      </div>)}
+      <div class="border-b border-gray-200 py-6">
+        <h3 class="-my-3 flow-root">
+          {/* Expand/collapse section button */}
+          <button type="button" class="flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500" aria-controls="filter-section-1" aria-expanded="false">
+            <span class="font-medium text-gray-900">Thương hiệu</span>
+          </button>
+        </h3>
+        {/* Filter section, show/hide based on section state. */}
+        <div class="pt-6" id="filter-section-1">
+          <div class="space-y-4">
+            <div>
+              <Select
+                id="brand"
+                name="brand"
+                required
+                value={filters?.brand}
+                onChange={handleFilterChange}
+              >
+                <option value={""}>
+                  Chọn thương hiệu
+                </option>
+                {selectBrand?.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {option.brandName}
+                  </option>
+                ))}
+              </Select>
+              {/* {selectedValue && (
+                              <button type="button" onClick={handleClearSelection}>
+                                Clear
+                              </button>
+                            )} */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  )
+}
+
+// The filter when the screen small
+function ProductFilter({ filters, setFilters, onFilterChange, renderCategory, selectBrand, subCategories }) {
+
+  const filteredCaterogy = subCategories
+  .filter(category => category.subCategories?._id === filters?.subCategory)
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters((prevFilters) => {
+      const updatedFilters = {
+        ...prevFilters,
+        [name]: value,
+      };
+      onFilterChange(updatedFilters); // Call onFilterChange with the updated filters
+      return updatedFilters; // Return the updated filters to setFilters
+    });
+  };
+
+  return (
+    <form class="mt-4 border-t border-gray-200">
+      <h3 class="sr-only">Danh mục</h3>
+      <ul role="list" class="px-4 py-3 space-y-4 text-sm font-medium text-gray-900">
+        {renderCategory}
+      </ul>
+
+      {filters?.subCategory && (<div class="border-t border-gray-200 px-4 py-6">
+        <h3 class="-mx-2 -my-3 flow-root">
+          <button type="button" class="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" aria-controls="filter-section-mobile-0" aria-expanded="false">
+            <span class="font-medium text-gray-900">Sản phẩm</span>
+          </button>
+        </h3>
+        {/* Filter section, show/hide based on section state. */}
+        <div class="pt-6" id="filter-section-mobile-0">
+          <div class="space-y-6">
+            <div>
+              <Select
+                id="category"
+                name="category"
+                required
+                value={filters?.category}
+                onChange={handleFilterChange}
+              >
+                <option value={"Chọn sản phẩm"}>
+                  Chọn sản phẩm
+                </option>
+                {filteredCaterogy?.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {option.categoryName}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </div>
+      </div>)}
+      <div class="border-t border-gray-200 px-4 py-6">
+        <h3 class="-mx-2 -my-3 flow-root">
+          {/* Expand/collapse section button */}
+          <button type="button" class="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500" aria-controls="filter-section-mobile-1" aria-expanded="false">
+            <span class="font-medium text-gray-900">Thương hiệu</span>
+          </button>
+        </h3>
+        {/* Filter section, show/hide based on section state. */}
+        <div class="pt-6" id="filter-section-mobile-1">
+          <div class="space-y-6">
+            <div>
+              <Select
+                id="brand"
+                name="brand"
+                required
+                value={filters?.brand}
+                onChange={handleFilterChange}
+              >
+                <option value={"Chọn thương hiệu"}>
+                  Chọn thương hiệu
+                </option>
+                {selectBrand?.map((option) => (
+                  <option key={option._id} value={option._id}>
+                    {option.brandName}
+                  </option>
+                ))}
+              </Select>
+              {/* {selectedValue && (
+                              <button type="button" onClick={handleClearSelection}>
+                                Clear
+                              </button>
+                            )} */}
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  )
+}

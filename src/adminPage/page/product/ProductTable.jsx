@@ -1,8 +1,7 @@
 import { Breadcrumb } from "flowbite-react";
-import { HiHome, HiPencilAlt, HiTrash } from "react-icons/hi";
+import { HiHome } from "react-icons/hi";
 import * as React from 'react';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { useDemoData } from '@mui/x-data-grid-generator';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import AddIcon from '@mui/icons-material/Add';
@@ -193,7 +192,8 @@ const Table = function () {
 			width: 200,
 			valueGetter: (params) => params?.value?.categoryName
 		},
-		{ field: 'origin', headerName: 'Xuất xứ' }
+		{ field: 'origin', headerName: 'Xuất xứ' },
+		{ field: 'active', headerName: 'Hoạt động' }
 	], []);
 
 	return (
@@ -228,49 +228,3 @@ const Table = function () {
 		</div>
 	)
 }
-
-// import React, { useState, useEffect } from 'react';
-// import { DataGrid } from '@mui/x-data-grid';
-
-// const App = () => {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const getUsers = async () => {
-//       setLoading(true);
-
-//       try {
-//         const response = await axios.get('https://api.example.com/users');
-//         setUsers(response.data);
-//       } catch (error) {
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     getUsers();
-//   }, []);
-
-//   const columns = [
-//     { field: 'id', headerName: 'ID' },
-//     { field: 'name', headerName: 'Name' },
-//     { field: 'email', headerName: 'Email' },
-//   ];
-
-//   return (
-//     <DataGrid
-//       rows={users}
-//       columns={columns}
-//       loading={loading}
-//       error={error}
-//       fetchRows={async () => {
-//         // Call the API and return the data.
-//         const response = await axios.get('https://api.example.com/users');
-//         return response.data;
-//       }}
-//     />
-//   );
-// };

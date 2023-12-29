@@ -49,13 +49,16 @@ const viewProfile = async () => {
 	return await axios.get("http://localhost:8081/view-profile", config)
 }
 
+const getProductInHome = async () => {
+	return await axios.get("http://localhost:8081/home/products")
+}
 
 const getProducts = async () => {
 	return await axios.get("http://localhost:8081/products", config)
 }
 
 const getProduct = async (id) => {
-	return await axios.get(`http://localhost:8081/products/${id}`, config)
+	return await axios.get(`http://localhost:8081/products/${id}`)
 }
 
 const createTimer = async (data) => {
@@ -145,6 +148,7 @@ export {
 	viewProfile,
 	getProducts,
 	getProduct,
+	getProductInHome,
 	getCategories,
 	createCategory,
 	updateCategory,

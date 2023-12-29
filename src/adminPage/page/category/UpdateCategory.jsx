@@ -9,18 +9,9 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-// import Select from '@mui/material/Select';
-import Switch from '@mui/material/Switch';
-import TextField from '@mui/material/TextField';
-import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createCategory, updateCategory } from '../../../api/apiServices';
+import { Label, TextInput, Select, Textarea } from 'flowbite-react';
+import { updateCategory, getCategories } from '../../../api/apiServices';
 
 export default function UpdateCategory(props) {
 
@@ -30,13 +21,41 @@ export default function UpdateCategory(props) {
 
   // Declare global variables to create product
   const { open, close, row, data, setData} = props;
-
+  const [select, setSelect] = React.useState([]);
   const [msgErr, setMsgErr] = React.useState("");
-
+  
 	const [error, setError] = React.useState({
     categoryName: "",
     description: "", 
   });
+
+  // Get categories 
+  React.useEffect(() => {
+    getCategories()
+      .then(res => {
+        setSelect(res.data.data)
+      })
+      .catch(err => {
+        if (err.response) {
+          console.log(err.response.data.result);
+          console.log(err.response.status);
+          console.log(err.response.data.message);
+        }
+      })
+  }, []);
+
+  // Select category options to change attributes
+  const [selectedValue, setSelectedValue] = React.useState("");
+
+  const handleSelect = (e) => {
+    // Set the state variable to the selected value.
+    setSelectedValue(e.target.value);
+    setError({category: ""})
+  }
+
+	React.useEffect(() => {
+		setSelectedValue(data?.subCategories?._id);
+	}, [data?.subCategories?._id]);
 
   const validation = () => {
     let msg = {}
@@ -86,6 +105,7 @@ export default function UpdateCategory(props) {
     const updatedData = {
       categoryName: data.categoryName,
       description: data.description,
+      subCategories: selectedValue
     }
 
 		const isValid = validation()
@@ -141,7 +161,7 @@ export default function UpdateCategory(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
@@ -161,6 +181,30 @@ export default function UpdateCategory(props) {
 									<p class="mt-1 text-sm text-red-500"> 
 										{error.categoryName}
 									</p>
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="category"
+                      value="Danh mục cha"
+                    />
+                  </div>
+                  <Select
+                    id="category"
+                    name="category"
+                    required
+                    value={selectedValue}
+                    onChange={handleSelect}
+                  >
+                    <option value={"Chọn danh mục sản phẩm"}>
+                      Chọn danh mục sản phẩm
+                    </option>
+                    {select?.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.categoryName}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
               </div>
 

@@ -11,6 +11,7 @@ import Home from './clientPage/page/Home';
 import ProductDetail from './clientPage/page/ProductDetail';
 import Introduction from './clientPage/page/Introduction';
 import Policy from './clientPage/page/Policy';
+import AllProduct from './clientPage/page/AllProduct';
 
 function App() {
   return (
@@ -22,15 +23,14 @@ function App() {
             <Route index path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
             <Route index path='/gioi-thieu' element={<Introduction />} />
             <Route index path='/chinh-sach' element={<Policy />} />
-            
-            {/* <Route index path={slug.DETAIL} element={<ProductDetail />} /> */}
+            <Route index path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
           <Route element={<LayoutAdmin />}>
-            <Route index path='/products' element={<ProductTable />} />
-            <Route path='/categories' element={<CategoryTable />} />
-            <Route path='/user-list' element={<UserTable />} />
-            <Route path='/nhan-hieu' element={<BrandTable />} />
+            <Route index path='/quan-ly/san-pham' element={<ProductTable />} />
+            <Route path='/quan-ly/danh-muc' element={<CategoryTable />} />
+            <Route path='/quan-ly/nguoi-dung' element={<UserTable />} />
+            <Route path='/quan-ly/nhan-hieu' element={<BrandTable />} />
           </Route>
         </Routes>
       </BrowserRouter>

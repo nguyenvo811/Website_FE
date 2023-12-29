@@ -7,7 +7,7 @@ import StateContext from "../component/StateContext";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
 // import ASide from "../component/ASide";
-import { getCategories } from "../../api/apiServices";
+import { getBrands, getCategories } from "../../api/apiServices";
 import ScrollToTopButton from "../component/ScrollToTopButton";
 
 export default function Layout(){
@@ -30,11 +30,23 @@ export default function Layout(){
           console.log(err.response.data.message);
         }
       })
+
+    getBrands()
+    .then(res => {
+      setSelectBrand(res.data.data)
+    })
+    .catch(err => {
+      if (err.response) {
+        console.log(err.response.data.result);
+        console.log(err.response.status);
+        console.log(err.response.data.message);
+      }
+    })
   }, []);
 
   return (
     <>
-      <StateContext.Provider value={{ open, setOpen }}>
+      <StateContext.Provider value={{ open, setOpen, selectCategory, selectBrand }}>
         <Header category={selectCategory} />
           {/* <ASide category={selectCategory} /> */}
           <MainContent />

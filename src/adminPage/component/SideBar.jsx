@@ -1,33 +1,34 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-	HiChartPie,
 	HiUsers,
-	HiLightBulb,
 	HiTag
 } from "react-icons/hi";
+import CategoryIcon from '@mui/icons-material/Category';
+import InventoryIcon from '@mui/icons-material/Inventory';
 export default function Sidebar() {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const data = [
 		{
-			icon: <HiTag size='1.3rem' />,
+			icon: <InventoryIcon size='1.3rem' />,
 			label: "Sản phẩm",
-			path: "/products"
+			path: "/quan-ly/san-pham"
 		},
 		{
 			icon: <HiUsers size='1.2rem' />,
 			label: "Người dùng",
-			path: "/user-list"
+			path: "/quan-ly/nguoi-dung"
 		},
 		{
-			icon: <HiUsers size='1.2rem' />,
+			icon: <CategoryIcon size='1.2rem' />,
 			label: "Danh mục sản phẩm",
-			path: "/categories"
+			path: "/quan-ly/danh-muc"
 		},
 		{
-			icon: <HiUsers size='1.2rem' />,
+			icon: <HiTag size='1.2rem' />,
 			label: "Nhãn hiệu",
-			path: "/nhan-hieu"
+			path: "/quan-ly/nhan-hieu"
 		}
 	]
 
@@ -35,18 +36,16 @@ export default function Sidebar() {
 		return (
 			<li data-drawer-hide="logo-sidebar"
 				className=
-				{val.path === location.pathname
+				{`cursor-pointer ${val.path === location.pathname
 					? "bg-gray-100 dark:bg-gray-700"
-					: ""
-				} >
-				<Link to={val.path} key={index}>
-					<a className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
-						<svg aria-hidden="true" className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-							{val.icon}
-						</svg>
-						<span className="ml-3">{val.label}</span>
-					</a>
-				</Link>
+					: ""}
+				`} >
+				<a key={index} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => navigate(val.path)}>
+					<svg aria-hidden="true" className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						{val.icon}
+					</svg>
+					<span className="ml-3">{val.label}</span>
+				</a>
 			</li>
 		)
 	})

@@ -11,243 +11,65 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import { getCategories, getProduct } from "../../api/apiServices";
+import { FormatCurrency } from "../../asset/FormatCurrency";
+import ReactQuill from "react-quill";
 
 export default function ProductDetail() {
   const location = useLocation();
   const [product, setProduct] = useState([]);
-  const [listColor, setListColor] = useState([]);
+  const [select, setSelect] = useState([]);
   const [color, setColor] = useState("");
-  const [colorChange, setColorChange] = useState("");
 
   const [value, setValue] = useState('1');
 
-	const handleChange = (event, newValue) => {
-		setValue(newValue);
-	};
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const scrollToElement = () => {
     // Find the element you want to scroll to
     const targetElement = document.getElementById('targetElementId');
     // Scroll to the target element with an offset
     if (targetElement) {
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest'});
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
     }
   };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    const productData = data.find(val => val?._id === location?.state)
-    setProduct(productData)
-    setListColor(productData.variants)
-  }, [])
+    getProduct(location?.state)
+      .then(res => {
+        setProduct(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
 
-  const data = [
-    {
-      _id: "1h",
-      productName: "Product A",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 1,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-          ],
-          price: "1.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 2,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "2.000.000VNĐ",
-          color: "Blue"
+    getCategories()
+      .then(res => {
+        setSelect(res.data.data)
+      })
+      .catch(err => {
+        if (err.response) {
+          console.log(err.response.data.result);
+          console.log(err.response.status);
+          console.log(err.response.data.message);
         }
-      ]
-    },
-    {
-      _id: "1f",
-      productName: "Product B",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 3,
-          images: [
-            'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 4,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    },
-    {
-      _id: "1e",
-      productName: "Product C",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 5,
-          images: [
-            'https://images.unsplash.com/photo-1661961112951-f2bfd1f253ce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2672&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 6,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    },
-    {
-      _id: "1d",
-      productName: "Product D",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 7,
-          images: [
-            'https://images.unsplash.com/photo-1512756290469-ec264b7fbf87?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2253&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 8,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    },
-    {
-      _id: "1c",
-      productName: "Product E",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 9,
-          images: [
-            'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2671&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 10,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    },
-    {
-      _id: "1b",
-      productName: "Product F",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 11,
-          images: [
-            'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2671&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 12,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    },
-    {
-      _id: "1a",
-      productName: "Product H",
-      brand: "AUDAX INDONESIA",
-      variants: [
-        {
-          _id: 13,
-          images: [
-            'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2671&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "3.000.000VNĐ",
-          color: "Red"
-        },
-        {
-          _id: 14,
-          images: [
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-            'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-          ],
-          price: "4.000.000VNĐ",
-          color: "Blue"
-        }
-      ]
-    }
-  ]
+      })
+  }, [location?.state])
 
   const selectValue = product?.variants?.find(val => val._id === product?.variants[0]?._id)
+  const compareCategory = select?.find(val => val?._id === product?.category?._id)
 
-  console.log(product?.variants)
-  console.log(selectValue)
+  console.log(product)
+  console.log(compareCategory)
 
-  
+
   const handleSelectColor = (event) => {
     const selectedColor = event.target.value;
     console.log(selectedColor);
     setColor(selectedColor);
-  
-    // Find the selected variant based on the color
-    const variant = listColor?.find((variant) => variant._id === selectedColor);
-    console.log(variant);
   };
 
   const listProductDetail = product?.variants?.map(val => { return val._id });
@@ -255,7 +77,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setColor(defaultColor);
-  }, [defaultColor]); 
+  }, [defaultColor]);
 
   const PrevArrow = ({ onClick }) => (
     <button
@@ -321,6 +143,271 @@ export default function ProductDetail() {
     asNavFor: '.slider-for',
   };
 
+  const renderSpecifications = () => {
+    return (
+      <>
+        {
+          compareCategory?.categoryName === "Speaker" ?
+            <table className="w-full text-sm text-left rtl:text-right border">
+              <tbody>
+                {product?.moreAttribute?.frequencyResponse && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Đáp tuyến tần số
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.frequencyResponse}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.averageSensitivity && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Độ nhạy trung bình
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.averageSensitivity}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.maximumPowerHandlingCapacity && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Xử lý công xuất tối đa đạt được
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.maximumPowerHandlingCapacity}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.maximumVoltage && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Điện áp tối đa
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.maximumVoltage}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.overallDimensions && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Kích thước tổng thể (C x R X D)
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.overallDimensions}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.impedance && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Trở kháng
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.impedance}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.maxHandlingCapacity && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Công suất xử lý tối đa
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.maxHandlingCapacity}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.totalDriver && (
+                  <tr className="border-b border-gray-200">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Tổng trình điều khiển
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.totalDriver}
+                    </td>
+                  </tr>
+                )}
+
+                {product?.moreAttribute?.material && (
+                  <tr className="">
+                    <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                      Chất liệu
+                    </th>
+                    <td className="w-1/2 px-6 py-4">
+                      {product?.moreAttribute?.material}
+                    </td>
+                  </tr>
+                )}
+
+              </tbody>
+            </table>
+            : compareCategory?.categoryName === "Amplifier" ?
+              <table className="w-full text-sm text-left rtl:text-right border">
+                <tbody>
+                  {product?.moreAttribute?.channelInput && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Kênh đầu vào
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.channelInput}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.channelOutput && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Kênh đầu ra
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.channelOutput}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.amplifierClass && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Lớp khuếch đại
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.amplifierClass}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.autoSwitching && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Tự động chuyển đổi
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.autoSwitching}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.autoAdjustVoltage && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Tự động điều chỉnh điện áp
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.autoAdjustVoltage}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.overallDimensions && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Kích thước tổng thể (Cao x Rộng x Dài)
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.overallDimensions}
+                      </td>
+                    </tr>
+                  )}
+
+                  {product?.moreAttribute?.weight && (
+                    <tr className="border-b border-gray-200">
+                      <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                        Trọng lượng
+                      </th>
+                      <td className="w-1/2 px-6 py-4">
+                        {product?.moreAttribute?.weight}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              : compareCategory?.categoryName === "Timer" ?
+                <table className="w-full text-sm text-left rtl:text-right border">
+                  <tbody>
+                    {product?.moreAttribute?.supplyTimer && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Nguồn cung cấp
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.supplyTimer}
+                        </td>
+                      </tr>
+                    )}
+
+                    {product?.moreAttribute?.switchContacts && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Công tắt tiếp điểm
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.switchContacts}
+                        </td>
+                      </tr>
+                    )}
+
+                    {product?.moreAttribute?.maximumLoadContact && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Tiếp điểm tải đối đa
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.maximumLoadContact}
+                        </td>
+                      </tr>
+                    )}
+
+                    {product?.moreAttribute?.programCapacity && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Dung lượng
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.programCapacity}
+                        </td>
+                      </tr>
+                    )}
+
+                    {product?.moreAttribute?.saveProgram && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Trình lưu
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.saveProgram}
+                        </td>
+                      </tr>
+                    )}
+
+                    {product?.moreAttribute?.batteryMemory && (
+                      <tr className="border-b border-gray-200">
+                        <th scope="row" className="w-1/2 px-6 py-4 font-medium whitespace-nowrap bg-gray-50">
+                          Bộ nhớ pin
+                        </th>
+                        <td className="w-1/2 px-6 py-4">
+                          {product?.moreAttribute?.batteryMemory}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+                : "Error"
+        }
+      </>
+    )
+  }
+
   return (
     <>
       <section class="pt-28 font-poppins dark:bg-gray-800">
@@ -362,29 +449,38 @@ export default function ProductDetail() {
             <div class="w-full px-4 md:w-1/2">
               <div class="lg:pl-20">
                 <div class="mb-6 ">
-                  <span class="px-2.5 py-0.5 text-xs text-blue-600 bg-blue-100 dark:bg-gray-700 rounded-xl dark:text-gray-200">{product?.brand}</span>
+                  <span class="px-2.5 py-0.5 text-xs text-blue-600 bg-blue-100 dark:bg-gray-700 rounded-xl dark:text-gray-200">{product?.brand?.brandName}</span>
                   <h2 class="max-w-xl mt-6 mb-6 text-xl font-semibold leading-loose tracking-wide text-gray-700 md:text-2xl dark:text-gray-300">
                     {product?.productName}
                   </h2>
-                 
+
                   <p class="inline-block text-2xl font-semibold text-gray-700 dark:text-gray-400 ">
-                    <span>Giá: Rs.7,000.00</span>
+                    {product?.variants?.map((val, index) =>
+                      color === val?._id && (
+                        <>
+                          <span>Giá: <FormatCurrency price={val?.price} /></span>
+                        </>
+                      )
+                    )}
+                  </p>
+                  <p class="mt-6 text-2xl font-semibold text-gray-700 dark:text-gray-400 ">
+                    <span>Xuất xứ: {product?.origin}</span>    
                   </p>
                 </div>
-                <div 
+                <div
                   class="cursor-pointer mb-6 flex items-center"
                   onClick={scrollToElement}
                 >
                   <h2 class="text-lg font-bold text-gray-700">Chi tiết sản phẩm</h2>
                   <svg
-										xmlns="http://www.w3.org/2000/svg"
-										className="h-4 w-4 ml-1 transform rotate-90"
-										fill="none"
-										viewBox="0 0 24 24"
-										stroke="currentColor"
-									>
-										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-									</svg>
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 ml-1 transform rotate-90"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
                 </div>
                 <div class="py-6 mb-6 border-t border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center">
@@ -432,7 +528,7 @@ export default function ProductDetail() {
                   borderBottom: 1,
                   borderColor: 'divider',
                 }}>
-                  <TabList 
+                  <TabList
                     value={value}
                     onChange={handleChange}
                     sx={{
@@ -441,14 +537,14 @@ export default function ProductDetail() {
                       }
                     }}
                   >
-                    <Tab label="MÔ TẢ SẢN PHẨM" value="1" 
+                    <Tab label="MÔ TẢ SẢN PHẨM" value="1"
                       sx={{
                         "&.Mui-selected": {
                           color: "#eab308", // Add '#' and fix the color value
                         },
                       }}
                     />
-                    <Tab label="THÔNG SỐ CHI TIẾT" value="2" 
+                    <Tab label="THÔNG SỐ CHI TIẾT" value="2"
                       sx={{
                         "&.Mui-selected": {
                           color: "#eab308", // Add '#' and fix the color value
@@ -459,207 +555,26 @@ export default function ProductDetail() {
                 </Box>
                 <TabPanel value="1">
                   <div className="text-left">
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        LỊCH SỬ THÀNH LẬP
-                      </strong>
-                    </div>
-                    <p className="text-justify">
-                      Được thành lập vào năm 2013 - trải qua một chặng đường dài trong việc nghiên cứu và phát triển về lĩnh vực thiết bị nhà nuôi yến,
-                      cùng với mong muốn mang đến cho khách hàng những sản phẩm và dịch vụ tốt nhất, ngày nay, CÔNG TY TNHH TM CUNG CẤP THIẾT BỊ NHÀ YẾN THÂN THI
-                      được nhắc đến như là một trong những nhà cung cấp hàng đầu các giải pháp dịch vụ trọn gói cho hệ thống Nhà Nuôi yến và hệ thống thiết bị lắp
-                      đặt nhà yến chuyên nghiệp, cũng như hỗ trợ, tư vấn tận tâm cho Quý khách hàng.
-                    </p>
-                    <br />
-                    <p className="text-justify">
-                      Hiểu được tâm tư và nguyện vọng của khách hàng, NHÀ YẾN THÂN THI luôn không ngừng phấn đấu để đem đến một quy trình phục vụ tốt nhất từ việc lên kế hoạch
-                      tìm hiểu, Tư vấn cho khách hàng, Thiết kế mô hình nhà nuôi yến, Cung cấp trọn gói hệ thống thiết bị lắp đặt nhà yến hoàn chỉnh và quan tâm
-                      sát sao đến việc bảo hành, bảo trì sản phẩm cho Quý khách hàng.
-                      May mắn nhận được sự hỗ trợ từ phía đối tác cũng như sự tin tưởng và tín nhiệm của khách hàng, NHÀ YẾN THÂN THI THÂN THI đã có cơ hội mở rộng quy mô thị
-                      trường hoạt động từ Trung Bộ trải dài tới Tây Nam Bộ nhằm đáp ứng nhu cầu ngày một cao hơn của khách hàng là các chủ nhà yến, kỹ thuật lắp đặt, đại
-                      lý phân phối sản phẩm thiết bị… trên Toàn Quốc.
-                    </p>
-                    <br />
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        TÌNH HÌNH HIỆN NAY
-                      </strong>
-                    </div>
-                    <p className="text-justify">
-                      Được thành lập vào năm 2013 - trải qua một chặng đường dài trong việc nghiên cứu và phát triển về lĩnh vực thiết bị nhà nuôi yến,
-                      cùng với mong muốn mang đến cho khách hàng những sản phẩm và dịch vụ tốt nhất, ngày nay, CÔNG TY TNHH TM CUNG CẤP THIẾT BỊ NHÀ YẾN THÂN THI
-                      được nhắc đến như là một trong những nhà cung cấp hàng đầu các giải pháp dịch vụ trọn gói cho hệ thống Nhà Nuôi yến và hệ thống thiết bị lắp
-                      đặt nhà yến chuyên nghiệp, cũng như hỗ trợ, tư vấn tận tâm cho Quý khách hàng.
-                    </p>
-                    <br />
-                    <p className="text-justify">
-                      Hiểu được tâm tư và nguyện vọng của khách hàng, NHÀ YẾN THÂN THI luôn không ngừng phấn đấu để đem đến một quy trình phục vụ tốt nhất từ việc lên kế hoạch
-                      tìm hiểu, Tư vấn cho khách hàng, Thiết kế mô hình nhà nuôi yến, Cung cấp trọn gói hệ thống thiết bị lắp đặt nhà yến hoàn chỉnh và quan tâm
-                      sát sao đến việc bảo hành, bảo trì sản phẩm cho Quý khách hàng.
-                      May mắn nhận được sự hỗ trợ từ phía đối tác cũng như sự tin tưởng và tín nhiệm của khách hàng, NHÀ YẾN THÂN THI THÂN THI đã có cơ hội mở rộng quy mô thị
-                      trường hoạt động từ Trung Bộ trải dài tới Tây Nam Bộ nhằm đáp ứng nhu cầu ngày một cao hơn của khách hàng là các chủ nhà yến, kỹ thuật lắp đặt, đại
-                      lý phân phối sản phẩm thiết bị… trên Toàn Quốc.
-                    </p>
-                    <br />
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        NHÓM HÀNG - SẢN PHẨM CHỦ LỰC
-                      </strong>
-                    </div>
-                    <p className="text-justify">
-                      Nhóm hệ thống gỗ
-                      Nhóm hệ thống Loa và Amply
-                      Nhóm hệ thống phun sương, tạo ẩm
-                      Nhóm dung dịch
-                      Nhóm thiết bị điện
-                      Nhóm thiết bị khác
-                    </p>
-                    <br />
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        THẾ MẠNH CỦA NHÀ YẾN THÂN THI
-                      </strong>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-justify">
-                        Có kinh nghiệm hơn 10 năm tìm hiểu và hoạt động trong lĩnh vực cung cấp thiết bị lắp đặt nhà nuôi yến.
-                      </p>
-                      <p className="text-justify">
-                        Sản phẩm mang thương hiệu  được nhập khẩu chính ngạch từ Malaysia, Indonesia, Taiwan,…Quý khách hàng khi
-                        mua thiết bị tại NHÀ YẾN THÂN THI sẽ được tư vấn và hướng dẫn cách sử dụng tận tâm cùng với chế độ bảo hành sản phẩm đặc biệt dành riêng cho quý khách hàng.
-                      </p>
-                      <p className="text-justify">
-                        Các nhóm sản phẩm đa dạng, chất lượng cao, với mức chi phí cạnh tranh và phù hợp nhất cho từng điều kiện kinh tế của chủ đầu tư.
-                      </p>
-                      <p className="text-justify">
-                        Hệ thống Đại lý phân phối của lớn mạnh trải dài từ Bắc Trung Bộ đến Tây Nam Bộ , đáp ứng mọi nhu cầu xây dựng, lắp đặt nhà yến của chủ nhà yến mọi miền Tổ quốc.
-                      </p>
-                      <p className="text-justify">
-                        Dịch vụ chăm sóc khách hàng, bảo trì, thay thế linh kiện linh hoạt, tận tâm và nhanh chóng.
-                      </p>
-                      <p className="text-justify">
-                        Đội ngũ nhân viên THÂN THI giàu kinh nghiệm, thân thiện, nhịêt tình và đầy trách nhiệm luôn thấu hiểu nhu cầu và phục vụ tối đa quyền lợi cho Quý khách hàng.
-                      </p>
-                    </div>
+                    <section className='w-full h-full pb-8 border-1 border-b'>
+                      <iframe
+                        width="100%"
+                        className="sm:h-[415px] lg:h-[615px] h-[315px]"
+                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(product?.video)}`}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title="Embedded Video"
+                      ></iframe>
+                    </section>
+                    <ReactQuill
+                      value={product?.description || ''}
+                      readOnly={true}
+                      theme="bubble"
+                    />
                   </div>
                 </TabPanel>
                 <TabPanel value="2">
-                  <div className="text-left">
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        TẦM NHÌN CHIẾN LƯỢC
-                      </strong>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-justify">
-                        “NHÀ YẾN THÂN THI- niềm tin hàng đầu của Quý khách hàng về sản phẩm thiết bị và dịch vụ”
-                      </p>
-                      <p className="text-justify">
-                        Với tầm nhìn dài hạn tập trung cho sự phát triển bền vững trở thành công ty tiên phong có tên tuổi và vị thế trên thị trường trong lĩnh vực Nhà nuôi yến.
-                      </p>
-                      <p className="text-justify">
-                        NHÀ YẾN THÂN THI tập trung cơ cấu ở 4 mảng chính gồm:
-                        <div className="space-y-1 ml-4">
-                          <p className="text-justify">
-                            Nghiên cứu cải tiến và phát triển công nghệ sản phẩm theo tiêu chuẩn chất lượng Quốc tế.
-                          </p>
-                          <p className="text-justify">
-                            Nhập khẩu và thương mại Thiết Bị Nhà Yến.
-                          </p>
-                          <p className="text-justify">
-                            Tư vấn và hỗ trợ kỹ thuật lắp đặt thiết bị nhà yến cho khách hàng.
-                          </p>
-                          <p className="text-justify">
-                            Xây dựng kênh thu mua, chế biến và phân phối.
-                          </p>
-                        </div>
-                      </p>
-                    </div>
-                    <br />
-                    <div className="flex items-center pb-2">
-                      <span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
-                      <strong
-                        class="block text-xl font-bold text-black sm:text-2xl"
-                      >
-                        SỨ MỆNH
-                      </strong>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-justify">
-                        “Giúp hàng ngàn người Việt thành công trong lĩnh vực Nhà Nuôi Yến”
-                      </p>
-                      <div>
-                        <span>
-                          <strong
-                            class="block text-sm font-bold text-black sm:text-lg"
-                          >
-                            Đối với khách hàng
-                          </strong>
-                          <p className="text-justify">
-                            THÂN THI tận tâm phục vụ đưa ra giải pháp thiết kế xây dựng- cung cấp thiết bị Nhà Nuôi Yến phù hợp đạt
-                            tiêu chuẩn chất lượng quốc tế. Giúp khách hàng tiết kiệm tối đa chi phí đầu tư và đem về nguồn lợi đáng kể từ Nhà Nuôi Yến.
-                          </p>
-                        </span>
-                        <span>
-                          <strong
-                            class="block text-sm font-bold text-black sm:text-lg"
-                          >
-                            Đối với đối tác
-                          </strong>
-                          <p className="text-justify">
-                            Trên tinh thần hợp tác cùng phát triển. Tuân thủ các thỏa thuận hợp tác và tuân thủ Pháp luật.
-                          </p>
-                        </span>
-                        <span>
-                          <strong
-                            class="block text-sm font-bold text-black sm:text-lg"
-                          >
-                            Đối với CBCNV
-                          </strong>
-                          <p className="text-justify">
-                            Xây dựng môi trường làm việc chuyên nghiệp, có nguồn thu nhập cao. Mỗi cá nhân đều có cơ hội học tập,
-                            phát triển trong môi trường năng động, sáng tạo, mang tính nhân văn và công bằng.
-                          </p>
-                        </span>
-                        <span>
-                          <strong
-                            class="block text-sm font-bold text-black sm:text-lg"
-                          >
-                            Đối với xã hội
-                          </strong>
-                          <p className="text-justify">
-                            Cân bằng giữa lợi ích doanh nghiệp và lợi ích xã hội. THÂN THI tích cực tham gia đóng góp, xây dựng các
-                            chương trình vì cộng đồng. Thể hiện tinh thần dân tộc và trách nhiệm đối với xã hội.
-                          </p>
-                        </span>
-                        <span>
-                          <strong
-                            class="block text-sm font-bold text-black sm:text-lg"
-                          >
-                            Đối với môi trường
-                          </strong>
-                          <p className="text-justify">
-                            Tuân thủ các quy định của Pháp luật về thiết kế- thi công- xây dựng. Bên cạnh đó là bảo vệ môi trường sinh sống cho loài Chim Yến.
-                          </p>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+                  {renderSpecifications()}
                 </TabPanel>
               </TabContext>
             </Box>
@@ -668,4 +583,13 @@ export default function ProductDetail() {
       </section>
     </>
   )
+}
+
+function getYouTubeVideoId(url) {
+  // Regular expression to extract the video ID
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = url?.match(regex);
+
+  // If there's a match, return the video ID, otherwise return an empty string
+  return match ? match[1] : "";
 }

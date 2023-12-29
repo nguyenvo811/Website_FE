@@ -146,7 +146,7 @@ export default function Authentication() {
 			.then(res => {
 				if (res.status === 200) {
 					clearState()
-					navigate("/products")
+					navigate("/quan-ly/san-pham")
 					window.location.reload()
 				}
 			})

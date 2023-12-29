@@ -140,7 +140,6 @@ const Table = function() {
       },
     },
     { field: 'categoryName', headerName: 'Danh mục sản phẩm', width: 200, },
-    { field: 'description', headerName: 'Mô tả' },
   ], []);
 
 	return (

@@ -26,7 +26,7 @@ const ScrollToTopButton = () => {
 
   return (
     <button
-      className={`fixed bottom-4 right-4 bg-yellow-400 p-2 rounded-full text-white hover:bg-yellow-500 ${isVisible ? 'visible' : 'hidden'}`}
+      className={`fixed z-50 bottom-4 right-4 bg-yellow-400 p-2 rounded-full text-white hover:bg-yellow-500 ${isVisible ? 'visible' : 'hidden'}`}
       onClick={scrollToTop}
     >
       <svg

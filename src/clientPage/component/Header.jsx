@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FaShoppingCart, FaSearch } from "react-icons/fa";
-import { AiOutlineClose } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import "react-toggle/style.css"
 import StateContext from "./StateContext";
 import ASide from "./ASide";
 import Logo from '../../asset/img/LOGO.png';
+import { getProductInHome } from "../../api/apiServices";
+import { FormatCurrency } from "../../asset/FormatCurrency";
+import slugify from 'slugify';
 // import { viewProfile } from "../../api/apiServices";
 // import ChangePassword from "../page/user/ChangePassword";
 
@@ -31,21 +32,19 @@ export default function Header(props) {
 	const [showSearch, setShowSearch] = useState(true);
 	const [scrolled, setScrolled] = useState(false);
 	const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+	const [data, setData] = useState([])
 	
 	const openSideBar = () => {setIsSideBarOpen(!isSideBarOpen)}
 
-	// const [profile, setProfile] = useState([]);
-	// const [open, setOpen] = React.useState(false);
-
-	// const handleClickOpen = () => {
-	// 	setOpen(true);
-	// };
-
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// };
-
 	useEffect(() => {
+		getProductInHome()
+		.then(res => {
+			setData(res.data.data)
+		})
+		.catch(err => {
+			console.log(err)
+		})
+
     const handleScroll = () => {
       if (window.scrollY > 0) {
         setScrolled(true);
@@ -61,7 +60,7 @@ export default function Header(props) {
     };
   }, []);
 
-  const headerClass = `font-sans w-full m-0 fixed top-0 z-50 ${
+  const headerClass = `font-sans w-full m-0 fixed top-0 z-10 ${
     window.location.pathname !== "/" && !scrolled
       ? "bg-red-700 opacity-100 transition-all duration-300 ease-in"
       : scrolled
@@ -69,65 +68,44 @@ export default function Header(props) {
       : "bg-opacity-0 transition-all duration-300 ease-out"
   }`;
 
-	const renderCategory = category.map((val, index) => {
+	const categories = [];
+
+  category.forEach((category) => {
+    if (!category.subCategories) {
+      categories.push(category);
+    }
+  });
+
+	const handleClick = useCallback(
+		async (val) => {
+			// Define the logic for handling click details
+			console.log("Item Clicked:", val);
+
+			// Example: Navigate to the product details page
+			const categoryNameSlug = slugify(val?.categoryName, { lower: true, locale: 'vi' });
+			const categoryPath = `/chi-tiet-san-pham/${categoryNameSlug}`;
+
+			navigate({
+				pathname: categoryPath
+			}, {state : val?._id});
+		},
+		[navigate]
+	);
+
+	const renderCategory = categories.map((val, index) => {
+		console.log(val)
 		return (
 			<>
 				<li
 					key={index}
 					// className="cursor-pointer block text-sm font-semibold px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white"
-					onClick={() => navigate(`/${val.categoryName.toLowerCase()}`)}
-					
+					onClick={() => handleClick(val)}
 				>
-					<a className="cursor-pointer block text-sm font-semibold px-4 py-2 text-gray-800 hover:bg-red-700 hover:text-white">{val.categoryName}</a>
+					<span className="cursor-pointer block text-sm font-semibold px-4 py-2 text-gray-800 hover:bg-red-700 hover:text-white">{val.categoryName}</span>
 				</li>
 			</>
 		)
 	})
-
-	const data = [
-		{
-			productName: "Product A",
-			variants: [
-				{
-					images: [
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-					],
-					price: "1.000.000VNĐ",
-					color: "Red"
-				},
-				{
-					images: [
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-					],
-					price: "2.000.000VNĐ",
-					color: "Blue"
-				}
-			]
-		},
-		{
-			productName: "Product B",
-			variants: [
-				{
-					images: [
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-					],
-					price: "3.000.000VNĐ",
-					color: "Red"
-				},
-				{
-					images: [
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80',
-						'https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2620&q=80'
-					],
-					price: "4.000.000VNĐ",
-					color: "Blue"
-				}
-			]
-		}
-	]
 
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
@@ -180,20 +158,16 @@ export default function Header(props) {
 		<div className="absolute left-0 top-1 w-[300px] sm:w-[400px] rounded-md overflow-x-auto bg-white border py-2 mx-auto">
 			{filteredData.slice(0, 15).map((val, index) => (
 				<div key={index} onClick={() => {return handleSearch(val), handleClickDetails(val)}}
-					className="cursor-pointer text-sm sm:text-lg flex">
+					className="cursor-pointer text-sm flex">
 					{console.log(val)}
 					<div className="px-2 w-full">
-						{val?.variants?.map((value, indexColor) => (
-							<div className="grid items-center grid-cols-3 sm:gap-2 py-2 hover:bg-gray-100">
-								<img key={indexColor} src={value?.images[0]} className="w-[70px] h-[60px] object-center object-cover" alt={`Slide ${indexColor + 1}`} />
-								<div className="text-left pl-2 text-gray-500 overflow-hidden scroll-m-0">
-									<a>{val.productName}</a>
-									<br></br>
-									<a>{value.color}</a>
+							<div className="grid items-center grid-cols-3 py-2 hover:bg-gray-100 text-black">
+								<img key={index} src={val?.variants[0]?.images[0]} className="w-[70px] h-[60px] object-center object-cover" alt={`Slide ${index + 1}`} />
+								<div className="text-left pl-2 overflow-hidden scroll-m-0">
+									<span className="block">{val?.productName}</span>
 								</div>
-								<a className="text-gray-500">{value?.price}</a>
+								<span className=""><FormatCurrency price={val?.variants[0]?.price} /></span>
 							</div>
-						))}
 					</div>
 				</div>
 			))}
@@ -214,7 +188,7 @@ export default function Header(props) {
 								<ul class="flex justify-center items-center">
 									<li onClick={() => navigate("/gioi-thieu") }><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Giới thiệu</a></li>
 									<li onClick={() => navigate("/chinh-sach")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Chính sách</a></li>
-									<li className="relative inline-block">
+									<li className="relative inline-block" onClick={() => navigate("/san-pham")}>
 										<button
 											className="flex justify-center items-center text-white text-sm font-semibold"
 											onMouseOver={() => { return setDropdownOpen(true) }}

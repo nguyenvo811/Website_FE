@@ -7,6 +7,7 @@ import Carousel from "../component/Carousel";
 import cooperateImg from "../../asset/img/wepik-export-20231121015625G76j.png"
 import NewProduct from "../component/NewProduct";
 import BestSeller from "../component/BestSeller";
+import Contribute from "../component/Contribute";
 // import Card from "../component/Card";
 
 export default function Home() {
@@ -50,6 +51,7 @@ export default function Home() {
 				</div>
 				<NewProduct />
 				<BestSeller />
+				<Contribute />
 			</div>
 		</>
 	)

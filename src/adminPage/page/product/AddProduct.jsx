@@ -1,27 +1,18 @@
 import * as React from 'react';
-import ReactDOM from 'react-dom';
-import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-// import Select from '@mui/material/Select';
-import Switch from '@mui/material/Switch';
-import TextField from '@mui/material/TextField';
-import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
+import { Label, TextInput, Select, Textarea } from 'flowbite-react';
 import { createAmplifier, createSpeaker, createTimer, getBrands, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
+import ReactQuill from 'react-quill';
 
 export default function AddProduct(props) {
 
@@ -31,12 +22,13 @@ export default function AddProduct(props) {
   const [msgErr, setMsgErr] = React.useState("");
   const [selectBrand, setSelectBrand] = React.useState([]);
 
+  const [description, setDescription] = React.useState("");
+
   const [newProduct, setNewProduct] = React.useState({
     productName: "",
-    description: "",
-    origin: ""
+    origin: "", 
+    video: ""
   });
-
 
   // Declare variables to create Timer
   const [timer, setTimer] = React.useState({
@@ -116,10 +108,11 @@ export default function AddProduct(props) {
         }
       })
   }, []);
-
+  
   // Select category options to change attributes
   const [selectedValue, setSelectedValue] = React.useState("");
   const [selectedBrandValue, setSelectedBrandValue] = React.useState("");
+  const [selectedSubCategoryValue, setSelectedSubCategoryValue] = React.useState("");
 
   const handleSelect = (e) => {
     // Set the state variable to the selected value.
@@ -127,19 +120,23 @@ export default function AddProduct(props) {
     setError({ category: "" })
   }
 
+  const handleSelectSubCategory = (e) => {
+    // Set the state variable to the selected value.
+    setSelectedSubCategoryValue(e.target.value);
+  }
+
   const handleBrandSelect = (e) => {
     // Set the state variable to the selected value.
     setSelectedBrandValue(e.target.value);
   }
 
-  const showProductBrand = selectBrand.find(val => {
-    if (val._id === selectedBrandValue) {
+  // List category to rendert
+  const selectedCategoryName = select.find(category => category._id === selectedValue);
+  const subCategoryList = select.find(val => {
+    if (val._id === selectedValue) {
       return val
     }
   });
-
-  // List category to rendert
-  const listCategory = select.map(val => { return val._id });
 
   const renderTimerAttribute = () => {
     return (
@@ -266,7 +263,7 @@ export default function AddProduct(props) {
             <div className="mb-2 block">
               <Label
                 htmlFor="frequencyResponse"
-                value="Phản hồi thường xuyên"
+                value="Đáp tuyến tần số"
               />
             </div>
             <TextInput
@@ -632,6 +629,11 @@ export default function AddProduct(props) {
     }
   };
 
+  const handleChangeQuill = (value) => {
+    setDescription(value);
+    setError({ ...error, description: '' });
+  };
+
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value })
@@ -789,8 +791,8 @@ export default function AddProduct(props) {
     setNewProduct({
       productName: "",
       description: "",
-      color: "",
-      origin: ""
+      origin: "",
+      video: ""
     });
 
     setSelectedValue("");
@@ -799,9 +801,12 @@ export default function AddProduct(props) {
     close();
   }
 
+  console.log(selectedCategoryName)
+
   const choseValue = (value) => {
+    console.log(value)
     switch (value) {
-      case listCategory[0]:
+      case "Timer":
         return {
           supplyTimer: timer.supplyTimer,
           switchContacts: timer.switchContacts,
@@ -810,7 +815,7 @@ export default function AddProduct(props) {
           saveProgram: timer.saveProgram,
           batteryMemory: timer.batteryMemory
         };
-      case listCategory[1]:
+      case "Speaker":
         return {
           frequencyResponse: speaker.frequencyResponse,
           averageSensitivity: speaker.averageSensitivity,
@@ -822,7 +827,7 @@ export default function AddProduct(props) {
           totalDriver: speaker.totalDriver,
           material: speaker.material
         };
-      case listCategory[2]:
+      case "Amplifier":
         return {
           channelInput: amplifier.channelInput,
           channelOutput: amplifier.channelOutput,
@@ -842,12 +847,14 @@ export default function AddProduct(props) {
 
     const data = {
       productName: newProduct.productName,
-      description: newProduct.description,
+      description: description,
       category: selectedValue,
+      subCategory: selectedSubCategoryValue,
       origin: newProduct.origin,
       brand: selectedBrandValue,
+      video: newProduct.video,
       variants: variants,
-      ...choseValue(selectedValue)
+      ...choseValue(selectedCategoryName?.categoryName)
     }
 
     const updatedVariants = [];
@@ -869,22 +876,21 @@ export default function AddProduct(props) {
     if (isValid) {
       // Create the appropriate product type based on the selected category
       const createProductType = async (productType) => {
+        console.log(productType)
         switch (productType) {
-          case listCategory[0]:
+          case "Timer":
             return await createTimer(data);
-          case listCategory[1]:
+          case "Speaker":
             return await createSpeaker(data);
-          case listCategory[2]:
+          case "Amplifier":
             return await createAmplifier(data);
           default:
             setError({ category: "" })
         }
       };
 
-
-
       // Create the product
-      return await createProductType(selectedValue)
+      return await createProductType(selectedCategoryName?.categoryName)
         .then((response) => {
           console.log(response.data.data)
           row(response.data.data);
@@ -899,7 +905,6 @@ export default function AddProduct(props) {
         })
     }
   }
-
 
   return (
     <div>
@@ -1013,6 +1018,74 @@ export default function AddProduct(props) {
                 <div>
                   <div className="mb-2 block">
                     <Label
+                      htmlFor="subCategory"
+                      value="Danh mục con"
+                    />
+                  </div>
+                  <Select
+                    id="subCategory"
+                    name="subCategory"
+                    required
+                    value={selectedSubCategoryValue}
+                    onChange={handleSelectSubCategory}
+                  >
+                    <option value={"Chọn danh mục con"}>
+                      Chọn danh mục con
+                    </option>
+                    {subCategoryList?.subCategory?.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.subCategoryName}
+                      </option>
+                    ))}
+                  </Select>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.category}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="description"
+                    value="Mô tả sản phẩm"
+                  />
+                </div>
+                <ReactQuill
+                  value={description}
+                  onChange={handleChangeQuill}
+                  theme="snow" // or "bubble"
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, 3, 4, false] }],
+                      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                      [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                      [{ script: 'super' }, { script: 'sub' }],
+                      [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
+                      ['link', 'image', 'video', 'formula'],
+                      ['clean'],
+                    ],
+                  }}
+                  formats={[
+                    'header', 'font',
+                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                    'list', 'bullet', 'script', 'indent',
+                    'link', 'image', 'video', 'color', 'size', 'align', 'formula',
+                    'background',
+                    'direction',
+                    'code-block',
+                    'code',
+                  ]}
+                />
+                <p class="mt-1 text-sm text-red-500">
+                  {error.description}
+                </p>
+              </div>
+              
+              <div className='grid grid-cols-2 gap-2'>
+              <div>
+                  <div className="mb-2 block">
+                    <Label
                       htmlFor="origin"
                       value="Xuất xứ"
                     />
@@ -1030,34 +1103,50 @@ export default function AddProduct(props) {
                     {error.origin}
                   </p>
                 </div>
-              </div>
-
-              <div>
-                <div className="mb-2 block">
-                  <Label
-                    htmlFor="description"
-                    value="Mô tả sản phẩm"
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="video"
+                      value="Youtube link"
+                    />
+                  </div>
+                  <TextInput
+                    id="video"
+                    name="video"
+                    placeholder="Youtube link"
+                    required
+                    type="text"
+                    value={newProduct.video}
+                    onChange={handleChangeInput}
                   />
                 </div>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Mô tả sản phẩm"
-                  required
-                  rows={4}
-                  value={newProduct.description}
-                  onChange={handleChangeInput}
-                />
-                <p class="mt-1 text-sm text-red-500">
-                  {error.description}
-                </p>
+                {/* <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="productName"
+                      value="Tên sản phẩm"
+                    />
+                  </div>
+                  <TextInput
+                    id="productName"
+                    name="productName"
+                    placeholder="Tên sản phẩm"
+                    required
+                    type="text"
+                    value={newProduct.productName}
+                    onChange={handleChangeInput}
+                  />
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.productName}
+                  </p>
+                </div> */}
               </div>
 
               {
                 selectedValue === "" ? ""
-                  : selectedValue === listCategory[0] ? renderTimerAttribute()
-                    : selectedValue === listCategory[1] ? renderSpeakerAttribute()
-                      : selectedValue === listCategory[2] ? renderAmplifierAttribute()
+                  : selectedCategoryName?.categoryName === "Timer" ? renderTimerAttribute()
+                    : selectedCategoryName?.categoryName === "Speaker" ? renderSpeakerAttribute()
+                      : selectedCategoryName?.categoryName === "Amplifier" ? renderAmplifierAttribute()
                         : ""
               }
 
