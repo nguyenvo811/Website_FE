@@ -6,6 +6,7 @@ import {
 } from "react-icons/hi";
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import FeedIcon from '@mui/icons-material/Feed';
 export default function Sidebar() {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -29,6 +30,11 @@ export default function Sidebar() {
 			icon: <HiTag size='1.2rem' />,
 			label: "Nhãn hiệu",
 			path: "/quan-ly/nhan-hieu"
+		},
+		{
+			icon: <FeedIcon size='1.2rem' />,
+			label: "Tin tức",
+			path: "/quan-ly/tin-tuc"
 		}
 	]
 

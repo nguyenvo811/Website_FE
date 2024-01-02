@@ -93,6 +93,10 @@ const removeProduct = async (id) => {
 	return await axios.delete(`http://localhost:8081/products/${id}`, config)
 }
 
+const searchProducts = async (search) => {
+	return await axios.get(`http://localhost:8081/search-products?search=${search}`)
+  }
+
 const getCategories = async () => {
 	return await axios.get("http://localhost:8081/categories", config)
 }
@@ -137,6 +141,27 @@ const updateBrand = async (id, data) => {
 		})
 }
 
+const getNews = async () => {
+	return await axios.get("http://localhost:8081/news", config)
+}
+
+const createNews = async (data) => {
+	return await axios.post("http://localhost:8081/news/add-news", data, config)
+		.then(response => {
+			return response
+		})
+}
+
+const removeNews = async (id) => {
+	return await axios.delete(`http://localhost:8081/news/${id}`, config)
+}
+
+const updateNews = async (id, data) => {
+	return await axios.patch(`http://localhost:8081/news/${id}`, data, config)
+		.then(response => {
+			return response
+		})
+}
 
 export {
 	signIn,
@@ -149,6 +174,7 @@ export {
 	getProducts,
 	getProduct,
 	getProductInHome,
+	searchProducts,
 	getCategories,
 	createCategory,
 	updateCategory,
@@ -157,6 +183,10 @@ export {
 	createBrand,
 	removeBrand,
 	updateBrand,
+	getNews,
+	createNews,
+	removeNews,
+	updateNews,
 	createTimer,
 	createSpeaker,
 	createAmplifier,

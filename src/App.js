@@ -12,6 +12,8 @@ import ProductDetail from './clientPage/page/ProductDetail';
 import Introduction from './clientPage/page/Introduction';
 import Policy from './clientPage/page/Policy';
 import AllProduct from './clientPage/page/AllProduct';
+import News from './clientPage/page/News';
+import NewsTable from './adminPage/page/news/NewsTable';
 
 function App() {
   return (
@@ -23,6 +25,7 @@ function App() {
             <Route index path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
             <Route index path='/gioi-thieu' element={<Introduction />} />
             <Route index path='/chinh-sach' element={<Policy />} />
+            <Route index path='/tin-tuc' element={<News />} />
             <Route index path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
@@ -31,6 +34,7 @@ function App() {
             <Route path='/quan-ly/danh-muc' element={<CategoryTable />} />
             <Route path='/quan-ly/nguoi-dung' element={<UserTable />} />
             <Route path='/quan-ly/nhan-hieu' element={<BrandTable />} />
+            <Route path='/quan-ly/tin-tuc' element={<NewsTable />} />
           </Route>
         </Routes>
       </BrowserRouter>

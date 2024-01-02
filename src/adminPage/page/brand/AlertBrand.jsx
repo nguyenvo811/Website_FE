@@ -8,7 +8,7 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Typography from '@mui/joy/Typography';
 
-export default function AlertCategory(props) {
+export default function AlertBrand(props) {
 
 	// Declare global variables to create product
 	const { open, close, handleRemove } = props;

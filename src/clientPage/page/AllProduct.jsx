@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StateContext from "../component/StateContext";
-import { getProductInHome } from "../../api/apiServices";
+import { getProductInHome, searchProducts } from "../../api/apiServices";
 import { FormatCurrency } from "../../asset/FormatCurrency";
 import slugify from 'slugify';
 import { Label, Select } from "flowbite-react";
@@ -22,8 +22,10 @@ function useStateContext() {
 
 export default function AllProduct() {
   const navigate = useNavigate();
-  const { category, search } = useParams();
+  const location = useLocation();
+  const { categoryName, search } = useParams();
   const { selectCategory, selectBrand } = useStateContext();
+  console.log(location.state)
 
   const [filters, setFilters] = useState({
     subCategory: '',
@@ -33,6 +35,7 @@ export default function AllProduct() {
   });
 
   const [data, setData] = useState([]);
+  const [searchData, setSearchData] = useState([]);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
   const openSideBar = () => { setIsSideBarOpen(!isSideBarOpen) }
 
@@ -45,7 +48,18 @@ export default function AllProduct() {
       .catch(err => {
         console.log(err)
       })
-  }, [])
+
+    if (location?.search && location?.state) {
+      searchProducts(location?.state)
+      .then(res => {
+        console.log(res.data.data)
+        setSearchData(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    }
+  }, [location?.state, location?.search])
 
   const subCategoryList = selectCategory.find(val => {
     if (val._id === filters.category) {
@@ -78,13 +92,15 @@ export default function AllProduct() {
   };
 
   const handleFilterChange = (filters) => {
-    const findCategory = selectCategory?.find(val => val?._id === filters?.category);
-    const categoryNameSlug = slugify(findCategory?.categoryName, { lower: true, locale: 'vi' });
-    const categoryPath = `/san-pham/danh-muc/${categoryNameSlug}`;
-
-    navigate({
-      pathname: categoryPath
-    });
+    if (filters?.category) {
+      const findCategory = selectCategory?.find((val) => val?._id === filters.category);
+      const categoryNameSlug = slugify(findCategory?.categoryName, { lower: true, locale: 'vi' });
+      const categoryPath = `/san-pham/danh-muc/${categoryNameSlug}`;
+      
+      navigate({
+        pathname: categoryPath,
+      });
+    }
 
     // Implement your logic to filter products based on the provided filters
     const updatedFilteredProducts = data.filter((product) => {
@@ -95,7 +111,7 @@ export default function AllProduct() {
       const brandMatches = !filters.brand || product?.brand?._id === filters?.brand;
 
       // Combine the conditions with logical AND
-      return categoryMatches && subCategoryMatches && brandMatches;
+      return (categoryMatches && subCategoryMatches && brandMatches) || (!categoryMatches && !subCategoryMatches && !brandMatches);
     });
 
     const sortedProducts = applySorting(updatedFilteredProducts, filters.sort);
@@ -145,44 +161,91 @@ export default function AllProduct() {
     setFilteredProducts(data)
   }, [data])
 
-  const listProduct = filteredProducts?.map((val, index) => {
-    return (
-      <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
-        <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
-          <div className="w-full md:h-[300px] h-[200px] ">
-            <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
-          </div>
-          <div class="mt-2.5 px-5 pb-5">
-            <a href="#">
-              <h5 class="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md font-semibold tracking-tight text-gray-900">{val?.productName}</h5>
-            </a>
-            <div class="flex items-center mt-2.5">
-              <span href="#">
-                <h5 class="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md tracking-tight text-gray-400">{val?.origin}</h5>
-              </span>
+  const listProduct = filteredProducts?.length !== 0 ? (
+    filteredProducts?.map((val, index) => {
+      return (
+        <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+            <div className="w-full md:h-[300px] h-[200px] ">
+              <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
             </div>
-            <div className="mt-2.5">
-              <span class="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
-              <div className="">
-                <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
-                  Tham khảo
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 ml-1 transform rotate-90"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                </button>
+            <div className="mt-2.5 px-5 pb-5">
+              <a href="#">
+                <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md font-semibold tracking-tight text-gray-900">{val?.productName}</h5>
+              </a>
+              <div className="flex items-center mt-2.5">
+                <span href="#">
+                  <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md tracking-tight text-gray-400">{val?.origin}</h5>
+                </span>
+              </div>
+              <div className="mt-2.5">
+                <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
+                <div className="">
+                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                    Tham khảo
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-1 transform rotate-90"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    )
-  })
+      );
+    })
+  ) : (
+    <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
+  );
+
+  const searchResult = searchData?.length !== 0 ? (
+    searchData?.map((val, index) => {
+      return (
+        <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+            <div className="w-full md:h-[300px] h-[200px] ">
+              <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
+            </div>
+            <div className="mt-2.5 px-5 pb-5">
+              <a href="#">
+                <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md font-semibold tracking-tight text-gray-900">{val?.productName}</h5>
+              </a>
+              <div className="flex items-center mt-2.5">
+                <span href="#">
+                  <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md tracking-tight text-gray-400">{val?.origin}</h5>
+                </span>
+              </div>
+              <div className="mt-2.5">
+                <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
+                <div className="">
+                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                    Tham khảo
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-1 transform rotate-90"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
+  );
 
   return (
     <div className='pt-28'>
@@ -217,8 +280,13 @@ export default function AllProduct() {
 
             <main class="">
               <div class="md:flex items-baseline justify-between border-b border-gray-200 pb-6">
-                <h1 class="pb-4 md:pb-0 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Sản phẩm của chúng tôi</h1>
-
+                {location?.state ?
+                  <div className="flex">
+                    <span class="pb-4 md:pb-0 text-3xl md:text-4xl tracking-tight text-gray-900">Kết quả tìm kiếm cho <span className="font-bold">"{location?.state}"</span></span>
+                  </div>
+                  :
+                  <h1 class="pb-4 md:pb-0 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Sản phẩm của chúng tôi</h1>
+                }
                 <div class="flex items-center">
                   <div class="relative inline-block text-left w-[200px]">
                     <div>
@@ -271,9 +339,9 @@ export default function AllProduct() {
                   />
                   <div class="w-full mx-auto">
                     <div className="flex flex-wrap gap-4">
-                      {listProduct}
+                      {location?.search && location?.state ? searchResult : listProduct}
                     </div>
-                    <Pagination totalItems={filteredProducts?.length} />
+                    <Pagination totalItems={(location?.search && location?.state) ? searchData?.length : filteredProducts?.length} />
                   </div>
                 </div>
               </section>

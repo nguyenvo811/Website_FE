@@ -100,7 +100,8 @@ export default function Footer(props) {
 
 							<ul class="mt-8 space-y-1 text-sm text-gray-700">
 								<li>Làm việc từ thứ hai đến thứ bảy</li>
-								<li>7:30 - 17:00</li>
+								<li>Sáng: 7:30</li>
+								<li>Chiều: 17:00</li>
 							</ul>
 
 							<ul class="mt-8 flex item-center justify-center gap-6">

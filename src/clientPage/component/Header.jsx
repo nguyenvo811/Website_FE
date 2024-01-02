@@ -60,7 +60,7 @@ export default function Header(props) {
     };
   }, []);
 
-  const headerClass = `font-sans w-full m-0 fixed top-0 z-10 ${
+  const headerClass = `font-sans w-full m-0 fixed top-0 z-50 ${
     window.location.pathname !== "/" && !scrolled
       ? "bg-red-700 opacity-100 transition-all duration-300 ease-in"
       : scrolled
@@ -110,27 +110,48 @@ export default function Header(props) {
   const [filteredData, setFilteredData] = useState([]);
   const [wordEntered, setWordEntered] = useState("");
 
-  const handleFilter = (event) => {
-    const searchWord = event.target.value;
-    setWordEntered(searchWord);
-    const newFilter = data.filter((value) => {
-      return value.productName.toLowerCase().includes(searchWord.toLowerCase());
-    });
+  const removeSpecialCharacters = (text) => {
+		return text.replace(/[^\w\s]/gi, "").toLowerCase();
+	};
+	
+	const handleFilter = (event) => {
+		const searchWord = event.target.value;
+		setWordEntered(searchWord);
+	
+		if (searchWord.trim() === "") {
+			setFilteredData([]);
+			setShowSearch(false);
+			return;
+		}
+	
+		const normalizedSearch = removeSpecialCharacters(searchWord);
+	
+		const newFilter = data.filter((value) => {
+			const normalizedProductName = removeSpecialCharacters(value.productName);
+	
+			// Check if the normalized search word is included in the normalized product name
+			return normalizedProductName.includes(normalizedSearch);
+		});
+	
+		setFilteredData(newFilter);
+		setShowSearch(true);
+	};
 
-    if (searchWord === "") {
-      setFilteredData([]);
-    } else {
-      setFilteredData(newFilter);
-    }
-		setShowSearch(searchWord !== "");
-  };
+  const handleClickDetails = useCallback(
+		async (val) => {
+			// Define the logic for handling click details
+			console.log("Item Clicked:", val);
 
-  const handleClickDetails = useCallback(async(val) => {
-		// navigate({
-		// 	pathname: slug.DETAIL, 
-		// 	search: `?_id=${val._id}`
-		// })
-	})
+			// Example: Navigate to the product details page
+			const productNameSlug = slugify(val?.productName, { lower: true, locale: 'vi' });
+			const productPath = `/chi-tiet-san-pham/${productNameSlug}`;
+
+			navigate({
+				pathname: productPath
+			}, {state : val?._id});
+		},
+		[navigate]
+	);
  
   const clearInput = () => {
     setFilteredData([]);
@@ -144,17 +165,25 @@ export default function Header(props) {
   }
 
   // search
+	const search = useCallback(
+		async (searchWord, e) => {
+			e.preventDefault();
+			// Define the logic for handling click details
+			console.log("Item Clicked:", searchWord);
+			setShowSearch(false)
+			// Example: Navigate to the product details page
+			const searchNameSlug = slugify(searchWord, { lower: true, locale: 'vi' });
+			const searchPath = `/san-pham/${searchNameSlug}`;
 
-  const search = (searchWord) => {
-    console.log(searchWord)
-    // navigate({
-    //   pathname: slug.SEARCH, 
-    //   search: `?search=${searchWord}`
-    // }, {state: searchWord})
-    setShowSearch(false)
-  }
+			navigate({
+				pathname: searchPath,
+				search: `?search=${searchWord}`
+			}, {state : searchWord});
+		},
+		[navigate]
+	);
 
-  const showData = filteredData.length !== 0 && (
+  const showData = filteredData?.length !== 0 ? (
 		<div className="absolute left-0 top-1 w-[300px] sm:w-[400px] rounded-md overflow-x-auto bg-white border py-2 mx-auto">
 			{filteredData.slice(0, 15).map((val, index) => (
 				<div key={index} onClick={() => {return handleSearch(val), handleClickDetails(val)}}
@@ -172,6 +201,12 @@ export default function Header(props) {
 				</div>
 			))}
 		</div>
+	) : (
+		wordEntered && (
+			<div className="absolute left-0 top-1 w-[300px] sm:w-[400px] rounded-md overflow-x-auto bg-white border py-2 mx-auto text-center text-gray-500">
+				Không tìm thấy sản phẩm.
+			</div>
+		)
 	);
 
 	return (
@@ -190,7 +225,7 @@ export default function Header(props) {
 									<li onClick={() => navigate("/chinh-sach")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Chính sách</a></li>
 									<li className="relative inline-block" onClick={() => navigate("/san-pham")}>
 										<button
-											className="flex justify-center items-center text-white text-sm font-semibold"
+											className="flex justify-center items-center text-white text-sm font-semibold mr-4"
 											onMouseOver={() => { return setDropdownOpen(true) }}
 										>
 											<span>Sản phẩm</span>
@@ -210,6 +245,8 @@ export default function Header(props) {
 											</svg>
 										</button>
 									</li>
+									<li onClick={() => navigate("/tin-tuc")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Tin tức</a></li>
+									<li onClick={() => navigate("/tin-tuc")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Liên hệ</a></li>
 								</ul>
 							</div>
 
@@ -229,7 +266,7 @@ export default function Header(props) {
 										<button 
 											type="submit" 
 											class="text-white absolute top-0 right-0 bottom-0 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-md text-xs sm:text-sm px-2 sm:px-4 sm:py-2"
-											onClick={() => search(wordEntered)}
+											onClick={(e) => search(wordEntered, e)}
 										>Tìm kiếm</button>
 									</div>
 								</form>
