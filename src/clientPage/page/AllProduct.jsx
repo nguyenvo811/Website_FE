@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import StateContext from "../component/StateContext";
-import { getProductInHome, searchProducts } from "../../api/apiServices";
+import { getProductByCategory, getProductInHome, searchProducts } from "../../api/apiServices";
 import { FormatCurrency } from "../../asset/FormatCurrency";
 import slugify from 'slugify';
 import { Label, Select } from "flowbite-react";
@@ -23,9 +23,7 @@ function useStateContext() {
 export default function AllProduct() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { categoryName, search } = useParams();
   const { selectCategory, selectBrand } = useStateContext();
-  console.log(location.state)
 
   const [filters, setFilters] = useState({
     subCategory: '',
@@ -34,8 +32,11 @@ export default function AllProduct() {
     sort: ''
   });
 
+  
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [data, setData] = useState([]);
   const [searchData, setSearchData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
   const [isSideBarOpen, setIsSideBarOpen] = useState(false)
   const openSideBar = () => { setIsSideBarOpen(!isSideBarOpen) }
 
@@ -49,8 +50,8 @@ export default function AllProduct() {
         console.log(err)
       })
 
-    if (location?.search && location?.state) {
-      searchProducts(location?.state)
+    if (location?.search && location?.state?.search) {
+      searchProducts(location?.state?.search)
       .then(res => {
         console.log(res.data.data)
         setSearchData(res.data.data)
@@ -59,15 +60,24 @@ export default function AllProduct() {
         console.log(err)
       })
     }
-  }, [location?.state, location?.search])
+
+    if (location?.state?.category) {
+      getProductByCategory(location?.state?.category)
+      .then(res => {
+        console.log("result ", res.data.data)
+        setCategoryData(res.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    }
+  }, [location?.state?.search, location?.search, location?.state?.category])
 
   const subCategoryList = selectCategory.find(val => {
     if (val._id === filters.category) {
       return val
     }
   });
-
-  const [filteredProducts, setFilteredProducts] = useState([]);
 
   let sort = [
     { _id: 1, value: "Mới nhất" },
@@ -154,9 +164,6 @@ export default function AllProduct() {
     </li>
   ));
 
-
-  console.log(filters)
-
   useEffect(() => {
     setFilteredProducts(data)
   }, [data])
@@ -204,8 +211,65 @@ export default function AllProduct() {
     <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
   );
 
+  useEffect(() => {
+    if (searchData) {
+      const sortedProducts = applySorting(searchData, filters.sort);
+      // Update the state with the filtered products
+      setFilteredProducts(sortedProducts);
+    }
+
+    if (categoryData) {
+      const sortedProducts = applySorting(categoryData, filters.sort);
+      // Update the state with the filtered products
+      setFilteredProducts(sortedProducts);
+    }
+  }, [searchData, categoryData, filters.sort]);
+
   const searchResult = searchData?.length !== 0 ? (
     searchData?.map((val, index) => {
+      return (
+        <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
+          <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+            <div className="w-full md:h-[300px] h-[200px] ">
+              <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
+            </div>
+            <div className="mt-2.5 px-5 pb-5">
+              <a href="#">
+                <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md font-semibold tracking-tight text-gray-900">{val?.productName}</h5>
+              </a>
+              <div className="flex items-center mt-2.5">
+                <span href="#">
+                  <h5 className="block overflow-hidden whitespace-nowrap overflow-ellipsis text-md tracking-tight text-gray-400">{val?.origin}</h5>
+                </span>
+              </div>
+              <div className="mt-2.5">
+                <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
+                <div className="">
+                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                    Tham khảo
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 ml-1 transform rotate-90"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  ) : (
+    <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
+  );
+
+  const categoryResult = categoryData?.length !== 0 ? (
+    categoryData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
@@ -252,7 +316,7 @@ export default function AllProduct() {
       <div className='max-w-8xl px-4 mx-auto text-left'>
         <div class="bg-white">
           <div>
-            {isSideBarOpen && <div class="relative z-40 lg:hidden" role="dialog" aria-modal="true">
+            {isSideBarOpen && <div class="relative z-50 lg:hidden" role="dialog" aria-modal="true">
               <div class="fixed inset-0 bg-black bg-opacity-25"></div>
               <div class="fixed inset-0 z-50 flex">
                 <div class="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl">
@@ -280,9 +344,9 @@ export default function AllProduct() {
 
             <main class="">
               <div class="md:flex items-baseline justify-between border-b border-gray-200 pb-6">
-                {location?.state ?
+                {location?.state?.search ?
                   <div className="flex">
-                    <span class="pb-4 md:pb-0 text-3xl md:text-4xl tracking-tight text-gray-900">Kết quả tìm kiếm cho <span className="font-bold">"{location?.state}"</span></span>
+                    <span class="pb-4 md:pb-0 text-3xl md:text-4xl tracking-tight text-gray-900">Kết quả tìm kiếm cho <span className="font-bold">"{location?.state?.search}"</span></span>
                   </div>
                   :
                   <h1 class="pb-4 md:pb-0 text-3xl md:text-4xl font-bold tracking-tight text-gray-900">Sản phẩm của chúng tôi</h1>
@@ -339,9 +403,23 @@ export default function AllProduct() {
                   />
                   <div class="w-full mx-auto">
                     <div className="flex flex-wrap gap-4">
-                      {location?.search && location?.state ? searchResult : listProduct}
+                    {
+                      location?.search && location?.state?.search
+                        ? searchResult
+                        : location?.state?.category
+                          ? categoryResult
+                          : listProduct
+                    }
                     </div>
-                    <Pagination totalItems={(location?.search && location?.state) ? searchData?.length : filteredProducts?.length} />
+                    <Pagination
+                      totalItems={
+                        location?.search && location?.state?.search
+                          ? searchResult?.length
+                          : location?.state?.category
+                            ? categoryData?.length
+                            : filteredProducts?.length
+                      }
+                    />
                   </div>
                 </div>
               </section>

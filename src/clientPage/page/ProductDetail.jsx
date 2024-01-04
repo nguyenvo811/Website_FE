@@ -38,7 +38,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    getProduct(location?.state)
+    getProduct(location?.state?.product)
       .then(res => {
         setProduct(res.data.data)
       })

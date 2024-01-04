@@ -61,6 +61,10 @@ const getProduct = async (id) => {
 	return await axios.get(`http://localhost:8081/products/${id}`)
 }
 
+const getProductByCategory = async (id) => {
+	return await axios.get(`http://localhost:8081/products/products-category/${id}`, config)
+}
+
 const createTimer = async (data) => {
 	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
 	.then(response => {
@@ -145,6 +149,13 @@ const getNews = async () => {
 	return await axios.get("http://localhost:8081/news", config)
 }
 
+const getNewsDetail = async (id) => {
+	return await axios.get(`http://localhost:8081/news-detail/${id}`)
+		.then(response => {
+			return response
+		})
+}
+
 const createNews = async (data) => {
 	return await axios.post("http://localhost:8081/news/add-news", data, config)
 		.then(response => {
@@ -174,6 +185,7 @@ export {
 	getProducts,
 	getProduct,
 	getProductInHome,
+	getProductByCategory,
 	searchProducts,
 	getCategories,
 	createCategory,
@@ -184,6 +196,7 @@ export {
 	removeBrand,
 	updateBrand,
 	getNews,
+	getNewsDetail,
 	createNews,
 	removeNews,
 	updateNews,

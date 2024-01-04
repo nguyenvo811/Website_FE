@@ -103,15 +103,20 @@ export default function Newest() {
 			console.log("Item Clicked:", val);
 
 			// Example: Navigate to the product details page
-			const productNameSlug = slugify(val?.productName, { lower: true, locale: 'vi' });
-			const productPath = `/chi-tiet-san-pham/${productNameSlug}`;
+			const tiltleSlug = slugify(val?.title, { lower: true, locale: 'vi' });
+			const titlePath = `/tin-tuc/${tiltleSlug}`;
 
 			navigate({
-				pathname: productPath
+				pathname: titlePath
 			}, {state : val?._id});
 		},
 		[navigate]
 	);
+
+	const newestArticles = data
+  .filter((val) => val?.active === true && val?.newest === true && val?.highLight === false)
+  .sort((a, b) => new Date(b?.createdAt) - new Date(a?.createdAt)) // Sort articles by timestamp in descending order
+  .slice(0, 10); // Take the first 10 articles
 
 	return (
 		<>
@@ -121,12 +126,12 @@ export default function Newest() {
 						TIN TỨC MỚI NHẤT
 					</strong>
 					<Slider {...settings} ref={sliderRef}>							
-            {data.map((val, index) => (
-              <div className="relative group centerMode" onClick={() => handleClickDetails(val)}>
+            {newestArticles.map((val, index) => (
+							<div className="relative group centerMode" onClick={() => handleClickDetails(val)}>
                 <div className="p-4 h-[250px] lg:h-[400px] w-full m-auto">
                   <img src={val?.image} className="w-full h-full object-center object-cover" alt={`Slide ${index + 1}`} />
-                  <div className="absolute inset-0 btm flex items-end">
-                    <div className="bg-black bg-opacity-60 p-4 w-full mx-4 text-left">
+                  <div className="cursor-pointer absolute inset-0 btm flex items-end" onClick={() => handleClickDetails(val)}>
+                    <div className="bg-black bg-opacity-40 p-4 w-full mx-4 text-left hover:bg-opacity-60">
                       <strong className="block text-sm font-bold text-white md:text-md lg:text-xl ">
                         {val?.title}
                       </strong>

@@ -14,6 +14,7 @@ import Policy from './clientPage/page/Policy';
 import AllProduct from './clientPage/page/AllProduct';
 import News from './clientPage/page/News';
 import NewsTable from './adminPage/page/news/NewsTable';
+import NewsDetail from './clientPage/page/NewsDetail';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route index path='/gioi-thieu' element={<Introduction />} />
             <Route index path='/chinh-sach' element={<Policy />} />
             <Route index path='/tin-tuc' element={<News />} />
+            <Route index path='/tin-tuc/:title' element={<NewsDetail />} />
             <Route index path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
