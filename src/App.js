@@ -15,6 +15,7 @@ import AllProduct from './clientPage/page/AllProduct';
 import News from './clientPage/page/News';
 import NewsTable from './adminPage/page/news/NewsTable';
 import NewsDetail from './clientPage/page/NewsDetail';
+import AllNews from './clientPage/page/AllNews';
 
 function App() {
   return (
@@ -23,12 +24,13 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index path='/' element={<Home />} />
-            <Route index path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
-            <Route index path='/gioi-thieu' element={<Introduction />} />
-            <Route index path='/chinh-sach' element={<Policy />} />
-            <Route index path='/tin-tuc' element={<News />} />
-            <Route index path='/tin-tuc/:title' element={<NewsDetail />} />
-            <Route index path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
+            <Route path='/chi-tiet-san-pham/:productName' element={<ProductDetail />} />
+            <Route path='/gioi-thieu' element={<Introduction />} />
+            <Route path='/chinh-sach' element={<Policy />} />
+            <Route path='/tin-tuc' element={<News />} />
+            <Route path='/tin-tuc/:title' element={<NewsDetail />} />
+            <Route path='/:status' element={<AllNews />} />
+            <Route path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
           <Route element={<LayoutAdmin />}>

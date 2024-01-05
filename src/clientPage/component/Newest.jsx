@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import slugify from 'slugify';
 import { getNews, getProductInHome, getProducts } from "../../api/apiServices";
+import { FormatDateAndTime } from '../../asset/FormatDateAndTime';
 // import Card from "../component/Card";
 
 export default function Newest() {

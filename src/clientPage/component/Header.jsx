@@ -93,7 +93,6 @@ export default function Header(props) {
 	);
 
 	const renderCategory = categories.map((val, index) => {
-		console.log(val)
 		return (
 			<>
 				<li
@@ -168,8 +167,6 @@ export default function Header(props) {
 	const search = useCallback(
 		async (searchWord, e) => {
 			e.preventDefault();
-			// Define the logic for handling click details
-			console.log("Item Clicked:", searchWord);
 			setShowSearch(false)
 			// Example: Navigate to the product details page
 			const searchNameSlug = slugify(searchWord, { lower: true, locale: 'vi' });

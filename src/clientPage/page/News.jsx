@@ -26,11 +26,9 @@ export default function News() {
 
 	const highLight = data
   .filter((val) => val?.active === true && val?.newest === false && val?.highLight === true)
-  .slice(0, 10); // Take the first 10 articles
 
 	const news = data
   .filter((val) => val?.active === true)
-  .slice(0, 10); // Take the first 10 articles
 
 	const handleClickDetails = useCallback(
 		async (val) => {
@@ -48,7 +46,24 @@ export default function News() {
 		[navigate]
 	);
 
-	const listNews = news.map((val, index) => {
+	const handleSeeMore = useCallback(
+		async (status, value) => {
+			console.log("ssss", value)
+			const tiltleSlug = slugify(status, { lower: true, locale: 'vi' });
+			const statusPath = `/${tiltleSlug}`;
+
+			navigate({
+				pathname: statusPath
+			}, {state : {
+				name: status,
+				data: value
+			}});
+		},
+		[navigate]
+	);
+
+
+	const listNews = news.slice(0, 10).map((val, index) => {
 		return (
 			<div href="#" key={index} class="flex-wrap grid grid-cols-2 items-center bg-white border border-gray-200 rounded-lg shadow max-w-screen-lg hover:bg-gray-100">
 				<div className="w-full h-[200px] lg:h-[400px] m-auto">
@@ -72,7 +87,7 @@ export default function News() {
 		)
 	})
 
-	const highLightNews = highLight.map((val, index) => {
+	const highLightNews = highLight.slice(0, 10).map((val, index) => {
 		return (
 			<div key={index} class="text-left w-full mb-2 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100">
 				<div className="w-full h-[150px] lg:h-[250px] m-auto">
@@ -118,13 +133,21 @@ export default function News() {
 
 				<div className="grid md:grid-cols-3 gap-4 p-10 px-20 lg:px-40">
 					<div class="md:col-span-2 w-full mx-auto">
-						<div className="flex flex-wrap gap-4">
+						<div className="flex flex-wrap gap-4 justify-center">
 							{listNews}
+							{news.length >= 10 && (
+								<span href="#" class="cursor-pointer inline-flex items-center px-3 py-2 text-sm font-medium text-center text-black hover:text-gray-500" onClick={() => handleSeeMore('Danh sách tin tức', news)}>
+									Xem thêm
+									<svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+										<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+									</svg>
+								</span>
+							)}
 						</div>
 					</div>
 					<div class="hidden md:block md:col-span-1 w-full mx-auto">
 						<div className="gap-4">
-							<div className="flex text-left mb-2">
+							<div className="flex text-left mb-2 justify-center">
 								<span class="block mr-2 w-1 h-7 bg-yellow-400 rounded"></span>
 								<strong
 									class="block text-2xl font-bold text-black"
@@ -133,6 +156,14 @@ export default function News() {
 								</strong>
 							</div>
 							{highLightNews}
+							{highLight.length >= 10 && (
+								<span href="#" class="cursor-pointer inline-flex items-center px-3 py-2 text-sm font-medium text-center text-black hover:text-gray-500" onClick={() => handleSeeMore('Tin nổi bật', highLight)}>
+									Xem thêm
+									<svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+										<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
+									</svg>
+								</span>
+							)}
 						</div>
 					</div>
 				</div>

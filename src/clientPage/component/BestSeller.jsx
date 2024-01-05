@@ -108,7 +108,7 @@ export default function BestSeller() {
 
 			navigate({
 				pathname: productPath
-			}, {state : val?._id});
+			}, {state : { product: val?._id }});
 		},
 		[navigate]
 	);

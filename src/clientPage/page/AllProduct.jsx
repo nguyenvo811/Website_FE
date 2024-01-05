@@ -5,7 +5,8 @@ import { getProductByCategory, getProductInHome, searchProducts } from "../../ap
 import { FormatCurrency } from "../../asset/FormatCurrency";
 import slugify from 'slugify';
 import { Label, Select } from "flowbite-react";
-import Pagination from "../component/Pagination";
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 function useStateContext() {
   // Get the context value
@@ -32,7 +33,7 @@ export default function AllProduct() {
     sort: ''
   });
 
-  
+
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [data, setData] = useState([]);
   const [searchData, setSearchData] = useState([]);
@@ -52,24 +53,24 @@ export default function AllProduct() {
 
     if (location?.search && location?.state?.search) {
       searchProducts(location?.state?.search)
-      .then(res => {
-        console.log(res.data.data)
-        setSearchData(res.data.data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+        .then(res => {
+          console.log(res.data.data)
+          setSearchData(res.data.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
 
     if (location?.state?.category) {
       getProductByCategory(location?.state?.category)
-      .then(res => {
-        console.log("result ", res.data.data)
-        setCategoryData(res.data.data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+        .then(res => {
+          console.log("result ", res.data.data)
+          setCategoryData(res.data.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   }, [location?.state?.search, location?.search, location?.state?.category])
 
@@ -106,7 +107,7 @@ export default function AllProduct() {
       const findCategory = selectCategory?.find((val) => val?._id === filters.category);
       const categoryNameSlug = slugify(findCategory?.categoryName, { lower: true, locale: 'vi' });
       const categoryPath = `/san-pham/danh-muc/${categoryNameSlug}`;
-      
+
       navigate({
         pathname: categoryPath,
       });
@@ -164,11 +165,41 @@ export default function AllProduct() {
     </li>
   ));
 
+  // pagination
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+
+  // Calculate total pages based on the data source
+  const totalPages = Math.ceil(
+    (location?.search && location?.state?.search
+      ? searchData?.length
+      : location?.state?.category
+        ? categoryData?.length
+        : filteredProducts?.length) / itemsPerPage
+  );
+
+  const handleChangePage = (newPage) => {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Calculate the index range for the current page
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  // Extract data for the current page
+  const currentPageData =
+    location?.search && location?.state?.search
+      ? searchData?.slice(startIndex, endIndex)
+      : location?.state?.category
+        ? categoryData?.slice(startIndex, endIndex)
+        : filteredProducts?.slice(startIndex, endIndex);
+
   useEffect(() => {
     setFilteredProducts(data)
   }, [data])
 
-  const listProduct = filteredProducts?.length !== 0 ? (
+  const listProduct = currentPageData?.length !== 0 ? (
     filteredProducts?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
@@ -225,7 +256,7 @@ export default function AllProduct() {
     }
   }, [searchData, categoryData, filters.sort]);
 
-  const searchResult = searchData?.length !== 0 ? (
+  const searchResult = currentPageData?.length !== 0 ? (
     searchData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
@@ -268,7 +299,7 @@ export default function AllProduct() {
     <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
   );
 
-  const categoryResult = categoryData?.length !== 0 ? (
+  const categoryResult = currentPageData?.length !== 0 ? (
     categoryData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
@@ -403,23 +434,24 @@ export default function AllProduct() {
                   />
                   <div class="w-full mx-auto">
                     <div className="flex flex-wrap gap-4">
-                    {
-                      location?.search && location?.state?.search
-                        ? searchResult
-                        : location?.state?.category
-                          ? categoryResult
-                          : listProduct
-                    }
-                    </div>
-                    <Pagination
-                      totalItems={
+                      {
                         location?.search && location?.state?.search
-                          ? searchResult?.length
+                          ? searchResult
                           : location?.state?.category
-                            ? categoryData?.length
-                            : filteredProducts?.length
+                            ? categoryResult
+                            : listProduct
                       }
-                    />
+                    </div>
+                    <div className='flex justify-center items-center mt-4'>
+                      <Stack spacing={2}>
+                        <Pagination
+                          count={totalPages}
+                          page={page}
+                          onChange={handleChangePage}
+                          variant="outlined"
+                          shape="rounded" />
+                      </Stack>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -434,7 +466,7 @@ export default function AllProduct() {
 
 // The filter when the screen large
 function MainProductFilter({ filters, setFilters, onFilterChange, renderCategory, selectBrand, selectSubCategory }) {
-  
+
   // const filteredCaterogy = subselectCategory
   // .filter(category => category.subselectCategory?._id === filters?.subCategory)
 
