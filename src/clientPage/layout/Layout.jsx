@@ -9,7 +9,7 @@ import Footer from "../component/Footer";
 // import ASide from "../component/ASide";
 import { getBrands, getCategories } from "../../api/apiServices";
 import ScrollToTopButton from "../component/ScrollToTopButton";
-import Contact from "../component/Contact";
+import ContactIcon from "../component/ContactIcon";
 
 export default function Layout(){
   // State variable here
@@ -54,7 +54,7 @@ export default function Layout(){
         {/* <div className="mt-4">
           <Bottom />
         </div> */}
-        <Contact />
+        <ContactIcon />
         <ScrollToTopButton />
         <Footer />
       </StateContext.Provider>

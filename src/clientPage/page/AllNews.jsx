@@ -34,7 +34,7 @@ export default function AllNews() {
   const [page, setPage] = useState(1);
   const totalPages = Math.ceil(location?.state?.data?.length / 10); // Assuming 10 items per page
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (newPage) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

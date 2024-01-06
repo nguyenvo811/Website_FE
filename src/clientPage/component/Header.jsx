@@ -243,7 +243,7 @@ export default function Header(props) {
 										</button>
 									</li>
 									<li onClick={() => navigate("/tin-tuc")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Tin tức</a></li>
-									<li onClick={() => navigate("/tin-tuc")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Liên hệ</a></li>
+									<li onClick={() => navigate("/lien-he")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Liên hệ</a></li>
 								</ul>
 							</div>
 

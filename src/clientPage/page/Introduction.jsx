@@ -10,6 +10,10 @@ import cooperateImg from "../../asset/img/wepik-export-20231121015625G76j.png";
 export default function Introduction() {
 	const [value, setValue] = useState('1');
 
+	useEffect(() => {
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	  }, [])
+
 	const handleChange = (event, newValue) => {
 		setValue(newValue);
 	};

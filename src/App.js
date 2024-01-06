@@ -16,6 +16,7 @@ import News from './clientPage/page/News';
 import NewsTable from './adminPage/page/news/NewsTable';
 import NewsDetail from './clientPage/page/NewsDetail';
 import AllNews from './clientPage/page/AllNews';
+import Contact from './clientPage/page/Contact';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path='/tin-tuc' element={<News />} />
             <Route path='/tin-tuc/:title' element={<NewsDetail />} />
             <Route path='/:status' element={<AllNews />} />
+            <Route path='/lien-he' element={<Contact />} />
             <Route path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />

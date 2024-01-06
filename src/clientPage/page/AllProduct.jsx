@@ -200,7 +200,7 @@ export default function AllProduct() {
   }, [data])
 
   const listProduct = currentPageData?.length !== 0 ? (
-    filteredProducts?.map((val, index) => {
+    currentPageData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
@@ -257,7 +257,7 @@ export default function AllProduct() {
   }, [searchData, categoryData, filters.sort]);
 
   const searchResult = currentPageData?.length !== 0 ? (
-    searchData?.map((val, index) => {
+    currentPageData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
@@ -300,7 +300,7 @@ export default function AllProduct() {
   );
 
   const categoryResult = currentPageData?.length !== 0 ? (
-    categoryData?.map((val, index) => {
+    currentPageData?.map((val, index) => {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
