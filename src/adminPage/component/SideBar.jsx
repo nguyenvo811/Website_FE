@@ -7,6 +7,8 @@ import {
 import CategoryIcon from '@mui/icons-material/Category';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import FeedIcon from '@mui/icons-material/Feed';
+import BadgeIcon from '@mui/icons-material/Badge';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 export default function Sidebar() {
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -35,6 +37,16 @@ export default function Sidebar() {
 			icon: <FeedIcon size='1.2rem' />,
 			label: "Tin tức",
 			path: "/quan-ly/tin-tuc"
+		},
+		{
+			icon: <SupportAgentIcon size='1.2rem' />,
+			label: "Nhân viên",
+			path: "/quan-ly/lien-he"
+		},
+		{
+			icon: <BadgeIcon size='1.2rem' />,
+			label: "Khách hàng",
+			path: "/quan-ly/khach-hang"
 		}
 	]
 

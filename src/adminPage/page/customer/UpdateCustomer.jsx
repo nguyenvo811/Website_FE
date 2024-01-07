@@ -20,9 +20,9 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { updateBrand } from '../../../api/apiServices';
+import { createCategory, updateCategory } from '../../../api/apiServices';
 
-export default function UpdateBrand(props) {
+export default function UpdateCustomer(props) {
 
 	// Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
@@ -92,7 +92,7 @@ export default function UpdateBrand(props) {
     if (isValid){
 
     // Create the category
-    await updateBrand(data._id, updatedData)
+    await updateCategory(data._id, updatedData)
       .then((response) => {
         row(response.data.data.value);
         clearState();

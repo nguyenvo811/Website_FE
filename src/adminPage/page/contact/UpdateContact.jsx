@@ -20,9 +20,9 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { updateBrand } from '../../../api/apiServices';
+import { createCategory, updateCategory, updateContact } from '../../../api/apiServices';
 
-export default function UpdateBrand(props) {
+export default function UpdateContact(props) {
 
 	// Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
@@ -34,16 +34,17 @@ export default function UpdateBrand(props) {
   const [msgErr, setMsgErr] = React.useState("");
 
 	const [error, setError] = React.useState({
-    categoryName: "",
+    contactName: "",
+    numberPhone: "",
     description: "", 
   });
 
   const validation = () => {
     let msg = {}
-    if (data.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
+    if (data.contactName === "") {
+      msg.contactName = "Không được bỏ trống ô!"
     } else if (msgErr !== "") {
-      msg.categoryName = msgErr
+      msg.contactName = msgErr
     } if (data.description === "") {
       msg.description = "Không được bỏ trống ô!"
     } 
@@ -64,11 +65,13 @@ export default function UpdateBrand(props) {
 
   const clearState = () => {
 		setError({
-      categoryName: "",
+      contactName: "",
+      numberPhone: "",
       description: "", 
     })
     setData({
-      categoryName: "",
+      contactName: "",
+      numberPhone: "",
       description: "", 
     })
     setMsgErr("");
@@ -84,7 +87,8 @@ export default function UpdateBrand(props) {
     e.preventDefault();
 
     const updatedData = {
-      categoryName: data.categoryName,
+      contactName: data.contactName,
+      numberPhone: data.numberPhone,
       description: data.description,
     }
 
@@ -92,7 +96,7 @@ export default function UpdateBrand(props) {
     if (isValid){
 
     // Create the category
-    await updateBrand(data._id, updatedData)
+    await updateContact(data._id, updatedData)
       .then((response) => {
         row(response.data.data.value);
         clearState();
@@ -118,7 +122,7 @@ export default function UpdateBrand(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm danh mục sản phẩm
+            Cập nhật nhân viên
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -141,25 +145,46 @@ export default function UpdateBrand(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="categoryName"
-                      value="Danh mục sản phẩm"
+                      htmlFor="contactName"
+                      value="Tên nhân viên"
                     />
                   </div>
                   <TextInput
-                    id="categoryName"
-                    name="categoryName"
-                    placeholder="Tên danh mục sản phẩm"
+                    id="contactName"
+                    name="contactName"
+                    placeholder="Tên nhân viên"
                     required
                     type="text"
-                    value={data.categoryName}
+                    value={data.contactName}
                     onChange={handleChangeInput}
                   />
 									<p class="mt-1 text-sm text-red-500"> 
-										{error.categoryName}
+										{error.contactName}
+									</p>
+                </div>
+
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="numberPhone"
+                      value="Số điện thoại"
+                    />
+                  </div>
+                  <TextInput
+                    id="numberPhone"
+                    name="numberPhone"
+                    placeholder="Số điện thoại"
+                    required
+                    type="text"
+                    value={data.numberPhone}
+                    onChange={handleChangeInput}
+                  />
+									<p class="mt-1 text-sm text-red-500"> 
+										{error.numberPhone}
 									</p>
                 </div>
               </div>
@@ -168,13 +193,13 @@ export default function UpdateBrand(props) {
                 <div className="mb-2 block">
                   <Label
                     htmlFor="description"
-                    value="Mô tả danh mục sản phẩm"
+                    value="Mô tả"
                   />
                 </div>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Mô tả danh mục sản phẩm"
+                  placeholder="Mô tả"
                   required
                   rows={4}
                   value={data.description}

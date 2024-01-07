@@ -20,35 +20,43 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { updateBrand } from '../../../api/apiServices';
+import { createContact, createCategory } from '../../../api/apiServices';
 
-export default function UpdateBrand(props) {
+export default function AddContact(props) {
 
 	// Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('sm');
 
   // Declare global variables to create product
-  const { open, close, row, data, setData} = props;
+  const { open, close, row } = props;
 
   const [msgErr, setMsgErr] = React.useState("");
 
+  const [newContact, setNewContact] = React.useState({
+    contactName: "",
+    numberPhone: "",
+    description: "",
+  });
+
 	const [error, setError] = React.useState({
-    categoryName: "",
+    contactName: "",
+    numberPhone: "",
     description: "", 
   });
 
   const validation = () => {
     let msg = {}
-    if (data.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
+    if (newContact.contactName === "") {
+      msg.contactName = "Vui lòng nhập tên danh mục sản phẩm!"
     } else if (msgErr !== "") {
-      msg.categoryName = msgErr
-    } if (data.description === "") {
-      msg.description = "Không được bỏ trống ô!"
+      msg.contactName = msgErr
+    } if (newContact.description === "") {
+      msg.description = "Vui lòng nhập mô tả danh mục!"
     } 
     
     setError(msg)
+    console.log("validating")
     if (Object.keys(msg).length > 0) {
       return false
     } else {
@@ -58,21 +66,23 @@ export default function UpdateBrand(props) {
 
 	const handleChangeInput = (e) => {
     let {name, value} = e.target;
-    setData({...data, [name]: value})
+    setNewContact({...newContact, [name]: value})
     setError({...error, [name]: ""})
   }
 
   const clearState = () => {
 		setError({
-      categoryName: "",
+      contactName: "",
+      numberPhone: "",
       description: "", 
-    })
-    setData({
-      categoryName: "",
+    });
+    setNewContact({
+      contactName: "",
+      numberPhone: "",
       description: "", 
-    })
+    });
     setMsgErr("");
-    close()
+    close();
   }
 
 	const handleClose = () => {
@@ -83,18 +93,20 @@ export default function UpdateBrand(props) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedData = {
-      categoryName: data.categoryName,
-      description: data.description,
+    const data = {
+      contactName: newContact.contactName,
+      numberPhone: newContact.numberPhone,
+      description: newContact.description,
     }
+    console.log(data)
 
 		const isValid = validation()
     if (isValid){
 
     // Create the category
-    await updateBrand(data._id, updatedData)
+    await createContact(data)
       .then((response) => {
-        row(response.data.data.value);
+        row(response.data.data);
         clearState();
       })
       .catch((error) => {
@@ -118,7 +130,7 @@ export default function UpdateBrand(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm danh mục sản phẩm
+            Thêm nhân viên
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -141,25 +153,46 @@ export default function UpdateBrand(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="categoryName"
-                      value="Danh mục sản phẩm"
+                      htmlFor="contactName"
+                      value="Tên nhân viên"
                     />
                   </div>
                   <TextInput
-                    id="categoryName"
-                    name="categoryName"
-                    placeholder="Tên danh mục sản phẩm"
+                    id="contactName"
+                    name="contactName"
+                    placeholder="Tên nhân viên"
                     required
                     type="text"
-                    value={data.categoryName}
+                    value={newContact.contactName}
                     onChange={handleChangeInput}
                   />
 									<p class="mt-1 text-sm text-red-500"> 
-										{error.categoryName}
+										{error.contactName}
+									</p>
+                </div>
+
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="numberPhone"
+                      value="Số điện thoại"
+                    />
+                  </div>
+                  <TextInput
+                    id="numberPhone"
+                    name="numberPhone"
+                    placeholder="+12 345 6789"
+                    required
+                    type="text"
+                    value={newContact.numberPhone}
+                    onChange={handleChangeInput}
+                  />
+									<p class="mt-1 text-sm text-red-500"> 
+										{error.numberPhone}
 									</p>
                 </div>
               </div>
@@ -168,16 +201,16 @@ export default function UpdateBrand(props) {
                 <div className="mb-2 block">
                   <Label
                     htmlFor="description"
-                    value="Mô tả danh mục sản phẩm"
+                    value="Mô tả"
                   />
                 </div>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Mô tả danh mục sản phẩm"
+                  placeholder="Mô tả"
                   required
                   rows={4}
-                  value={data.description}
+                  value={newContact.description}
                   onChange={handleChangeInput}
                 />
 								<p class="mt-1 text-sm text-red-500"> 

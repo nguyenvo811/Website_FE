@@ -17,6 +17,8 @@ import NewsTable from './adminPage/page/news/NewsTable';
 import NewsDetail from './clientPage/page/NewsDetail';
 import AllNews from './clientPage/page/AllNews';
 import Contact from './clientPage/page/Contact';
+import ContactTable from './adminPage/page/contact/ContactTable';
+import CustomerTable from './adminPage/page/customer/CustomerTable';
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
             <Route path='/quan-ly/nguoi-dung' element={<UserTable />} />
             <Route path='/quan-ly/nhan-hieu' element={<BrandTable />} />
             <Route path='/quan-ly/tin-tuc' element={<NewsTable />} />
+            <Route path='/quan-ly/lien-he' element={<ContactTable />} />
+            <Route path='/quan-ly/khach-hang' element={<CustomerTable />} />
           </Route>
         </Routes>
       </BrowserRouter>

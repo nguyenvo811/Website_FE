@@ -6,7 +6,7 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import contact_img from "../../asset/img/contact_img.avif";
 import { Link, useNavigate } from "react-router-dom";
-import { getNews } from "../../api/apiServices";
+import { getContacts, getNews } from "../../api/apiServices";
 import slugify from 'slugify';
 import CallIcon from '@mui/icons-material/Call';
 import { Label, TextInput, Textarea } from "flowbite-react";
@@ -15,10 +15,20 @@ export default function News() {
 	const navigate = useNavigate();
 	const [data, setData] = useState([]);
 
+	const [customerData, setCustomerData] = useState({
+		firstName: "",
+		lastNane: "",
+		numberPhone: "",
+		email: "",
+		message: "",
+	})
+
+	
+
 	useEffect(() => {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 
-		getNews()
+		getContacts()
 			.then(res => {
 				setData(res.data.data)
 			})
@@ -26,6 +36,27 @@ export default function News() {
 				console.log(err)
 			})
 	}, [])
+
+	const listContact = data.map((val, index) => {
+		return (
+			<div className="lg:basis-[calc(100%/3-16px)] m-auto flex justify-center items-center">
+				<div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-2">
+					<div className="flex justify-center item-center">
+						<div className="w-14 h-14 bg-yellow-400 rounded-xl p-2 flex items-center justify-center">
+							<CallIcon className="h-8 w-8 text-white" />
+						</div>
+					</div>
+					<div className="space-y-2">
+						<div className="text-xl font-medium text-black">{val?.contactName}</div>
+						<p className="text-gray-500">
+							{val?.description}
+						</p>
+						<a href="tel:+123456789" className="text-black hover:underline">{val?.numberPhone}</a>
+					</div>
+				</div>
+			</div>
+		)
+	})
 
 	return (
 		<>
@@ -161,24 +192,9 @@ export default function News() {
 					<div className="absolute w-full h-full bg-black opacity-40"></div>
 					<img src={contact_img} className="w-full h-full object-cover object-center" />
 				</div>
-				<div className="w-full bg-white mt-60">
-					<div className="p-10 px-40">
-						<div className="flex justify-center items-center">
-							<div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-2">
-								<div className="flex justify-center item-center">
-									<div className="w-14 h-14 bg-yellow-400 rounded-xl p-2 flex items-center justify-center">
-										<CallIcon className="h-8 w-8 text-white" />
-									</div>
-								</div>
-								<div className="space-y-2">
-									<div className="text-xl font-medium text-black">Contact us:</div>
-									<p className="text-gray-500">
-										Contact us for general queries, including marketing and partnership opportunities.
-									</p>
-									<a href="tel:+123456789" className="text-black hover:underline">+1 (234) 567-89</a>
-								</div>
-							</div>
-						</div>
+				<div className="w-full mx-auto mt-80">
+					<div className="flex flex-wrap gap-4">
+						{listContact}
 					</div>
 				</div>
 			</div>

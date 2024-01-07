@@ -8,7 +8,7 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Typography from '@mui/joy/Typography';
 
-export default function AlertBrand(props) {
+export default function AlertContact(props) {
 
 	// Declare global variables to create product
 	const { open, close, handleRemove } = props;
@@ -31,7 +31,7 @@ export default function AlertBrand(props) {
 					</Typography>
 					<Divider />
 					<Typography id="alert-dialog-modal-description" className="flex justify-center" textColor="text.tertiary">
-						Bạn có chắc là sẽ xóa thương hiệu này?
+						Bạn có chắc là sẽ xóa nhân viên này?
 					</Typography>
 					<Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 2 }}>
 						<Button variant="plain" color="neutral" onClick={close}>
