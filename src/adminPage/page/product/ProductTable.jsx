@@ -10,7 +10,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddProduct from "./AddProduct";
 import { getProduct, getProducts, removeProduct } from "../../../api/apiServices";
 import AlertProduct from "./AlertProduct";
-import UpdateProduct from "./Updateproduct";
+import UpdateProduct from "./UpdateProduct";
 import Progress from "../../component/Progress";
 // import MaterialReactTable from 'material-react-table';
 // import { Box, IconButton, Tooltip } from '@mui/material';
@@ -193,7 +193,10 @@ const Table = function () {
 			valueGetter: (params) => params?.value?.categoryName
 		},
 		{ field: 'origin', headerName: 'Xuất xứ' },
-		{ field: 'active', headerName: 'Hoạt động' }
+		{ field: 'variantCategory', headerName: 'Loại biến thể' },
+		{ field: 'active', headerName: 'Hoạt động' },
+		{ field: 'newest', headerName: 'Mới nhất' },
+		{ field: 'bestSeller', headerName: 'Best Seller' },
 	], []);
 
 	return (

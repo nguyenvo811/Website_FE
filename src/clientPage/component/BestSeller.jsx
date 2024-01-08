@@ -89,12 +89,9 @@ export default function BestSeller() {
 		],
   };
 
-//   const handleClickDetails = useCallback(async(val) => {
-// 	navigate({
-// 		pathname: slug.DETAIL, 
-// 		search: `?_id=${val._id}`
-// 	})
-// })
+	const bestSellerProducts = data
+  .filter((val) => val?.active === true && val?.newest === false && val?.bestSeller === true)
+  .slice(0, 10); // Take the first 10 articles
 
 
 	const handleClickDetails = useCallback(
@@ -121,8 +118,8 @@ export default function BestSeller() {
 						Sản phẩm bán chạy
 					</strong>
 					<Slider {...settings} ref={sliderRef}>							
-            {data.map((product, index) => (
-              <div className="relative group centerMode" onClick={() => handleClickDetails(product)}>
+            {bestSellerProducts.map((product, index) => (
+              <div className="cursor-pointer relative group centerMode" onClick={() => handleClickDetails(product)}>
                 <div className="p-4 h-[250px] lg:h-[400px] w-full m-auto">
                   <img src={product?.variants[0]?.images[0]} className="w-full h-full object-center object-cover" alt={`Slide ${index + 1}`} />
                   <div className="absolute inset-0 btm flex items-end">

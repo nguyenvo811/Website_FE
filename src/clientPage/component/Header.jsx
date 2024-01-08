@@ -33,48 +33,47 @@ export default function Header(props) {
 	const [scrolled, setScrolled] = useState(false);
 	const [isSideBarOpen, setIsSideBarOpen] = useState(false)
 	const [data, setData] = useState([])
-	
-	const openSideBar = () => {setIsSideBarOpen(!isSideBarOpen)}
+
+	const openSideBar = () => { setIsSideBarOpen(!isSideBarOpen) }
 
 	useEffect(() => {
 		getProductInHome()
-		.then(res => {
-			setData(res.data.data)
-		})
-		.catch(err => {
-			console.log(err)
-		})
+			.then(res => {
+				setData(res.data.data)
+			})
+			.catch(err => {
+				console.log(err)
+			})
 
-    const handleScroll = () => {
-      if (window.scrollY > 0) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+		const handleScroll = () => {
+			if (window.scrollY > 0) {
+				setScrolled(true);
+			} else {
+				setScrolled(false);
+			}
+		};
 
-    window.addEventListener("scroll", handleScroll);
+		window.addEventListener("scroll", handleScroll);
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+		return () => {
+			window.removeEventListener("scroll", handleScroll);
+		};
+	}, []);
 
-  const headerClass = `font-sans w-full m-0 fixed top-0 z-40 ${
-    window.location.pathname !== "/" && !scrolled
-      ? "bg-red-700 opacity-100 transition-all duration-300 ease-in"
-      : scrolled
-      ? "bg-red-700 transition-all duration-300 ease-in"
-      : "bg-opacity-0 transition-all duration-300 ease-out"
-  }`;
+	const headerClass = `font-sans w-full m-0 fixed top-0 z-40 ${window.location.pathname !== "/" && !scrolled
+			? "bg-red-700 opacity-100 transition-all duration-300 ease-in"
+			: scrolled
+				? "bg-red-700 transition-all duration-300 ease-in"
+				: "bg-opacity-0 transition-all duration-300 ease-out"
+		}`;
 
 	const categories = [];
 
-  category.forEach((category) => {
-    if (!category.subCategories) {
-      categories.push(category);
-    }
-  });
+	category.forEach((category) => {
+		if (!category.subCategories) {
+			categories.push(category);
+		}
+	});
 
 	const handleClick = useCallback(
 		async (val) => {
@@ -87,7 +86,7 @@ export default function Header(props) {
 
 			navigate({
 				pathname: categoryPath
-			}, {state: { category: val?._id }});
+			}, { state: { category: val?._id } });
 		},
 		[navigate]
 	);
@@ -106,37 +105,37 @@ export default function Header(props) {
 		)
 	})
 
-  const [filteredData, setFilteredData] = useState([]);
-  const [wordEntered, setWordEntered] = useState("");
+	const [filteredData, setFilteredData] = useState([]);
+	const [wordEntered, setWordEntered] = useState("");
 
-  const removeSpecialCharacters = (text) => {
+	const removeSpecialCharacters = (text) => {
 		return text.replace(/[^\w\s]/gi, "").toLowerCase();
 	};
-	
+
 	const handleFilter = (event) => {
 		const searchWord = event.target.value;
 		setWordEntered(searchWord);
-	
+
 		if (searchWord.trim() === "") {
 			setFilteredData([]);
 			setShowSearch(false);
 			return;
 		}
-	
+
 		const normalizedSearch = removeSpecialCharacters(searchWord);
-	
+
 		const newFilter = data.filter((value) => {
 			const normalizedProductName = removeSpecialCharacters(value.productName);
-	
+
 			// Check if the normalized search word is included in the normalized product name
 			return normalizedProductName.includes(normalizedSearch);
 		});
-	
+
 		setFilteredData(newFilter);
 		setShowSearch(true);
 	};
 
-  const handleClickDetails = useCallback(
+	const handleClickDetails = useCallback(
 		async (val) => {
 			// Define the logic for handling click details
 			console.log("Item Clicked:", val);
@@ -147,23 +146,23 @@ export default function Header(props) {
 
 			navigate({
 				pathname: productPath
-			}, {state : { product: val?._id }});
+			}, { state: { product: val?._id } });
 		},
 		[navigate]
 	);
- 
-  const clearInput = () => {
-    setFilteredData([]);
-    setWordEntered("");
-  };
 
-  const handleSearch = (val) => {
-    setWordEntered(val.productName)
-    setShowSearch(false)
-    clearInput()
-  }
+	const clearInput = () => {
+		setFilteredData([]);
+		setWordEntered("");
+	};
 
-  // search
+	const handleSearch = (val) => {
+		setWordEntered(val.productName)
+		setShowSearch(false)
+		clearInput()
+	}
+
+	// search
 	const search = useCallback(
 		async (searchWord, e) => {
 			e.preventDefault();
@@ -175,25 +174,24 @@ export default function Header(props) {
 			navigate({
 				pathname: searchPath,
 				search: `?search=${searchWord}`
-			}, {state : { search: searchWord }});
+			}, { state: { search: searchWord } });
 		},
 		[navigate]
 	);
 
-  const showData = filteredData?.length !== 0 ? (
-		<div className="absolute left-0 top-1 w-[300px] sm:w-[400px] rounded-md overflow-x-auto bg-white border py-2 mx-auto">
+	const showData = filteredData?.length !== 0 ? (
+		<div className="absolute left-0 top-1 w-[300px] sm:w-[400px] h-[400px] rounded-md overflow-x-auto overflow-y-scroll bg-white border py-2 mx-auto">
 			{filteredData.slice(0, 15).map((val, index) => (
-				<div key={index} onClick={() => {return handleSearch(val), handleClickDetails(val)}}
+				<div key={index} onClick={() => { return handleSearch(val), handleClickDetails(val) }}
 					className="cursor-pointer text-sm flex">
-					{console.log(val)}
 					<div className="px-2 w-full">
-							<div className="grid items-center grid-cols-3 py-2 hover:bg-gray-100 text-black">
-								<img key={index} src={val?.variants[0]?.images[0]} className="w-[70px] h-[60px] object-center object-cover" alt={`Slide ${index + 1}`} />
-								<div className="text-left pl-2 overflow-hidden scroll-m-0">
-									<span className="block">{val?.productName}</span>
-								</div>
-								<span className=""><FormatCurrency price={val?.variants[0]?.price} /></span>
+						<div className="grid items-center grid-cols-3 py-2 hover:bg-gray-100 text-black">
+							<img key={index} src={val?.variants[0]?.images[0]} className="w-[70px] h-[60px] object-center object-cover" alt={`Slide ${index + 1}`} />
+							<div className="text-left pl-2 overflow-hidden scroll-m-0">
+								<span className="block">{val?.productName}</span>
 							</div>
+							<span className=""><FormatCurrency price={val?.variants[0]?.price} /></span>
+						</div>
 					</div>
 				</div>
 			))}
@@ -218,7 +216,7 @@ export default function Header(props) {
 
 							<div class="hidden lg:flex lg:items-center">
 								<ul class="flex justify-center items-center">
-									<li onClick={() => navigate("/gioi-thieu") }><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Giới thiệu</a></li>
+									<li onClick={() => navigate("/gioi-thieu")}><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Giới thiệu</a></li>
 									<li onClick={() => navigate("/chinh-sach")} ><a class="cursor-pointer text-white text-sm font-semibold hover:text-yellow-400 mr-4">Chính sách</a></li>
 									<li className="relative inline-block" onClick={() => navigate("/san-pham")}>
 										<button
@@ -251,24 +249,24 @@ export default function Header(props) {
 								<form>
 									<div class="relative w-[300px] sm:w-[400px]">
 										<div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-												<svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+											<svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 										</div>
-										<input 
-											type="search" 
-											class="block w-full pl-10 rounded-md border border-[#DDE2E4] px-3 py-2 text-sm text-gray-800" 
-											placeholder="Tên sản phẩm..." 
+										<input
+											type="search"
+											class="block w-full pl-10 rounded-md border border-[#DDE2E4] px-3 py-2 text-sm text-gray-800"
+											placeholder="Tên sản phẩm..."
 											value={wordEntered}
-            					onChange={handleFilter}
-											required/>
-										<button 
-											type="submit" 
+											onChange={handleFilter}
+											required />
+										<button
+											type="submit"
 											class="text-white absolute top-0 right-0 bottom-0 bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:outline-none focus:ring-transparent font-medium rounded-md text-xs sm:text-sm px-2 sm:px-4 sm:py-2"
 											onClick={(e) => search(wordEntered, e)}
 										>Tìm kiếm</button>
 									</div>
 								</form>
-								<div className={`relative flex border-t-none z-10 bg-gray-50 justify-center ${showSearch? "" : "hidden"}`} onMouseLeave={() => { return setShowSearch(false) }}> 
-									<div className="mx-auto" > 
+								<div className={`relative flex border-t-none z-10 bg-gray-50 justify-center ${showSearch ? "" : "hidden"}`} onMouseLeave={() => { return setShowSearch(false) }}>
+									<div className="mx-auto" >
 										{showData}
 									</div>
 								</div>
@@ -299,12 +297,20 @@ export default function Header(props) {
 						<div
 							className="absolute w-full z-10 left-0 space-y-2 bg-white border rounded shadow-md"
 						>
-							<ul class="gap-x-8 text-white" onMouseLeave={() => { return setDropdownOpen(false)}}>
-								{renderCategory}
-							</ul>
+							<div className="grid grid-cols-2 p-4 gap-4">
+								<div className="flex justify-center">
+									<span className="text-center">
+										<strong className="text-2xl font-normal">Nhà Yến Thân Thi</strong>
+										<p className="text-gray-500 max-w-md">Chúng tôi nhập khẩu thiết bị nhà yến yến hàng đầu để thúc đẩy ngành công nghiệp yến sào của Việt Nam.</p>
+									</span>
+								</div>
+								<ul class="text-left grid grid-cols-3 text-white" onMouseLeave={() => { return setDropdownOpen(false) }}>
+									{renderCategory}
+								</ul>
+							</div>
 						</div>
 					)}
-					
+
 				</div>
 			</div>
 		</>

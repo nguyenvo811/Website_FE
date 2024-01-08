@@ -65,29 +65,15 @@ const getProductByCategory = async (id) => {
 	return await axios.get(`http://localhost:8081/products/products-category/${id}`, config)
 }
 
-const createTimer = async (data) => {
-	return await axios.post("http://localhost:8081/products/timers/add-timer", data, config)
+const createProduct = async (data) => {
+	return await axios.post("http://localhost:8081/products/add-product", data, config)
 	.then(response => {
 		return response
 	})
 }
 
-const createSpeaker = async (data) => {
-	return await axios.post("http://localhost:8081/products/speakers/add-speaker", data, config)
-	.then(response => {
-		return response
-	})
-}
-
-const createAmplifier = async (data) => {
-	return await axios.post("http://localhost:8081/products/amplifiers/add-amplifier", data, config)
-	.then(response => {
-		return response
-	})
-}
-
-const updateTimer = async (id, data) => {
-	return await axios.patch(`http://localhost:8081/products/timers/${id}`, data, config)
+const updateProduct = async (id, data) => {
+	return await axios.patch(`http://localhost:8081/products/${id}`, data, config)
 		.then(response => {
 			return response
 		})
@@ -244,10 +230,8 @@ export {
 	createNews,
 	removeNews,
 	updateNews,
-	createTimer,
-	createSpeaker,
-	createAmplifier,
-	updateTimer,
+	createProduct,
+	updateProduct,
 	removeProduct,
 	getContacts,
 	createContact,

@@ -116,7 +116,6 @@ export default function AllProduct() {
     // Implement your logic to filter products based on the provided filters
     const updatedFilteredProducts = data.filter((product) => {
       // Access the nested category object
-      console.log(product)
       const categoryMatches = !filters.category || product?.category?._id === filters.category;
       const subCategoryMatches = !filters.subCategory || product?.subCategory === filters.subCategory;
       const brandMatches = !filters.brand || product?.brand?._id === filters?.brand;
@@ -167,7 +166,7 @@ export default function AllProduct() {
 
   // pagination
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
 
   // Calculate total pages based on the data source
   const totalPages = Math.ceil(
@@ -178,7 +177,7 @@ export default function AllProduct() {
         : filteredProducts?.length) / itemsPerPage
   );
 
-  const handleChangePage = (newPage) => {
+  const handleChangePage = (event, newPage) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -196,8 +195,18 @@ export default function AllProduct() {
         : filteredProducts?.slice(startIndex, endIndex);
 
   useEffect(() => {
-    setFilteredProducts(data)
-  }, [data])
+    if (data) {
+      setFilteredProducts(data)
+    } else if (searchData) {
+      // Update the state with the filtered products
+      setFilteredProducts(searchData);
+    } else if (categoryData) {
+      // Update the state with the filtered products
+      setFilteredProducts(categoryData);
+    }
+  }, [data, searchData, categoryData])
+
+  console.log("data", filteredProducts)
 
   const listProduct = currentPageData?.length !== 0 ? (
     currentPageData?.map((val, index) => {
@@ -241,20 +250,6 @@ export default function AllProduct() {
   ) : (
     <div className="w-full max-w-sm mx-auto text-center text-gray-500">Không tìm thấy sản phẩm.</div>
   );
-
-  useEffect(() => {
-    if (searchData) {
-      const sortedProducts = applySorting(searchData, filters.sort);
-      // Update the state with the filtered products
-      setFilteredProducts(sortedProducts);
-    }
-
-    if (categoryData) {
-      const sortedProducts = applySorting(categoryData, filters.sort);
-      // Update the state with the filtered products
-      setFilteredProducts(sortedProducts);
-    }
-  }, [searchData, categoryData, filters.sort]);
 
   const searchResult = currentPageData?.length !== 0 ? (
     currentPageData?.map((val, index) => {

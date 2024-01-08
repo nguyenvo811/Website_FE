@@ -20,7 +20,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createAmplifier, createSpeaker, updateTimer, getCategories } from '../../../api/apiServices';
+import { updateProduct, getCategories } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
 
 export default function UpdateProduct(props) {
@@ -877,11 +877,11 @@ export default function UpdateProduct(props) {
     const updateProductType = async (productType) => {
       switch (productType) {
         case listCategory[0]:
-          return await updateTimer(data._id, updatedData);
+          return await updateProduct(data._id, updatedData);
         case listCategory[1]:
-          return await createSpeaker(updatedData);
+          return await updateProduct(updatedData);
         case listCategory[2]:
-          return await createAmplifier(updatedData);
+          return await updateProduct(updatedData);
         default:
           setError({category: ""})
       }

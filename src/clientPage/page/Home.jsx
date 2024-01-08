@@ -51,7 +51,7 @@ export default function Home() {
 				</div>
 				<NewProduct />
 				<BestSeller />
-				<Contribute />
+				{/* <Contribute /> */}
 			</div>
 		</>
 	)
