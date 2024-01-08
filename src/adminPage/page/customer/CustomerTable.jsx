@@ -20,7 +20,7 @@ export default function CustomerTable() {
 				<div className="mb-1 w-full">
 					<div className="mb-4 pt-16">
 						<h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-							DANH SÁCH NHÃN HIỆU
+							DANH SÁCH KHÁCH HÀNG
 						</h1>
 						<Breadcrumb className="mb-4">
 							<Breadcrumb.Item href="#">
@@ -29,7 +29,7 @@ export default function CustomerTable() {
 									<span className="dark:text-white">Home</span>
 								</div>
 							</Breadcrumb.Item>
-							<Breadcrumb.Item>Nhãn hiệu</Breadcrumb.Item>
+							<Breadcrumb.Item>Khách hàng</Breadcrumb.Item>
 						</Breadcrumb>
 					</div>
 				</div>
@@ -128,8 +128,11 @@ const Table = function() {
         );
       },
     },
-    { field: 'CustomerName', headerName: 'Nhãn hiệu', width: 200, },
-    { field: 'description', headerName: 'Mô tả' },
+    { field: 'firstName', headerName: 'Họ', width: 100, },
+    { field: 'lastName', headerName: 'Tên', width: 100, },
+		{ field: 'email', headerName: 'Email', width: 100, },
+		{ field: 'numberPhone', headerName: 'Số điện thoại', width: 100, },
+		{ field: 'message', headerName: 'Nội dung', width: 100, },
   ], []);
 
 	return (

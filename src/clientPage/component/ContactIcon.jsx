@@ -3,7 +3,6 @@ import CallIcon from '@mui/icons-material/Call';
 import { Link, useNavigate } from "react-router-dom";
 
 export default function ContactIcon() {
-  //href='https://zalo.me/0869.588.879'
   const navigate = useNavigate();
 	return (
 		<div className="relative">

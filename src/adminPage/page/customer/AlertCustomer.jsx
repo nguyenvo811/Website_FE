@@ -31,7 +31,7 @@ export default function AlertCustomer(props) {
 					</Typography>
 					<Divider />
 					<Typography id="alert-dialog-modal-description" className="flex justify-center" textColor="text.tertiary">
-						Bạn có chắc là sẽ xóa nhãn hiệu này?
+						Bạn có chắc là sẽ xóa khách hàng này?
 					</Typography>
 					<Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 2 }}>
 						<Button variant="plain" color="neutral" onClick={close}>

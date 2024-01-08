@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "react-toggle/style.css"
 import { viewProfile } from "../../api/apiServices";
 import ChangePassword from "../page/user/ChangePassword";
+import Logo from '../../asset/img/LOGO.png';
 
 export default function NavBar() {
 	const navigate = useNavigate();
@@ -49,8 +50,10 @@ export default function NavBar() {
 								</svg>
 							</button>
 							<a href="/" className="flex ml-2 md:mr-24">
-								{/* <img src={logo} className="h-8 mr-3" alt="E-Smart Logo" /> */}
-								<span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">E-Smart</span>
+								<div className="cursor-pointer w-[40px] h-[40px] relative" onClick={() => navigate("/")}>
+								<img className="w-full h-full object-center object-cover" src={Logo} />
+							</div>
+								<span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">NHÀ YẾN THÂN THI</span>
 							</a>
 						</div>
 						<div className="flex items-center">

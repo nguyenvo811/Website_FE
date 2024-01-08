@@ -69,7 +69,7 @@ export default function AddUser(props) {
       msg.email = "Email không đúng định dạng!"
 		} else if (msgErr !== "") {
       msg.email = msgErr
-    }if (newUser.password === "") {
+    } if (newUser.password === "") {
       msg.password = "Vui lòng điền mật khẩu!"
     } else if (newUser.password.length < 6) {
       msg.password = "Mật khẩu phải trên 6 ký tự!"

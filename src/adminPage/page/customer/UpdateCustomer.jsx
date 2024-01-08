@@ -20,35 +20,54 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { createCategory, updateCategory } from '../../../api/apiServices';
+import { createCategory, updateCategory, updateCustomer } from '../../../api/apiServices';
+import isEmail from 'validator/lib/isEmail';
 
 export default function UpdateCustomer(props) {
 
-	// Set dialog size
+  // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('sm');
 
   // Declare global variables to create product
-  const { open, close, row, data, setData} = props;
+  const { open, close, row, data, setData } = props;
 
   const [msgErr, setMsgErr] = React.useState("");
 
-	const [error, setError] = React.useState({
-    categoryName: "",
-    description: "", 
+  const [error, setError] = React.useState({
+    firstName: "",
+    lastName: "",
+    numberPhone: "",
+    email: "",
+    message: "",
   });
+
+  const isVietnamesePhoneNumber = (number) => {
+    // Vietnamese phone numbers should start with '0' and have a total length of 10 digits
+    const vietnamesePhoneNumberRegex = /\+84|0[35789]([0-9]{8})\b/g;
+    return vietnamesePhoneNumberRegex.test(number);
+  };
 
   const validation = () => {
     let msg = {}
-    if (data.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
-    } else if (msgErr !== "") {
-      msg.categoryName = msgErr
-    } if (data.description === "") {
-      msg.description = "Không được bỏ trống ô!"
-    } 
-    
+    if (data.email === "") {
+      msg.email = "Vui lòng điền email!"
+    } else if (!isEmail(data.email)) {
+      msg.email = "Email không đúng định dạng!"
+    } if (data.numberPhone === "") {
+      msg.numberPhone = "Vui lòng điền số điện thoại!"
+    } else if (!isVietnamesePhoneNumber(data.numberPhone)) {
+      msg.numberPhone = "Số điện thoại không đúng!"
+    } if (data.firstName === "") {
+      msg.firstName = "Vui lòng nhập họ của bạn!"
+    } if (data.lastName === "") {
+      msg.lastName = "Vui lòng nhập tên tên!"
+    } if (data.message === "") {
+      msg.message = "Vui lòng nhập nội dung!"
+    }
+
     setError(msg)
+    console.log("validating")
     if (Object.keys(msg).length > 0) {
       return false
     } else {
@@ -56,26 +75,32 @@ export default function UpdateCustomer(props) {
     }
   };
 
-	const handleChangeInput = (e) => {
-    let {name, value} = e.target;
-    setData({...data, [name]: value})
-    setError({...error, [name]: ""})
+  const handleChangeInput = (e) => {
+    let { name, value } = e.target;
+    setData({ ...data, [name]: value })
+    setError({ ...error, [name]: "" })
   }
 
   const clearState = () => {
-		setError({
-      categoryName: "",
-      description: "", 
+    setError({
+      firstName: "",
+      lastName: "",
+      numberPhone: "",
+      email: "",
+      message: "",
     })
     setData({
-      categoryName: "",
-      description: "", 
+      firstName: "",
+      lastName: "",
+      numberPhone: "",
+      email: "",
+      message: "",
     })
     setMsgErr("");
     close()
   }
 
-	const handleClose = () => {
+  const handleClose = () => {
     clearState()
     close()
   }
@@ -84,29 +109,32 @@ export default function UpdateCustomer(props) {
     e.preventDefault();
 
     const updatedData = {
-      categoryName: data.categoryName,
-      description: data.description,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      numberPhone: data.numberPhone,
+      email: data.email,
+      message: data.message,
     }
 
-		const isValid = validation()
-    if (isValid){
+    const isValid = validation()
+    if (isValid) {
 
-    // Create the category
-    await updateCategory(data._id, updatedData)
-      .then((response) => {
-        row(response.data.data.value);
-        clearState();
-      })
-      .catch((error) => {
-				if (error.response.status === 500) {
-					console.log(error.response.data.result);
-					console.log(error);
-					setMsgErr(error.response.data.message);
-				}
-      })
-		}
+      // Create the category
+      await updateCustomer(data._id, updatedData)
+        .then((response) => {
+          row(response.data.data.value);
+          clearState();
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            console.log(error.response.data.result);
+            console.log(error);
+            setMsgErr(error.response.data.message);
+          }
+        })
+    }
   }
-  
+
 
   return (
     <div>
@@ -118,7 +146,7 @@ export default function UpdateCustomer(props) {
           onClose={handleClose}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm danh mục sản phẩm
+            Cập nhật khách hàng
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -141,48 +169,112 @@ export default function UpdateCustomer(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="categoryName"
-                      value="Danh mục sản phẩm"
+                      htmlFor="firstName"
+                      value="Họ"
                     />
                   </div>
                   <TextInput
-                    id="categoryName"
-                    name="categoryName"
-                    placeholder="Tên danh mục sản phẩm"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Họ của bạn"
                     required
                     type="text"
-                    value={data.categoryName}
+                    value={data.firstName}
                     onChange={handleChangeInput}
                   />
-									<p class="mt-1 text-sm text-red-500"> 
-										{error.categoryName}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.firstName}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="lastName"
+                      value="Tên"
+                    />
+                  </div>
+                  <TextInput
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Tên của bạn"
+                    required
+                    type="text"
+                    value={data.lastName}
+                    onChange={handleChangeInput}
+                  />
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.lastName}
+                  </p>
+                </div>
+              </div>
+              <div className='grid grid-cols-2 gap-2'>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="numberPhone"
+                      value="Số điện thoại"
+                    />
+                  </div>
+                  <TextInput
+                    id="numberPhone"
+                    name="numberPhone"
+                    placeholder="+12 345 6789"
+                    required
+                    type="text"
+                    value={data.numberPhone}
+                    onChange={handleChangeInput}
+                  />
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.numberPhone}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="email"
+                      value="Email"
+                    />
+                  </div>
+                  <TextInput
+                    id="email"
+                    name="email"
+                    placeholder="Ví dụ: yensaokiengiang@gmail.com"
+                    required
+                    type="text"
+                    value={data.email}
+                    onChange={handleChangeInput}
+                  />
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.email}
+                  </p>
                 </div>
               </div>
 
               <div>
                 <div className="mb-2 block">
                   <Label
-                    htmlFor="description"
-                    value="Mô tả danh mục sản phẩm"
+                    htmlFor="message"
+                    value="Nội dung"
                   />
                 </div>
                 <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Mô tả danh mục sản phẩm"
+                  id="message"
+                  name="message"
+                  placeholder="Hãy để lại nội dung"
                   required
-                  rows={4}
-                  value={data.description}
+                  rows={8}
+                  value={data.message}
                   onChange={handleChangeInput}
                 />
-								<p class="mt-1 text-sm text-red-500"> 
-									{error.description}
-								</p>
+                <p class="mt-1 text-sm text-red-500">
+                  {error.message}
+                </p>
               </div>
 
             </Box>

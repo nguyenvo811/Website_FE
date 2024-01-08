@@ -30,7 +30,7 @@ export default function Sidebar() {
 		},
 		{
 			icon: <HiTag size='1.2rem' />,
-			label: "Nhãn hiệu",
+			label: "Thương hiệu",
 			path: "/quan-ly/nhan-hieu"
 		},
 		{
