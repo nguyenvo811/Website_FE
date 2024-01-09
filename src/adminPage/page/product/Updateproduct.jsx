@@ -20,8 +20,10 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { Combobox, Label, TextInput, Select, Textarea } from 'flowbite-react';
-import { updateProduct, getCategories } from '../../../api/apiServices';
+import { updateProduct, getCategories, getBrands } from '../../../api/apiServices';
 import UploadFile from '../../../asset/library/UploadFile';
+import 'react-quill/dist/quill.snow.css'; // Import the styles
+import ReactQuill from 'react-quill';
 
 export default function UpdateProduct(props) {
 
@@ -29,23 +31,121 @@ export default function UpdateProduct(props) {
   const { open, close, row, data, setData } = props;
   const [select, setSelect] = React.useState([]);
   const [msgErr, setMsgErr] = React.useState("");
+  const [selectBrand, setSelectBrand] = React.useState([]);
   
 	console.log(data)
 
-  const handleChangeInputTimer = (e) => {
-    let { name, value } = e.target;
-    setData({ ...data, [name]: value })
-  }
+  const [description, setDescription] = React.useState("");
 
-  const handleChangeInputAmplifier = (e) => {
-    let { name, value } = e.target;
-    setData({ ...data, [name]: value })
-  }
+  const renderStatus = [
+    {id: "true", value: "true"},
+    {id: "false", value: "false"},
+  ]
 
-  const handleChangeInputSpeaker = (e) => {
-    let { name, value } = e.target;
-    setData({ ...data, [name]: value })
-  }
+  const renderVariantCategory = [
+    {id: "color", value: "Màu sắc"},
+    {id: "specification", value: "Thông số"},
+    {id: "weigth", value: "Trọng lượng"},
+    {id: "material", value: "Chất liệu"},
+    {id: "volume", value: "Thể tích"},
+  ]
+
+  // Declare variables to create Timer
+  const [specifications, setSpecifications] = React.useState([{
+    name: "",
+    value: ""
+  }]);
+
+  const handleAddSpecification = () => {
+    const newSpecification = {
+      name: "",
+      value: ""
+    };
+
+    setSpecifications([...specifications, newSpecification]);
+  };
+
+  const handleNameChange = (index, event) => {
+    const specificationsCopy = [...specifications];
+    specificationsCopy[index].name = event.target.value;
+
+    setSpecifications(specificationsCopy);
+  };
+
+  const handleValueChange = (index, event) => {
+    const specificationsCopy = [...specifications];
+    specificationsCopy[index].value = event.target.value;
+
+    setSpecifications(specificationsCopy);
+  };
+
+  const handleSpecificationDeletion = (index) => {
+    const specificationsCopy = [...specifications];
+    specificationsCopy.splice(index, 1);
+
+    setSpecifications(specificationsCopy);
+  };
+
+  const displaySpecification = () => {
+    return (
+      <>
+        {Array.isArray(specifications) && specifications?.map((spec, index) => (
+          <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
+            <div className="border-b border-gray-300 my-2">
+              <div className='absolute top-0 right-0'>
+                <IconButton>
+                  <HighlightOffIcon onClick={(e) => handleSpecificationDeletion(index)} />
+                </IconButton>
+              </div>
+              <div className='p-2 font-sans font-bold'>
+                <h4>Thông số {index + 1}</h4>
+              </div>
+            </div>
+            <div className='grid grid-cols-2 gap-2 m-2'>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="name"
+                    value="Tên thông số"
+                  />
+                </div>
+                <TextInput
+                  id="name"
+                  name="name"
+                  required
+                  placeholder="Tên của biến thể"
+                  defaultValue={spec.name}
+                  onChange={(event) => handleNameChange(index, event)}
+                />
+                {/* <p class="mt-1 text-sm text-red-500">
+                  {error.variantName}
+                </p> */}
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="value"
+                    value="Giá trị của thông số"
+                  />
+                </div>
+                <TextInput
+                  id="value"
+                  name="value"
+                  required
+                  placeholder="Giá trị của thông số"
+                  defaultValue={spec.value}
+                  onChange={(event) => handleValueChange(index, event)}
+                />
+                {/* <p class="mt-1 text-sm text-red-500">
+                  {error.price}
+                </p> */}
+              </div>
+            </div>
+          </div>
+        ))}
+      </>
+    );
+  };
 
   // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
@@ -64,10 +164,24 @@ export default function UpdateProduct(props) {
           console.log(err.response.data.message);
         }
       })
+
+      getBrands()
+      .then(res => {
+        setSelectBrand(res.data.data)
+      })
+      .catch(err => {
+        if (err.response) {
+          console.log(err.response.data.result);
+          console.log(err.response.status);
+          console.log(err.response.data.message);
+        }
+      })
   }, []);
 
   // Select category options to change attributes
   const [selectedValue, setSelectedValue] = React.useState("");
+  const [selectedBrandValue, setSelectedBrandValue] = React.useState("");
+  const [selectedSubCategoryValue, setSelectedSubCategoryValue] = React.useState("");
 
   const handleSelect = (e) => {
     // Set the state variable to the selected value.
@@ -75,447 +189,26 @@ export default function UpdateProduct(props) {
     setError({category: ""})
   }
 
+  const handleSelectSubCategory = (e) => {
+    // Set the state variable to the selected value.
+    setSelectedSubCategoryValue(e.target.value);
+  }
+
+  const handleBrandSelect = (e) => {
+    // Set the state variable to the selected value.
+    setSelectedBrandValue(e.target.value);
+  }
+
   // List category to rendert
-  const listCategory = select.map(val => { return val._id });
-
-	React.useEffect(() => {
-		setSelectedValue(data?.category?._id);
-	}, [data?.category?._id]);
-
-  const renderTimerAttribute = () => {
-    return (
-      <>
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="supplyTimer"
-                value="Nguồn cung cấp"
-              />
-            </div>
-            <TextInput
-              id="supplyTimer"
-              name="supplyTimer"
-              placeholder="DC 12V"
-              required
-              type="text"
-              value={data?.moreAttribute?.supplyTimer}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="switchContacts"
-                value="Công tắt tiếp điểm"
-              />
-            </div>
-            <TextInput
-              id="switchContacts"
-              name="switchContacts"
-              required
-              placeholder="2 Rơ-le"
-              type="text"
-              value={data?.moreAttribute?.switchContacts}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="maximumLoadContact"
-                value="Tiếp điểm tải đối đa"
-              />
-            </div>
-            <TextInput
-              id="maximumLoadContact"
-              name="maximumLoadContact"
-              placeholder="10 A /220VAC/Rơle/Kênh"
-              required
-              type="text"
-              value={data?.moreAttribute?.maximumLoadContact}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="programCapacity"
-                value="Dung lượng"
-              />
-            </div>
-            <TextInput
-              id="programCapacity"
-              name="programCapacity"
-              required
-              placeholder="2 chương trình hẹn giờ (2 TẮT & 2 BẬT)/ Kênh"
-              type="text"
-              value={data?.moreAttribute?.programCapacity}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="saveProgram"
-                value="Trình lưu"
-              />
-            </div>
-            <TextInput
-              id="saveProgram"
-              name="saveProgram"
-              placeholder="Chương trình vẫn được lưu khi không có nguồn cung cấp"
-              required
-              type="text"
-              value={data?.moreAttribute?.saveProgram}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="batteryMemory"
-                value="Bộ nhớ pin"
-              />
-            </div>
-            <TextInput
-              id="batteryMemory"
-              name="batteryMemory"
-              required
-              placeholder="CR 2032"
-              type="text"
-              value={data?.moreAttribute?.batteryMemory}
-              onChange={handleChangeInputTimer}
-            />
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const renderSpeakerAttribute = () => {
-    return (
-      <>
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="frequencyResponse"
-                value="Phản hồi thường xuyên"
-              />
-            </div>
-            <TextInput
-              id="frequencyResponse"
-              name="frequencyResponse"
-              required
-              placeholder="1,5-13 KHz"
-              type="text"
-              value={data?.moreAttribute?.frequencyResponse}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="maxHandlingCapacity"
-                value="Công suất xử lý tối đa"
-              />
-            </div>
-            <TextInput
-              id="maxHandlingCapacity"
-              name="maxHandlingCapacity"
-              required
-              placeholder="80W"
-              type="text"
-              value={data?.moreAttribute?.maxHandlingCapacity}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="averageSensitivity"
-                value="Độ nhạy trung bình"
-              />
-            </div>
-            <TextInput
-              id="averageSensitivity"
-              name="averageSensitivity"
-              placeholder="103dB"
-              required
-              type="text"
-              value={data?.moreAttribute?.averageSensitivity}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="maximumPowerHandlingCapacity"
-                value="Xử lý công xuất tối đa đạt được"
-              />
-            </div>
-            <TextInput
-              id="maximumPowerHandlingCapacity"
-              name="maximumPowerHandlingCapacity"
-              required
-              placeholder="75 W (EIA RS426) "
-              type="text"
-              value={data?.moreAttribute?.maximumPowerHandlingCapacity}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="maximumVoltage"
-                value="Điện áp tối đa"
-              />
-            </div>
-            <TextInput
-              id="maximumVoltage"
-              name="maximumVoltage"
-              placeholder="15 V rms liên tục / 35 V rms gián đoạn"
-              required
-              type="text"
-              value={data?.moreAttribute?.maximumVoltage}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="overallDimensionsv"
-                value="Kích thước tổng thể (Cao x Rộng X Dài)"
-              />
-            </div>
-            <TextInput
-              id="overallDimensions"
-              name="overallDimensions"
-              required
-              placeholder="39,0 x 39,0 x 21,0 cm"
-              type="text"
-              value={data?.moreAttribute?.overallDimensions}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="totalDriver"
-                value="Tổng trình điều khiển"
-              />
-            </div>
-            <TextInput
-              id="totalDriver"
-              name="totalDriver"
-              placeholder="6 x 2 = 12"
-              required
-              type="text"
-              value={data?.moreAttribute?.totalDriver}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="material"
-                value="Chất liệu"
-              />
-            </div>
-            <TextInput
-              id="material"
-              name="material"
-              required
-              placeholder="Tấm Besi Tebal 1.5mm"
-              type="text"
-              value={data?.moreAttribute?.material}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-        </div>
-
-        <div className='gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="impedance"
-                value="Trở kháng"
-              />
-            </div>
-            <TextInput
-              id="impedance"
-              name="impedance"
-              placeholder="
-                8 Ohms
-                / 6.420 Ohms @1 KHz
-                / 7.232 Ohms @10 KHz"
-              required
-              type="text"
-              value={data?.moreAttribute?.impedance}
-              onChange={handleChangeInputSpeaker}
-            />
-          </div>
-        </div>
-      </>
-    )
-  }
-
-  const renderAmplifierAttribute = () => {
-    return (
-      <>
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="channelInput"
-                value="Kênh đầu vào"
-              />
-            </div>
-            <TextInput
-              id="channelInput"
-              name="channelInput"
-              placeholder="2"
-              required
-              type="text"
-              value={data?.moreAttribute?.channelInput}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="channelOutput"
-                value="Kênh đầu ra"
-              />
-            </div>
-            <TextInput
-              id="channelOutput"
-              name="channelOutput"
-              required
-              placeholder="4"
-              type="text"
-              value={data?.moreAttribute?.channelOutput}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="amplifierClass"
-                value="Lớp khuếch đại"
-              />
-            </div>
-            <TextInput
-              id="amplifierClass"
-              name="amplifierClass"
-              placeholder="D"
-              required
-              type="text"
-              value={data?.moreAttribute?.amplifierClass}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="autoSwitching"
-                value="Tự động chuyển đổi"
-              />
-            </div>
-            <TextInput
-              id="autoSwitching"
-              name="autoSwitching"
-              required
-              placeholder="AC <=> DC"
-              type="text"
-              value={data?.moreAttribute?.autoSwitching}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="autoAdjustVoltage"
-                value="Tự động điều chỉnh điện áp"
-              />
-            </div>
-            <TextInput
-              id="autoAdjustVoltage"
-              name="autoAdjustVoltage"
-              placeholder="110 - 230 V"
-              required
-              type="text"
-              value={data?.moreAttribute?.autoAdjustVoltage}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="weight"
-                value="Trọng lượng"
-              />
-            </div>
-            <TextInput
-              id="weight"
-              name="weight"
-              required
-              placeholder="2 kg"
-              type="text"
-              value={data?.moreAttribute?.weight}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-        </div>
-
-        <div className='grid gap-2'>
-          <div>
-            <div className="mb-2 block">
-              <Label
-                htmlFor="overallDimensions"
-                value="Kích thước tổng thể (Cao x Rộng x Dài)"
-              />
-            </div>
-            <TextInput
-              id="overallDimensions"
-              name="overallDimensions"
-              placeholder="55 x 210 x 188mm"
-              required
-              type="text"
-              value={data?.moreAttribute?.overallDimensions}
-              onChange={handleChangeInputAmplifier}
-            />
-          </div>
-        </div>
-      </>
-    )
-  }
+  const subCategoryList = select.find(val => {
+    if (val._id === selectedValue) {
+      return val
+    }
+  });
 
   // Select, preview and remove image
   const [variants, setVariants] = React.useState([{
-    color: "",
+    variantName: "",
     price: "",
     images: []
   }]);
@@ -529,18 +222,25 @@ export default function UpdateProduct(props) {
         ...variant,
         images: []
       })))
+
+      setSpecifications(data?.specifications);
+
+      setSelectedValue(data?.category?._id);
+      setSelectedSubCategoryValue(data?.subCategory)
+      setSelectedBrandValue(data?.brand?._id)
+      setDescription(data?.description)
     }
-  }, [data?.variants]);
+  }, [data?.variants, data?.category?._id, data?.subCategory, data?.brand?._id, data?.description]);
 
   const handleAddVariant = () => {
     const newVariant = {
-      color: "",
+      variantName: "",
       price: "",
       images: []
     };
 
     const newTmpVariant = {
-      color: "",
+      variantName: "",
       price: "",
       images: []
     };
@@ -553,9 +253,10 @@ export default function UpdateProduct(props) {
   const [error, setError] = React.useState({
     productName: "",
     description: "",
+    shortDescription: "",
     origin: "",
     category: "",
-    color: "",
+    variantName: "",
     price: "",
     images: ""
   });
@@ -574,8 +275,8 @@ export default function UpdateProduct(props) {
       msg.price = "Vui lòng nhập giá sản phẩm!"
     } else if (variants.price < 1) {
       msg.price = "Giá sản phẩm không thể thấp hơn 1!"
-    } if (variants.color === "") {
-      msg.price = "Vui lòng nhập màu sản phẩm!"
+    } if (variants.variantName === "") {
+      msg.variantName = "Vui lòng nhập màu sản phẩm!"
     } if (selectedValue === "") {
       msg.category = "Vui lòng chọn danh mục sản phẩm!"
     } 
@@ -592,15 +293,20 @@ export default function UpdateProduct(props) {
     }
   };
 
+  const handleChangeQuill = (value) => {
+    setDescription(value);
+    setError({ ...error, description: '' });
+  };
+
   const handleChangeInput = (e) => {
     let { name, value } = e.target;
     setData({ ...data, [name]: value })
     setError({...error, [name]: ""})
   }
 
-  const handleColorChange = (index, event) => {
+  const handleVariantNameChange = (index, event) => {
     const variantsCopy = [...variants];
-    variantsCopy[index].color = event.target.value;
+    variantsCopy[index].variantName = event.target.value;
 
     setVariants(variantsCopy);
     setError({color: ""})
@@ -649,7 +355,7 @@ export default function UpdateProduct(props) {
   const displayPreview = () => {
     return (
       <>
-        {variants?.map((variant, index) => (
+        {Array.isArray(variants) && variants?.map((variant, index) => (
           <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
             <div className="border-b border-gray-300 my-2">
               <div className='absolute top-0 right-0'>
@@ -658,27 +364,27 @@ export default function UpdateProduct(props) {
                 </IconButton>
               </div>
               <div className='p-2 font-sans font-bold'>
-                <h4>Sản phẩm {index + 1}</h4>
+                <h4>Biến thể {index + 1}</h4>
               </div>
             </div>
             <div className='grid grid-cols-3 gap-2 m-2'>
               <div>
                 <div className="mb-2 block">
                   <Label
-                    htmlFor="color"
-                    value="Màu sắc"
+                    htmlFor="variantName"
+                    value="Tên biến thể"
                   />
                 </div>
                 <TextInput
-                  id="color"
-                  name="color"
+                  id="variantName"
+                  name="variantName"
                   required
-                  placeholder="Màu của sản phẩm"
-                  defaultValue={variant.color}
-                  onChange={(event) => handleColorChange(index, event)}
+                  placeholder="Tên biến thể"
+                  defaultValue={variant.variantName}
+                  onChange={(event) => handleVariantNameChange(index, event)}
                 />
                 <p class="mt-1 text-sm text-red-500"> 
-                  {error.color}
+                  {error.variantName}
                 </p>
               </div>
               <div>
@@ -756,38 +462,11 @@ export default function UpdateProduct(props) {
   };
 
   const clearState = () => {
-
-
     setData({
       productName: "",
       description: "",
       color: "",
       origin: "",
-
-      supplyTimer: "",
-      switchContacts: "",
-      maximumLoadContact: "",
-      programCapacity: "",
-      saveProgram: "",
-      batteryMemory: "",
-
-      frequencyResponse: "",
-			averageSensitivity: "",
-			maximumPowerHandlingCapacity: "",
-			maximumVoltage: "",
-			overallDimensions: "",
-			impedance: "",
-			maxHandlingCapacity: "",
-			totalDriver: "",
-			material: "",
-
-			channelInput: "",
-			channelOutput: "",
-			amplifierClass: "",
-			autoSwitching: "",
-			autoAdjustVoltage: "",
-			overallDimensions: "",
-			weight: ""
     });
 
     setSelectedValue("");
@@ -795,58 +474,31 @@ export default function UpdateProduct(props) {
     setMsgErr("");
     close();
   }
-
-  const choseValue = (value) => {
-    switch (value) {
-      case listCategory[0]:
-        return {
-          supplyTimer: data.supplyTimer,
-          switchContacts: data.switchContacts,
-          maximumLoadContact: data.maximumLoadContact,
-          programCapacity: data.programCapacity,
-          saveProgram: data.saveProgram,
-          batteryMemory: data.batteryMemory
-        };
-      case listCategory[1]:
-        return {
-          frequencyResponse: data.frequencyResponse,
-          averageSensitivity: data.averageSensitivity,
-          maximumPowerHandlingCapacity: data.maximumPowerHandlingCapacity,
-          maximumVoltage: data.maximumVoltage,
-          overallDimensions: data.overallDimensions,
-          impedance: data.impedance,
-          maxHandlingCapacity: data.maxHandlingCapacity,
-          totalDriver: data.totalDriver,
-          material: data.material
-        };
-      case listCategory[2]:
-        return {
-          channelInput: data.channelInput,
-          channelOutput: data.channelOutput,
-          amplifierClass: data.amplifierClass,
-          autoSwitching: data.autoSwitching,
-          autoAdjustVoltage: data.autoAdjustVoltage,
-          overallDimensions: data.overallDimensions,
-          weight: data.weight
-        };
-      default:
-        setError({category: ""})
-    }
-  };
-
+console.log(data)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updatedData = {
       productName: data.productName,
-      description: data.description,
+      description: description,
       category: selectedValue,
+      subCategory: selectedSubCategoryValue,
       origin: data.origin,
+      shortDescription: data.shortDescription,
+      brand: selectedBrandValue,
+      video: data.video,
       variants: variants,
-      ...choseValue(selectedValue)
+      variantCategory: data.variantCategory,
+      active: data.active,
+      newest: data.newest,
+      bestSeller: data.bestSeller,
+      specifications: specifications
     }
 
-    const updatedVariants = [];
+    
+    const isValid = validation();
+    if (isValid) {
+      const updatedVariants = [];
     for (let index = 0; index < tmpVariants.length; index++) {
 
       const element = tmpVariants[index];
@@ -871,41 +523,22 @@ export default function UpdateProduct(props) {
     updatedData.variants = updatedVariants;
 
     console.log(updatedData)
-    const isValid = validation()
-    if (isValid){
-    // Create the appropriate product type based on the selected category
-    const updateProductType = async (productType) => {
-      switch (productType) {
-        case listCategory[0]:
-          return await updateProduct(data._id, updatedData);
-        case listCategory[1]:
-          return await updateProduct(updatedData);
-        case listCategory[2]:
-          return await updateProduct(updatedData);
-        default:
-          setError({category: ""})
-      }
-    };
-
     
-
-    // Update the product
-    return await updateProductType(selectedValue)
-      .then((response) => {
-        console.log(response.data.data)
+      // Update the product
+      try {
+        const response = await updateProduct(data._id, updatedData);
+        console.log(response.data.data);
         row(response.data.data.value);
         clearState();
-      })
-      .catch((error) => {
-				if (error.response.status === 500) {
-					console.log(error.response.data.result);
-					console.log(error);
-					setMsgErr(error.response.data.message);
-				}
-      })
+      } catch (error) {
+        if (error.response && error.response.status === 500) {
+          console.log(error.response.data.result);
+          console.log(error);
+          setMsgErr(error.response.data.message);
+        }
+      }
     }
   }
-
 
   return (
     <div>
@@ -917,7 +550,7 @@ export default function UpdateProduct(props) {
           onClose={close}
         >
           <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-            Thêm sản phẩm
+            Cập nhật sản phẩm
           </DialogTitle>
           <IconButton
             aria-label="close"
@@ -932,7 +565,7 @@ export default function UpdateProduct(props) {
             <CloseIcon />
           </IconButton>
           <DialogContent dividers>
-            <Box
+          <Box
               component="form"
               sx={{
                 '& .MuiTextField-root': { m: 1, width: '25ch' },
@@ -940,7 +573,7 @@ export default function UpdateProduct(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid gap-2'>
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
@@ -957,9 +590,33 @@ export default function UpdateProduct(props) {
                     value={data.productName}
                     onChange={handleChangeInput}
                   />
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.productName}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.productName}
+                  </p>
+                </div>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="brand"
+                      value="Thương hiệu"
+                    />
+                  </div>
+                  <Select
+                    id="brand"
+                    name="brand"
+                    required
+                    value={selectedBrandValue}
+                    onChange={handleBrandSelect}
+                  >
+                    <option value={"Chọn thương hiệu"}>
+                      Chọn thương hiệu
+                    </option>
+                    {selectBrand?.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.brandName}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
               </div>
 
@@ -975,7 +632,6 @@ export default function UpdateProduct(props) {
                     id="category"
                     name="category"
                     required
-										// defaultValue={defaultCategoryName}
                     value={selectedValue}
                     onChange={handleSelect}
                   >
@@ -988,11 +644,102 @@ export default function UpdateProduct(props) {
                       </option>
                     ))}
                   </Select>
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.category}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.category}
+                  </p>
                 </div>
 
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="subCategory"
+                      value="Danh mục con"
+                    />
+                  </div>
+                  <Select
+                    id="subCategory"
+                    name="subCategory"
+                    required
+                    value={selectedSubCategoryValue}
+                    onChange={handleSelectSubCategory}
+                  >
+                    <option value={"Chọn danh mục con"}>
+                      Chọn danh mục con
+                    </option>
+                    {subCategoryList?.subCategory?.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.subCategoryName}
+                      </option>
+                    ))}
+                  </Select>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.category}
+                  </p>
+                </div>
+              </div>
+
+              <div className='grid gap-2'>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="shortDescription"
+                      value="Mô tả ngắn"
+                    />
+                  </div>
+                  <Textarea
+                    id="shortDescription"
+                    name="shortDescription"
+                    placeholder="Mô tả ngắn"
+                    required
+                    rows={4}
+                    value={data.shortDescription}
+                    onChange={handleChangeInput}
+                  />
+                  <p class="mt-1 text-sm text-red-500"> 
+                    {error.shortDescription}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="description"
+                    value="Mô tả sản phẩm"
+                  />
+                </div>
+                <ReactQuill
+                  value={description}
+                  onChange={handleChangeQuill}
+                  theme="snow" // or "bubble"
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, 3, 4, false] }],
+                      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                      [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                      [{ script: 'super' }, { script: 'sub' }],
+                      [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
+                      ['link', 'image', 'video', 'formula'],
+                      ['clean'],
+                    ],
+                  }}
+                  formats={[
+                    'header', 'font',
+                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                    'list', 'bullet', 'script', 'indent',
+                    'link', 'image', 'video', 'color', 'size', 'align', 'formula',
+                    'background',
+                    'direction',
+                    'code-block',
+                    'code',
+                  ]}
+                />
+                <p class="mt-1 text-sm text-red-500">
+                  {error.description}
+                </p>
+              </div>
+
+              <div className='grid grid-cols-2 gap-2'>
                 <div>
                   <div className="mb-2 block">
                     <Label
@@ -1009,49 +756,158 @@ export default function UpdateProduct(props) {
                     value={data.origin}
                     onChange={handleChangeInput}
                   />
-                  <p class="mt-1 text-sm text-red-500"> 
-										{error.origin}
-									</p>
+                  <p class="mt-1 text-sm text-red-500">
+                    {error.origin}
+                  </p>
                 </div>
-              </div>
-
-              <div>
-                <div className="mb-2 block">
-                  <Label
-                    htmlFor="description"
-                    value="Mô tả sản phẩm"
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="video"
+                      value="Youtube link"
+                    />
+                  </div>
+                  <TextInput
+                    id="video"
+                    name="video"
+                    placeholder="Youtube link"
+                    required
+                    type="text"
+                    value={data.video}
+                    onChange={handleChangeInput}
                   />
                 </div>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Mô tả sản phẩm"
-                  required
-                  rows={4}
-                  value={data.description}
-                  onChange={handleChangeInput}
-                />
-                <p class="mt-1 text-sm text-red-500"> 
-										{error.description}
-									</p>
               </div>
 
-              {
-                selectedValue === "" ? ""
-                  : selectedValue === listCategory[0] ? renderTimerAttribute()
-                    : selectedValue === listCategory[1] ? renderSpeakerAttribute()
-                      : selectedValue === listCategory[2] ? renderAmplifierAttribute()
-                        : ""
-              }
+              <div className='grid grid-cols-3 gap-2'>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="active"
+                      value="Hoạt động"
+                    />
+                  </div>
+                  <Select
+                    id="active"
+                    name="active"
+                    required
+                    value={data.active}
+                    onChange={handleChangeInput}
+                  >
+                    <option value={"active"}>
+                      Active
+                    </option>
+                    {renderStatus?.map((option) => (
+                      <option key={option.id} value={option.value}>
+                        {option.value}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
 
-              {displayPreview() || []}
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="newest"
+                      value="Mới nhất"
+                    />
+                  </div>
+                  <Select
+                    id="newest"
+                    name="newest"
+                    required
+                    value={data.newest}
+                    onChange={handleChangeInput}
+                  >
+                    <option value={"newest"}>
+                      Mới nhất
+                    </option>
+                    {renderStatus?.map((option) => (
+                      <option key={option.id} value={option.value}>
+                        {option.value}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
 
-              <div className='mt-4'>
-                <Button 
-                  variant="contained" 
-                  color="inherit"
-                  onClick={handleAddVariant}
-                >Thêm màu sản phẩm</Button>
+                <div>
+                  <div className="mb-2 block">
+                    <Label
+                      htmlFor="bestSeller"
+                      value="Best Seller"
+                    />
+                  </div>
+                  <Select
+                    id="bestSeller"
+                    name="bestSeller"
+                    required
+                    value={data.bestSeller}
+                    onChange={handleChangeInput}
+                  >
+                    <option value={"bestSeller"}>
+                      Best Seller
+                    </option>
+                    {renderStatus?.map((option) => (
+                      <option key={option.id} value={option.value}>
+                        {option.value}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+              </div>
+
+              <div className='p-4 border-2 mt-2 rounded-lg'>
+                {displaySpecification()}
+
+                <div className='mt-4'>
+                  <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={handleAddSpecification}
+                  >Thêm thông số</Button>
+                </div>
+              </div>
+
+              <div className='p-4 border-2 mt-2 rounded-lg'>
+                <div className='grid grid-cols-1 gap-2'>
+                  <div>
+                    <div className="mb-2 block">
+                      <Label
+                        htmlFor="variantCategory"
+                        value="Loại biến thể"
+                      />
+                    </div>
+                    <Select
+                      id="variantCategory"
+                      name="variantCategory"
+                      required
+                      value={data.variantCategory}
+                      onChange={handleChangeInput}
+                    >
+                      <option value={"variantCategory"}>
+                        Chọn loại biến thể
+                      </option>
+                      {renderVariantCategory?.map((option) => (
+                        <option key={option.id} value={option.value}>
+                          {option.value}
+                        </option>
+                      ))}
+                    </Select>
+                    <p class="mt-1 text-sm text-red-500">
+                      {error.origin}
+                    </p>
+                  </div>
+                </div>
+
+                {displayPreview()}
+
+                <div className='mt-4'>
+                  <Button
+                    variant="contained"
+                    color="inherit"
+                    onClick={handleAddVariant}
+                  >Thêm biến thể</Button>
+                </div>
               </div>
 
             </Box>

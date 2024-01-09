@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProductInHome } from '../../api/apiServices';
 import StateContext from "./StateContext";
+import slugify from 'slugify';
 
 function useStateContext() {
 	// Get the context value
@@ -19,14 +20,19 @@ function useStateContext() {
 const ASide = ({ isSideBarOpen, openSideBar }) => {
 	const navigate = useNavigate();
 	const { selectCategory } = useStateContext();
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+	const toggleDropdown = () => {
+		setIsDropdownOpen(!isDropdownOpen);
+	};
 
 	const categories = [];
 
-  selectCategory.forEach((category) => {
-    if (!category.subCategories) {
-      categories.push(category);
-    }
-  });
+	selectCategory.forEach((category) => {
+		if (!category.subCategories) {
+			categories.push(category);
+		}
+	});
 
 	let listTabSide = [
 		{
@@ -56,11 +62,29 @@ const ASide = ({ isSideBarOpen, openSideBar }) => {
 		openSideBar()
 	}
 
+	const handleClickDetails = useCallback(
+		async (val) => {
+			// Define the logic for handling click details
+			console.log("Item Clicked:", val);
+
+			// Example: Navigate to the product details page
+			const categoryNameSlug = slugify(val?.categoryName, { lower: true, locale: 'vi' });
+			const categoryPath = `/san-pham/danh-muc/${categoryNameSlug}`;
+
+			navigate({
+				pathname: categoryPath
+			}, { state: { category: val?._id } });
+		},
+		[navigate]
+	);
+
 	const renderCategory = categories.map((val, index) => {
 		return (
-			<>
-				<SidebarSubItem key={index} label={val?.categoryName} />
-			</>
+			<li key={index}>
+				<a className="cursor-pointer block p-2 flex items-center" onClick={() => handleClickDetails(val)}>
+					{val?.categoryName}
+				</a>
+			</li>
 		)
 	})
 
@@ -93,9 +117,32 @@ const ASide = ({ isSideBarOpen, openSideBar }) => {
 
 						<ul role="list" class="text-left px-4 py-3 space-y-4 text-sm font-medium text-gray-900">
 							{renderTabSide}
-							<SidebarItem label="Sản phẩm">
-								{renderCategory}
-							</SidebarItem>
+							<li className="opcion-con-desplegable">
+								<div className="flex items-center justify-between">
+									<div className="cursor-pointer flex items-center">
+										<span onClick={() => navigate('/san-pham')}>Sản phẩm</span>
+										<svg
+											onClick={toggleDropdown}
+											className={`h-5 w-5 ${isDropdownOpen ? 'transform rotate-180' : ''}`}
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth="2"
+												d="M19 9l-7 7-7-7"
+											/>
+										</svg>
+									</div>
+									<i className="fas fa-chevron-down text-xs"></i>
+								</div>
+								<ul className={`desplegable ml-2 mt-2 ${isDropdownOpen ? 'block' : 'hidden'}`}>
+									{renderCategory}
+								</ul>
+							</li>
 						</ul>
 
 					</div>
@@ -106,49 +153,3 @@ const ASide = ({ isSideBarOpen, openSideBar }) => {
 };
 
 export default ASide;
-
-const SidebarItem = ({ label, children }) => {
-	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-	const toggleDropdown = () => {
-		setIsDropdownOpen(!isDropdownOpen);
-	};
-
-	return (
-		<li className="opcion-con-desplegable">
-			<div className="flex items-center justify-between" onClick={toggleDropdown}>
-				<div className="flex items-center">
-					<span>{label}</span>
-					<svg
-						className={`h-5 w-5 ${isDropdownOpen ? 'transform rotate-180' : ''}`}
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
-				</div>
-				<i className="fas fa-chevron-down text-xs"></i>
-			</div>
-			<ul className={`desplegable ml-2 mt-2 ${isDropdownOpen ? 'block' : 'hidden'}`}>
-				{children}
-			</ul>
-		</li>
-	);
-};
-
-const SidebarSubItem = ({ label }) => {
-	return (
-		<li>
-			<a href="#" className="block p-2 flex items-center">
-				{label}
-			</a>
-		</li>
-	);
-};

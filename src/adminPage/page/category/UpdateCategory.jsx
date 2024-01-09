@@ -10,64 +10,134 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { Label, TextInput, Select, Textarea } from 'flowbite-react';
 import { updateCategory, getCategories } from '../../../api/apiServices';
 
 export default function UpdateCategory(props) {
 
-	// Set dialog size
+  // Set dialog size
   const [fullWidth, setFullWidth] = React.useState(true);
   const [maxWidth, setMaxWidth] = React.useState('sm');
 
   // Declare global variables to create product
-  const { open, close, row, data, setData} = props;
-  const [select, setSelect] = React.useState([]);
+  const { open, close, row, data, setData } = props;
   const [msgErr, setMsgErr] = React.useState("");
-  
-	const [error, setError] = React.useState({
+
+  const [error, setError] = React.useState({
     categoryName: "",
-    description: "", 
+    description: "",
   });
 
-  // Get categories 
+  const [subCategory, setSubCategory] = React.useState([]);
+
   React.useEffect(() => {
-    getCategories()
-      .then(res => {
-        setSelect(res.data.data)
-      })
-      .catch(err => {
-        if (err.response) {
-          console.log(err.response.data.result);
-          console.log(err.response.status);
-          console.log(err.response.data.message);
-        }
-      })
-  }, []);
+    setSubCategory(data?.subCategory)
+  }, [data?.subCategory])
 
-  // Select category options to change attributes
-  const [selectedValue, setSelectedValue] = React.useState("");
-
-  const handleSelect = (e) => {
-    // Set the state variable to the selected value.
-    setSelectedValue(e.target.value);
-    setError({category: ""})
+  const handleAddSubCategory = () => {
+    let newField = {
+      subCategoryName: "",
+      description: ""
+    }
+    setSubCategory([...subCategory, newField])
   }
 
-	React.useEffect(() => {
-		setSelectedValue(data?.subCategories?._id);
-	}, [data?.subCategories?._id]);
+  const handleSubCategoryChange = (index, event) => {
+    const subCategoryCopy = [...subCategory];
+    subCategoryCopy[index].subCategoryName = event.target.value;
+    setSubCategory(subCategoryCopy)
+  }
+
+  const handleDescriptionChange = (index, event) => {
+    const subCategoryCopy = [...subCategory];
+    subCategoryCopy[index].description = event.target.value;
+    setSubCategory(subCategoryCopy)
+  }
+
+  const handleSubCategoryDeletion = (index) => {
+    const subCategoryCopy = [...subCategory];
+    subCategoryCopy.splice(index, 1);
+    setSubCategory(subCategoryCopy)
+  }
+
+  console.log(subCategory)
+
+  const displaySubCategory = () => {
+    return (
+      <>
+        {Array.isArray(subCategory) && subCategory.map((val, index) => (
+          <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
+            <div className="border-b border-gray-300 my-2">
+              <div className='absolute top-0 right-0'>
+                <IconButton>
+                  <HighlightOffIcon onClick={() => handleSubCategoryDeletion(index)} />
+                </IconButton>
+              </div>
+              <div className='p-2 font-sans font-bold'>
+                <h4>Sản phẩm {index + 1}</h4>
+              </div>
+            </div>
+
+            <div className='grid gap-2 m-2'>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="subCategoryName"
+                    value="Tên sản phẩm"
+                  />
+                </div>
+                <TextInput
+                  id="subCategoryName"
+                  name="subCategoryName"
+                  required
+                  placeholder="Tên sản phẩm"
+                  defaultValue={val?.subCategoryName}
+                  onChange={(event) => handleSubCategoryChange(index, event)}
+                />
+                <p class="mt-1 text-sm text-red-500">
+                  {error.color}
+                </p>
+              </div>
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="description"
+                    value="Mô tả"
+                  />
+                </div>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Mô tả sản phẩm"
+                  required
+                  rows={4}
+                  defaultValue={val?.description}
+                  onChange={(event) => handleDescriptionChange(index, event)}
+                />
+                <p class="mt-1 text-sm text-red-500">
+                  {error.price}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </>
+    );
+  };
 
   const validation = () => {
     let msg = {}
     if (data.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
+      msg.categoryName = "Vui lòng nhập tên danh mục sản phẩm!"
     } else if (msgErr !== "") {
       msg.categoryName = msgErr
     } if (data.description === "") {
-      msg.description = "Không được bỏ trống ô!"
-    } 
-    
+      msg.description = "Vui lòng nhập mô tả danh mục!"
+    }
+
     setError(msg)
+    console.log("validating")
     if (Object.keys(msg).length > 0) {
       return false
     } else {
@@ -75,26 +145,26 @@ export default function UpdateCategory(props) {
     }
   };
 
-	const handleChangeInput = (e) => {
-    let {name, value} = e.target;
-    setData({...data, [name]: value})
-    setError({...error, [name]: ""})
+  const handleChangeInput = (e) => {
+    let { name, value } = e.target;
+    setData({ ...data, [name]: value })
+    setError({ ...error, [name]: "" })
   }
 
   const clearState = () => {
-		setError({
+    setError({
       categoryName: "",
-      description: "", 
-    })
+      description: "",
+    });
     setData({
       categoryName: "",
-      description: "", 
-    })
+      description: "",
+    });
     setMsgErr("");
-    close()
+    close();
   }
 
-	const handleClose = () => {
+  const handleClose = () => {
     clearState()
     close()
   }
@@ -105,28 +175,29 @@ export default function UpdateCategory(props) {
     const updatedData = {
       categoryName: data.categoryName,
       description: data.description,
-      subCategories: selectedValue
+      subCategory: subCategory
     }
+    console.log(data)
 
-		const isValid = validation()
-    if (isValid){
+    const isValid = validation()
+    if (isValid) {
 
-    // Create the category
-    await updateCategory(data._id, updatedData)
-      .then((response) => {
-        row(response.data.data.value);
-        clearState();
-      })
-      .catch((error) => {
-				if (error.response.status === 500) {
-					console.log(error.response.data.result);
-					console.log(error);
-					setMsgErr(error.response.data.message);
-				}
-      })
-		}
+      // Create the category
+      await updateCategory(data?._id, updatedData)
+        .then((response) => {
+          row(response.data.data.value);
+          clearState();
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            console.log(error.response.data.result);
+            console.log(error);
+            setMsgErr(error.response.data.message);
+          }
+        })
+    }
   }
-  
+
 
   return (
     <div>
@@ -161,51 +232,25 @@ export default function UpdateCategory(props) {
               noValidate
               autoComplete="off"
             >
-              <div className='grid grid-cols-2 gap-2'>
-                <div>
-                  <div className="mb-2 block">
-                    <Label
-                      htmlFor="categoryName"
-                      value="Danh mục sản phẩm"
-                    />
-                  </div>
-                  <TextInput
-                    id="categoryName"
-                    name="categoryName"
-                    placeholder="Tên danh mục sản phẩm"
-                    required
-                    type="text"
-                    value={data.categoryName}
-                    onChange={handleChangeInput}
+              <div>
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="categoryName"
+                    value="Danh mục sản phẩm"
                   />
-									<p class="mt-1 text-sm text-red-500"> 
-										{error.categoryName}
-									</p>
                 </div>
-                <div>
-                  <div className="mb-2 block">
-                    <Label
-                      htmlFor="category"
-                      value="Danh mục cha"
-                    />
-                  </div>
-                  <Select
-                    id="category"
-                    name="category"
-                    required
-                    value={selectedValue}
-                    onChange={handleSelect}
-                  >
-                    <option value={"Chọn danh mục sản phẩm"}>
-                      Chọn danh mục sản phẩm
-                    </option>
-                    {select?.map((option) => (
-                      <option key={option._id} value={option._id}>
-                        {option.categoryName}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
+                <TextInput
+                  id="categoryName"
+                  name="categoryName"
+                  placeholder="Tên danh mục sản phẩm"
+                  required
+                  type="text"
+                  value={data.categoryName}
+                  onChange={handleChangeInput}
+                />
+                <p class="mt-1 text-sm text-red-500">
+                  {error.categoryName}
+                </p>
               </div>
 
               <div>
@@ -224,9 +269,19 @@ export default function UpdateCategory(props) {
                   value={data.description}
                   onChange={handleChangeInput}
                 />
-								<p class="mt-1 text-sm text-red-500"> 
-									{error.description}
-								</p>
+                <p class="mt-1 text-sm text-red-500">
+                  {error.description}
+                </p>
+              </div>
+
+              {displaySubCategory()}
+
+              <div className='mt-4'>
+                <Button
+                  variant="contained"
+                  color="inherit"
+                  onClick={handleAddSubCategory}
+                >Thêm sản phẩm</Button>
               </div>
 
             </Box>

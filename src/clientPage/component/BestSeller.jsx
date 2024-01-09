@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import slugify from 'slugify';
 import { getProductInHome, getProducts } from "../../api/apiServices";
+import LOGO_MO from "../../asset/img/LOGO_MO.png";
 // import Card from "../component/Card";
 
 export default function BestSeller() {
@@ -121,6 +122,7 @@ export default function BestSeller() {
             {bestSellerProducts.map((product, index) => (
               <div className="cursor-pointer relative group centerMode" onClick={() => handleClickDetails(product)}>
                 <div className="p-4 h-[250px] lg:h-[400px] w-full m-auto">
+					<img src={LOGO_MO} className="absolute w-24 h-24 top-1/2 left-1/2"/>
                   <img src={product?.variants[0]?.images[0]} className="w-full h-full object-center object-cover" alt={`Slide ${index + 1}`} />
                   <div className="absolute inset-0 btm flex items-end">
                     <div className="bg-black bg-opacity-60 p-4 w-full mx-4 overflow-hidden">

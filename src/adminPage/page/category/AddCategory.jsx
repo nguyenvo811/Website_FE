@@ -64,7 +64,7 @@ export default function AddCategory(props) {
   const displaySubCategory = () => {
     return (
       <>
-        {subCategory.map((val, index) => (
+        {Array.isArray(subCategory) && subCategory.map((val, index) => (
           <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
             <div className="border-b border-gray-300 my-2">
               <div className='absolute top-0 right-0'>

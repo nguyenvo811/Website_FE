@@ -4,7 +4,7 @@ import { FaShoppingCart, FaSearch } from "react-icons/fa";
 import { AiOutlineClose } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import "react-toggle/style.css";
-import queryString from "query-string";
+import LOGO_MO from "../../asset/img/LOGO_MO.png";
 import Slider from "react-slick";
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -161,6 +161,7 @@ export default function ProductDetail() {
                     val?.images.map((image, imgIndex) => (
                       <div className="relative group" key={imgIndex}>
                         <div className="p-4 h-[450px] lg:h-[450px] w-full m-auto">
+                          <img src={LOGO_MO} className="absolute w-24 h-24 top-1/2 left-1/2"/>
                           <img src={image} className="w-full h-full object-center object-cover duration-700" alt={`Slide ${imgIndex + 1}`} />
                         </div>
                       </div>

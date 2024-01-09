@@ -34,6 +34,7 @@ export default function AddProduct(props) {
     {id: "specification", value: "Thông số"},
     {id: "weigth", value: "Trọng lượng"},
     {id: "material", value: "Chất liệu"},
+    {id: "volume", value: "Thể tích"},
   ]
 
   const [newProduct, setNewProduct] = React.useState({
@@ -86,7 +87,7 @@ export default function AddProduct(props) {
   const displaySpecification = () => {
     return (
       <>
-        {specifications.map((spec, index) => (
+        {Array.isArray(specifications) && specifications?.map((spec, index) => (
           <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
             <div className="border-b border-gray-300 my-2">
               <div className='absolute top-0 right-0'>
@@ -111,7 +112,7 @@ export default function AddProduct(props) {
                   name="name"
                   required
                   placeholder="Tên của biến thể"
-                  defaultValue={spec.variantName}
+                  defaultValue={spec?.variantName}
                   onChange={(event) => handleNameChange(index, event)}
                 />
                 {/* <p class="mt-1 text-sm text-red-500">
@@ -130,7 +131,7 @@ export default function AddProduct(props) {
                   name="value"
                   required
                   placeholder="Giá trị của thông số"
-                  defaultValue={spec.value}
+                  defaultValue={spec?.value}
                   onChange={(event) => handleValueChange(index, event)}
                 />
                 {/* <p class="mt-1 text-sm text-red-500">
@@ -196,7 +197,6 @@ export default function AddProduct(props) {
   }
 
   // List category to rendert
-  const selectedCategoryName = select.find(category => category._id === selectedValue);
   const subCategoryList = select.find(val => {
     if (val._id === selectedValue) {
       return val
@@ -246,7 +246,7 @@ export default function AddProduct(props) {
     } else if (variants.price < 1) {
       msg.price = "Giá sản phẩm không thể thấp hơn 1!"
     } if (variants.variantName === "") {
-      msg.price = "Vui lòng nhập màu sản phẩm!"
+      msg.variantName = "Vui lòng nhập màu sản phẩm!"
     } if (selectedValue === "") {
       msg.category = "Vui lòng chọn danh mục sản phẩm!"
     }
@@ -318,7 +318,7 @@ export default function AddProduct(props) {
   const displayPreview = () => {
     return (
       <>
-        {variants.map((variant, index) => (
+        {Array.isArray(variants) && variants?.map((variant, index) => (
           <div key={index} className="relative border border-gray-300 rounded-lg mt-2">
             <div className="border-b border-gray-300 my-2">
               <div className='absolute top-0 right-0'>
@@ -416,18 +416,31 @@ export default function AddProduct(props) {
 
     setNewProduct({
       productName: "",
-      description: "",
       origin: "",
-      video: ""
+      video: "",
+      variantCategory: "",
+      shortDescription: "",
+      active: "",
+      newest: "",
+      bestSeller: ""
     });
 
     setSelectedValue("");
-    setVariants([]);
+    setVariants({
+      variantName: "",
+      price: "",
+      images: []
+    });
+    setSpecifications({
+      name: "",
+      value: ""
+    });
+    setSelectedBrandValue("");
+    setSelectedSubCategoryValue("");
+    setDescription("");
     setMsgErr("");
     close();
   }
-
-  console.log(selectedCategoryName)
 
   const handleSubmit = async (e) => {
     e.preventDefault();

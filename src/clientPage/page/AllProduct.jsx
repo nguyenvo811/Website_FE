@@ -7,6 +7,7 @@ import slugify from 'slugify';
 import { Label, Select } from "flowbite-react";
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
+import LOGO_MO from "../../asset/img/LOGO_MO.png";
 
 function useStateContext() {
   // Get the context value
@@ -213,7 +214,8 @@ export default function AllProduct() {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
-            <div className="w-full md:h-[300px] h-[200px] ">
+            <div className="relative w-full md:h-[300px] h-[200px] ">
+              <img src={LOGO_MO} className="absolute w-24 h-24 top-1/2 left-1/2"/>
               <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
             </div>
             <div className="mt-2.5 px-5 pb-5">
@@ -256,7 +258,8 @@ export default function AllProduct() {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
-            <div className="w-full md:h-[300px] h-[200px] ">
+            <div className="relative w-full md:h-[300px] h-[200px] ">
+              <img src={LOGO_MO} className="absolute w-24 h-24 top-1/2 left-1/2"/>
               <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
             </div>
             <div className="mt-2.5 px-5 pb-5">
@@ -299,7 +302,8 @@ export default function AllProduct() {
       return (
         <div key={index} className="lg:basis-[calc(100%/3-16px)] basis-[calc(100%/2-16px)] w-[330px] overflow-hidden">
           <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow">
-            <div className="w-full md:h-[300px] h-[200px] ">
+            <div className="relative w-full md:h-[300px] h-[200px] ">
+              <img src={LOGO_MO} className="absolute w-24 h-24 top-1/2 left-1/2"/>
               <img className="rounded-t-lg w-full h-full object-cover object-center" src={val?.variants[0]?.images[0]} alt="product image" />
             </div>
             <div className="mt-2.5 px-5 pb-5">
@@ -453,7 +457,6 @@ export default function AllProduct() {
             </main>
           </div>
         </div>
-
       </div>
     </div>
   )

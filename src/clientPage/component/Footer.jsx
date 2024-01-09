@@ -92,7 +92,7 @@ export default function Footer(props) {
 									LIÊN HỆ ĐẶT HÀNG
 								</span>
 
-								<p className="cursor-pointer block text-2xl font-medium text-gray-900 sm:text-3xl rounded-full text-gray-900 text-sm font-medium transition hover:text-gray-500 flex items-center justify-center mx-auto">
+								<p onClick={() => navigate("/lien-he")} className="cursor-pointer block text-2xl font-medium text-gray-900 sm:text-3xl rounded-full text-gray-900 text-sm font-medium transition hover:text-gray-500 flex items-center justify-center mx-auto">
 									LIÊN HỆ NGAY
 									<svg
 										xmlns="http://www.w3.org/2000/svg"

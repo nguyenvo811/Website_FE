@@ -116,7 +116,7 @@ export default function News() {
 	const listContact = data.map((val, index) => {
 		return (
 			<div className="lg:basis-[calc(100%/3-16px)] m-auto flex justify-center items-center">
-				<div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-2">
+				<div className="p-6 w-[400px] h-[250px] max-w-sm mx-auto bg-white rounded-xl shadow-md space-y-2">
 					<div className="flex justify-center item-center">
 						<div className="w-14 h-14 bg-yellow-400 rounded-xl p-2 flex items-center justify-center">
 							<CallIcon className="h-8 w-8 text-white" />

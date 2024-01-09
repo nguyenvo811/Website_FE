@@ -34,16 +34,16 @@ export default function UpdateBrand(props) {
   const [msgErr, setMsgErr] = React.useState("");
 
 	const [error, setError] = React.useState({
-    categoryName: "",
+    brandName: "",
     description: "", 
   });
 
   const validation = () => {
     let msg = {}
-    if (data.categoryName === "") {
-      msg.categoryName = "Không được bỏ trống ô!"
+    if (data.brandName === "") {
+      msg.brandName = "Không được bỏ trống ô!"
     } else if (msgErr !== "") {
-      msg.categoryName = msgErr
+      msg.brandName = msgErr
     } if (data.description === "") {
       msg.description = "Không được bỏ trống ô!"
     } 
@@ -64,11 +64,11 @@ export default function UpdateBrand(props) {
 
   const clearState = () => {
 		setError({
-      categoryName: "",
+      brandName: "",
       description: "", 
     })
     setData({
-      categoryName: "",
+      brandName: "",
       description: "", 
     })
     setMsgErr("");
@@ -84,7 +84,7 @@ export default function UpdateBrand(props) {
     e.preventDefault();
 
     const updatedData = {
-      categoryName: data.categoryName,
+      brandName: data.brandName,
       description: data.description,
     }
 
@@ -145,21 +145,21 @@ export default function UpdateBrand(props) {
                 <div>
                   <div className="mb-2 block">
                     <Label
-                      htmlFor="categoryName"
-                      value="Danh mục sản phẩm"
+                      htmlFor="brandName"
+                      value="Tên thương hiệu"
                     />
                   </div>
                   <TextInput
-                    id="categoryName"
-                    name="categoryName"
-                    placeholder="Tên danh mục sản phẩm"
+                    id="brandName"
+                    name="brandName"
+                    placeholder="Nhập tên thương hiệu"
                     required
                     type="text"
-                    value={data.categoryName}
+                    value={data.brandName}
                     onChange={handleChangeInput}
                   />
 									<p class="mt-1 text-sm text-red-500"> 
-										{error.categoryName}
+										{error.brandName}
 									</p>
                 </div>
               </div>
@@ -168,13 +168,13 @@ export default function UpdateBrand(props) {
                 <div className="mb-2 block">
                   <Label
                     htmlFor="description"
-                    value="Mô tả danh mục sản phẩm"
+                    value="Mô tả thương hiệu"
                   />
                 </div>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Mô tả danh mục sản phẩm"
+                  placeholder="Mô tả thương hiệu"
                   required
                   rows={4}
                   value={data.description}
