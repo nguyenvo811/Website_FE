@@ -81,6 +81,22 @@ export default function AllProduct() {
     }
   });
 
+  const handleClickDetails = useCallback(
+		async (val) => {
+			// Define the logic for handling click details
+			console.log("Item Clicked:", val);
+
+			// Example: Navigate to the product details page
+			const productNameSlug = slugify(val?.productName, { lower: true, locale: 'vi' });
+			const productPath = `/chi-tiet-san-pham/${productNameSlug}`;
+
+			navigate({
+				pathname: productPath
+			}, {state : { product: val?._id }});
+		},
+		[navigate]
+	);
+
   let sort = [
     { _id: 1, value: "Mới nhất" },
     { _id: 2, value: "Giá từ thấp đến cao" },
@@ -230,7 +246,7 @@ export default function AllProduct() {
               <div className="mt-2.5">
                 <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
                 <div className="">
-                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                  <button onClick={() => handleClickDetails(val)} className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
                     Tham khảo
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +290,7 @@ export default function AllProduct() {
               <div className="mt-2.5">
                 <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
                 <div className="">
-                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                  <button onClick={() => handleClickDetails(val)} className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
                     Tham khảo
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -318,7 +334,7 @@ export default function AllProduct() {
               <div className="mt-2.5">
                 <span className="text-xl font-bold text-gray-900"><FormatCurrency price={val?.variants[0]?.price} /></span>
                 <div className="">
-                  <button className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
+                  <button onClick={() => handleClickDetails(val)} className="mt-2.5 rounded-md bg-yellow-400 px-4 py-2 text-white text-sm font-medium transition hover:bg-yellow-500 flex items-center justify-center">
                     Tham khảo
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

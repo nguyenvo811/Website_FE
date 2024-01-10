@@ -1,5 +1,6 @@
 import './App.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LayoutAdmin from './adminPage/layout/LayoutAdmin';
 import ProductTable from './adminPage/page/product/ProductTable';
 import Authentication from './adminPage/page/Authentication';
@@ -19,8 +20,22 @@ import AllNews from './clientPage/page/AllNews';
 import Contact from './clientPage/page/Contact';
 import ContactTable from './adminPage/page/contact/ContactTable';
 import CustomerTable from './adminPage/page/customer/CustomerTable';
+import { viewProfile } from './api/apiServices';
 
 function App() {
+  const [isSignIn, setIsSignIn] = useState(null);
+
+  useEffect(() => {
+    viewProfile()
+      .then(res => {
+        console.log(res.data.data)
+        setIsSignIn(true);
+      })
+      .catch(error => {
+        setIsSignIn(false);
+      })
+  }, []);
+
   return (
     <div className="App">
       <BrowserRouter>
@@ -37,14 +52,22 @@ function App() {
             <Route path='/san-pham/:categoryName?/:search?' element={<AllProduct />} />
           </Route>
           <Route index path='/dang-nhap' element={<Authentication />} />
-          <Route element={<LayoutAdmin />}>
-            <Route index path='/quan-ly/san-pham' element={<ProductTable />} />
-            <Route path='/quan-ly/danh-muc' element={<CategoryTable />} />
-            <Route path='/quan-ly/nguoi-dung' element={<UserTable />} />
-            <Route path='/quan-ly/nhan-hieu' element={<BrandTable />} />
-            <Route path='/quan-ly/tin-tuc' element={<NewsTable />} />
-            <Route path='/quan-ly/lien-he' element={<ContactTable />} />
-            <Route path='/quan-ly/khach-hang' element={<CustomerTable />} />
+          <Route
+            element={isSignIn === null ? (
+              <div>Loading...</div>
+            ) : isSignIn ? (
+              <LayoutAdmin />
+            ) : (
+              <Navigate to="/" replace={true} />
+            )}
+          >
+            <Route index path="/quan-ly/san-pham" element={<ProductTable />} />
+            <Route path="/quan-ly/danh-muc" element={<CategoryTable />} />
+            <Route path="/quan-ly/nguoi-dung" element={<UserTable />} />
+            <Route path="/quan-ly/nhan-hieu" element={<BrandTable />} />
+            <Route path="/quan-ly/tin-tuc" element={<NewsTable />} />
+            <Route path="/quan-ly/lien-he" element={<ContactTable />} />
+            <Route path="/quan-ly/khach-hang" element={<CustomerTable />} />
           </Route>
         </Routes>
       </BrowserRouter>

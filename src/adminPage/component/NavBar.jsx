@@ -6,10 +6,13 @@ import "react-toggle/style.css"
 import { viewProfile } from "../../api/apiServices";
 import ChangePassword from "../page/user/ChangePassword";
 import Logo from '../../asset/img/LOGO.png';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export default function NavBar() {
 	const navigate = useNavigate();
 	const [showSearch, setShowSearch] = useState(false);
+	const [isSignIn, setIsSignIn] = useState(false);
+	const [isDropdownOpen, setDropdownOpen] = React.useState(false);
 	const [profile, setProfile] = useState([]);
 	const [open, setOpen] = React.useState(false);
 
@@ -31,6 +34,7 @@ export default function NavBar() {
 			.then(res => {
 				console.log(res.data.data)
 				setProfile(res.data.data)
+				setIsSignIn(true)
 			})
 			.catch(error => {
 				console.log(error)
@@ -59,10 +63,58 @@ export default function NavBar() {
 						<div className="flex items-center">
 							<div className="flex items-center ml-3">
 								<div>
-									<button type="button" className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" aria-expanded="false" data-dropdown-toggle="dropdown-user">
-										<span className="sr-only">Open user menu</span>
-										<img className="w-8 h-8 rounded-full object-cover object-center" src={profile.image} />
-									</button>
+								{!isSignIn ? (
+                <button
+                  type="button"
+                  class="ml-2 flex cursor-pointer items-center gap-x-1 rounded-md py-2 px-4 bg-green-400 hover:text-gray-800 hover:bg-gray-100"
+                  onClick={() => navigate("/sign-in")}
+                >
+                  <span class="text-sm font-medium">Sign in</span>
+                </button>
+              ) : (
+                <>
+
+                  <button
+                    type="button"
+                    className="text-sm"
+                    onMouseOver={() => setDropdownOpen(true)}
+                  >
+                    <span className="sr-only">Open user menu</span>
+                    <AccountCircleIcon />
+                  </button>
+
+                  {isDropdownOpen && (
+                    <div
+                      className="absolute right-0 top-10 z-10 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
+                      id="dropdown-user"
+                      onMouseLeave={() => setDropdownOpen(false)}
+                    >
+                      <div className="px-4 py-3" role="none">
+                        <p className="text-sm text-gray-900 dark:text-white" role="none">
+                          {profile.fullName}
+                        </p>
+                        <p className="text-sm font-medium text-gray-900 truncate " role="none">
+                          {profile.email}
+                        </p>
+                      </div>
+                      <ul className="py-1" role="none">
+                       { profile?.role === "Admin" || profile?.role === "Staff"?
+                        <li>
+                          <a onClick={() => navigate("/managements/products")} className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Management</a>
+                        </li>
+                        : ""}
+                        <li>
+                          <a className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Change password</a>
+                        </li>
+                        <li>
+                          <a onClick={() => handleLogOut()}
+                            className="cursor-pointer block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
 								</div>
 								<div className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
 									<div className="px-4 py-3" role="none">

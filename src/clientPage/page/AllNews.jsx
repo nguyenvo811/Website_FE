@@ -44,7 +44,7 @@ export default function AllNews() {
   const endIndex = startIndex + 10;
   const currentPageData = location?.state?.data.slice(startIndex, endIndex);
 
-  const listNews = currentPageData.map((val, index) => {
+  const listNews = currentPageData?.map((val, index) => {
     return (
       <div href="#" key={index} class="lg:basis-[calc(100%/2-16px)] flex-wrap grid grid-cols-2 items-center bg-white border border-gray-200 rounded-lg shadow max-w-screen-lg hover:bg-gray-100">
         <div className="w-full h-[200px] lg:h-[400px] m-auto">

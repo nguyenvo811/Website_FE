@@ -59,7 +59,6 @@ export default function ProductTable() {
 const Table = function () {
 
 	// Add product dialog
-	const [loading, setLoading] = React.useState(true);
 	const [open, setOpen] = React.useState(false);
 	const [openUpdate, setOpenUpdate] = React.useState(false);
 	const [openAlert, setOpenAlert] = React.useState(false);
@@ -77,44 +76,15 @@ const Table = function () {
 	const apiRef = React.useRef(null);
 
 	React.useEffect(() => {
-		const fetchDataAndComplete = async () => {
-			try {
-				const startTime = Date.now(); // Record the start time
-
-				const fetchDataPromise = new Promise((resolve) => {
-					const endTime = Date.now(); // Record the end time
-					// Calculate the time it took to fetch the data
-					const fetchTime = endTime - startTime;
-
-					// Use the fetchTime to set the delay
-					const delayTime = fetchTime < 2000 ? 2000 - fetchTime : 0;
-	
-				// Fetch data after the delay
-					setTimeout(() => {
-						getProducts()
-							.then((res) => {
-								setData(res.data.data);
-								console.log(res.data.data);
-								resolve(); // Resolve the promise after data is fetched
-							})
-							.catch((err) => {
-								console.log(err);
-								resolve(); // Resolve the promise even if an error occurs
-							});
-					}, delayTime);
-				});
-	
-				// Wait for the data to be fetched before setting loading to false
-				await fetchDataPromise;
-			} catch (error) {
-				console.error('Error fetching data:', error);
-			} finally {
-				setLoading(false);
-			}
-		};
-	
-		fetchDataAndComplete();
-	}, []);
+		getProducts()
+		  .then(res => {
+			setData(res.data.data)
+			console.log(res.data.data)
+		  })
+		  .catch(err => {
+			console.log(err); 
+		  }) 
+	  }, [])
 
 	// Update the row.
 	const updateRow = async (value) => {
@@ -201,9 +171,7 @@ const Table = function () {
 
 	return (
 		<div>
-			{loading ? (
-				<Progress />
-			) : (
+			
 				<div>
 					<div className="flex pb-4 justify-end">
 						<Button variant="outlined" onClick={handleClickOpen}>
@@ -227,7 +195,6 @@ const Table = function () {
 					<UpdateProduct open={openUpdate} close={() => setOpenUpdate(false)} row={updateRow} data={rows} setData={setRows} />
 					<AlertProduct open={openAlert} close={() => setOpenAlert(false)} handleRemove={() => removeRow()} />
 				</div>
-			)}
 		</div>
 	)
 }
